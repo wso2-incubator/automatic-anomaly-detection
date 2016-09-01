@@ -48,7 +48,7 @@ public class GarbageCollectorBean {
     /**
      * Constructor
      *
-     * Obtain the Garbage Collection MX beans from any given Server Connection to the JVM
+     * Obtain the Garbage Collection MX beans from any given Server Connection to the JVMs
      * Construct the obj using those GC beans
      *
      * @param serverConnection
