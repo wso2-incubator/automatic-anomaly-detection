@@ -70,7 +70,7 @@ public class Connector {
                 if (connector != null){
                     connector.disconnectFromVM();
                 }
-                connector =  new Connector(pid);
+                connector = new Connector(pid);
                 return  connector;
 
             } catch (IOException e) {
@@ -85,24 +85,28 @@ public class Connector {
 
     /**
      * Create the MBeanServerConnection
-     * This server connection can be used to get the Bean objects from the monitoring VM
+     * This server connection can be used to get the UsageBean objects from the monitoring VM
      *
      * @return {MBeanServerConnection} Server Connection
      * @throws AgentLoadException
      * @throws AgentInitializationException
      * @throws IOException
      */
-    public MBeanServerConnection connectToVM() throws AgentLoadException, AgentInitializationException, IOException, AttachNotSupportedException {
+    public MBeanServerConnection getServerConnection() throws IOException, AgentLoadException, AgentInitializationException {
 
 
+        //print properties of connected VM
         System.out.println("Connected to "+vm.id());
         System.out.println("System Properties:");
+
         for(Map.Entry<?,?> en:vm.getSystemProperties().entrySet())
             System.out.println("\t"+en.getKey()+" = "+en.getValue());
+
         System.out.println();
 
 
         String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+
         if(connectorAddress == null)
         {
             System.out.println("loading agent");
@@ -110,12 +114,17 @@ public class Connector {
             String home  = props.getProperty("java.home");
             String agent = home+ File.separator+"lib"+File.separator+"management-agent.jar";
             vm.loadAgent(agent);
+
             connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
             while(connectorAddress==null) try {
                 Thread.sleep(1000);
                 connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
-            } catch(InterruptedException ex){}
+            }
+            catch(InterruptedException e){
+                e.printStackTrace();
+            }
         }
+
         JMXConnector c= JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
         return c.getMBeanServerConnection();
     }
