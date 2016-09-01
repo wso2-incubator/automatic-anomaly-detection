@@ -38,67 +38,70 @@ import java.util.Set;
 
 /**
  * Manage the Garbage Collection logs from any connected JVMs
+ *
  */
-public class GarbageCollectionBean {
+public class GarbageCollectorBean {
 
-
+    List<GarbageCollectorMXBean> gcBeans;
+    List<Map<String, String>> gcUsages;
 
     /**
+     * Constructor
+     *
      * Obtain the Garbage Collection MX beans from any given Server Connection to the JVM
+     * Construct the obj using those GC beans
+     *
      * @param serverConnection
      * @return {List<GarbageCollectorMXBean>} list of GC MX beans
      * @throws InterruptedException
      * @throws MalformedObjectNameException
      */
-    public List<GarbageCollectorMXBean> getGarbageCollectionBeans(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
+    public GarbageCollectorBean(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
 
         Set<ObjectName> gcnames = serverConnection.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
-        List<GarbageCollectorMXBean> gcBeans = new ArrayList<>(gcnames.size());
+        this.gcBeans = new ArrayList<>(gcnames.size());
 
-        for (ObjectName on : gcnames) {
-            gcBeans.add(ManagementFactory.newPlatformMXBeanProxy(serverConnection, on.toString(), GarbageCollectorMXBean.class));
-        }
-        return gcBeans;
-    }
-
-
-
-    public  void installGCMonitoring() throws MalformedObjectNameException, InterruptedException, IOException {
-
+        GarbageCollectorMXBean gcbean;
         //get all the GarbageCollectorMXBeans - there's one for each heap generation
         //so probably two - the old generation and young generation
-        List<GarbageCollectorMXBean> gcbeans = getGarbageCollectionBeans(null);
-        //Install a notifcation handler for each beans
-        for (GarbageCollectorMXBean gcbean : gcbeans) {
-            System.out.println(gcbean);
+        for (ObjectName on : gcnames) {
+            gcbean = ManagementFactory.newPlatformMXBeanProxy(serverConnection, on.toString(), GarbageCollectorMXBean.class);
+            gcBeans.add(gcbean);
+
             NotificationEmitter emitter = (NotificationEmitter) gcbean;
-            //use an anonymously generated listener for this example
-            // - proper code should really use a named class
+
             NotificationListener listener = new NotificationListener() {
-                //keep a count of the total time spent in GCs
-                long totalGcDuration = 0;
-                //implement the notifier callback handler
+
+                long totalGcDuration = 0;   //keep a count of the total time spent in GCs
+
+                /**
+                 *  implement the notifier callback handler
+                 */
                 @Override
                 public void handleNotification(Notification notification, Object handback) {
 
                     System.out.println("handleNotification started");
-                    //we only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+
+                    //only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
                     if (notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
+
                         //get the information associated with this notification
                         GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
                         //get all the info and pretty print it
                         long duration = info.getGcInfo().getDuration();
                         String gctype = info.getGcAction();
+
                         if ("end of minor monitor.GC".equals(gctype)) {
                             gctype = "Young Gen monitor.GC";
                         } else if ("end of major monitor.GC".equals(gctype)) {
                             gctype = "Old Gen monitor.GC";
                         }
+
                         System.out.println();
                         System.out.println(gctype + ": - " + info.getGcInfo().getId()+ " " + info.getGcName() + " (from " + info.getGcCause()+") "+duration + " microseconds; start-end times " + info.getGcInfo().getStartTime()+ "-" + info.getGcInfo().getEndTime());
-                        //System.out.println("GcInfo CompositeType: " + info.getGcInfo().getCompositeType());
-                        //System.out.println("GcInfo MemoryUsageAfterGc: " + info.getGcInfo().getMemoryUsageAfterGc());
-                        //System.out.println("GcInfo MemoryUsageBeforeGc: " + info.getGcInfo().getMemoryUsageBeforeGc());
+                        System.out.println("GcInfo CompositeType: " + info.getGcInfo().getCompositeType());
+                        System.out.println("GcInfo MemoryUsageAfterGc: " + info.getGcInfo().getMemoryUsageAfterGc());
+                        System.out.println("GcInfo MemoryUsageBeforeGc: " + info.getGcInfo().getMemoryUsageBeforeGc());
 
                         //Get the information about each memory space, and pretty print it
                         Map<String, MemoryUsage> membefore = info.getGcInfo().getMemoryUsageBeforeGc();
@@ -122,44 +125,14 @@ public class GarbageCollectionBean {
                         System.out.println("monitor.GC cumulated overhead "+(percent/10)+"."+(percent%10)+"%");
                     }
                 }
+
             };
 
-            //Add the listener
-
             emitter.addNotificationListener(listener, null, null);
-
-
-            while (true){
-
-
-                int iteratorValue = 10;
-
-                for (int outerIterator = 1; outerIterator < 20000; outerIterator++) {
-//            System.out.println(" 1 Iteration " + outerIterator + " Free Mem: " + Runtime.getRuntime().freeMemory());
-
-                    int loop1 = 2;
-                    int[] memoryFillIntVar = new int[iteratorValue];
-
-                    // feel memoryFillIntVar array in loop..
-                    do {
-                        memoryFillIntVar[loop1] = 0;
-                        loop1--;
-                    } while (loop1 > 0);
-
-                    //increase the length of next array
-                    iteratorValue = (int)(iteratorValue * 1) + 10000;
-//            System.out.println("\nRequired Memory for next loop: " + iteratorValue);
-
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-
-
-                }
-            }
         }
+
+
+
     }
+
 }
