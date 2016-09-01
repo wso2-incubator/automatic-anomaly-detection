@@ -1,22 +1,5 @@
 package monitor.beans;
 
-import com.sun.management.GarbageCollectionNotificationInfo;
-import javax.management.MBeanServerConnection;
-import javax.management.MalformedObjectNameException;
-import javax.management.Notification;
-import javax.management.NotificationEmitter;
-import javax.management.NotificationListener;
-import javax.management.ObjectName;
-import javax.management.openmbean.CompositeData;
-import java.io.IOException;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -35,10 +18,29 @@ import java.util.Set;
 * under the License.
 */
 
+import com.sun.management.GarbageCollectionNotificationInfo;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.Notification;
+import javax.management.NotificationEmitter;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
+import java.io.IOException;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
 /**
- * Collect the Garbage Collection logs from any connected JVMs
+ * Manage the Garbage Collection logs from any connected JVMs
  */
 public class GarbageCollectionBean {
+
 
 
     /**
@@ -66,7 +68,7 @@ public class GarbageCollectionBean {
         //get all the GarbageCollectorMXBeans - there's one for each heap generation
         //so probably two - the old generation and young generation
         List<GarbageCollectorMXBean> gcbeans = getGarbageCollectionBeans(null);
-        //Install a notifcation handler for each bean
+        //Install a notifcation handler for each beans
         for (GarbageCollectorMXBean gcbean : gcbeans) {
             System.out.println(gcbean);
             NotificationEmitter emitter = (NotificationEmitter) gcbean;
