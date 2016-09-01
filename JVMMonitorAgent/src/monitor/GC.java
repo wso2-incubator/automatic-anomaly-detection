@@ -1,7 +1,31 @@
 package monitor;
 
+import com.sun.management.GarbageCollectionNotificationInfo;
+import com.sun.tools.attach.*;
+
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.Notification;
+import javax.management.NotificationEmitter;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+import java.io.File;
+import java.io.IOException;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryUsage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 /*
-*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -18,29 +42,90 @@ package monitor;
 * under the License.
 */
 
-import com.sun.management.GarbageCollectionNotificationInfo;
-
-import javax.management.Notification;
-import javax.management.NotificationEmitter;
-import javax.management.NotificationListener;
-import javax.management.openmbean.CompositeData;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.MemoryUsage;
-import java.util.List;
-import java.util.Map;
 
 public class GC {
 
-    public static void main(String[] args) {
+    static final String CONNECTOR_ADDRESS =
+            "com.sun.management.jmxremote.localConnectorAddress";
+
+
+    public static void main(String[] args) throws InterruptedException , MalformedObjectNameException{
         installGCMonitoring();
+//        printStats("5164");
     }
 
 
-    public static void installGCMonitoring(){
+
+    public static List<GarbageCollectorMXBean> printStats(String id) throws InterruptedException, MalformedObjectNameException {
+        try
+        {
+
+            VirtualMachine vm=VirtualMachine.attach(id);
+            System.out.println("Connected to "+vm.id());
+            System.out.println("System Properties:");
+            for(Map.Entry<?,?> en:vm.getSystemProperties().entrySet())
+                System.out.println("\t"+en.getKey()+" = "+en.getValue());
+            System.out.println();
+            try
+            {
+                MBeanServerConnection mbs = connect(vm);
+                Set<ObjectName> gcnames = mbs.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
+                List<GarbageCollectorMXBean> gcBeans = new ArrayList<>(gcnames.size());
+                for(ObjectName on: gcnames) {
+                    gcBeans.add(ManagementFactory.newPlatformMXBeanProxy(mbs, on.toString(), GarbageCollectorMXBean.class));
+                }
+
+//                MBeanServerConnection sc=connect(vm);
+//                GarbageCollectorMXBean[] gcs = ManagementFactory.newPlatformMXBeanProxy(sc, ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE+ " ,name=*", GarbageCollectorMXBean.class);
+//                System.out.println();
+
+//                while (true) {
+//                    Thread.sleep(100);
+//                    System.out.println("Scavenger used: " + gcBeans.toArray()[0]);
+//                }
+
+                return gcBeans;
+            } catch(AgentLoadException | AgentInitializationException ex)
+            {
+                System.out.println("JMX: "+ex);
+            }
+            vm.detach();
+
+        } catch(AttachNotSupportedException | IOException ex)
+        {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+
+    static MBeanServerConnection connect(VirtualMachine vm)
+            throws AgentLoadException, AgentInitializationException, IOException
+    {
+        String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+        if(connectorAddress == null)
+        {
+            System.out.println("loading agent");
+            Properties props = vm.getSystemProperties();
+            String home  = props.getProperty("java.home");
+            String agent = home+ File.separator+"lib"+File.separator+"management-agent.jar";
+            vm.loadAgent(agent);
+            connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+            while(connectorAddress==null) try {
+                Thread.sleep(1000);
+                connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+            } catch(InterruptedException ex){}
+        }
+        JMXConnector c= JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
+        return c.getMBeanServerConnection();
+    }
+
+
+    public static void installGCMonitoring() throws MalformedObjectNameException , InterruptedException{
 
         //get all the GarbageCollectorMXBeans - there's one for each heap generation
         //so probably two - the old generation and young generation
-        List<GarbageCollectorMXBean> gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
+        List<GarbageCollectorMXBean> gcbeans = printStats("5164");
         //Install a notifcation handler for each bean
         for (GarbageCollectorMXBean gcbean : gcbeans) {
             System.out.println(gcbean);
