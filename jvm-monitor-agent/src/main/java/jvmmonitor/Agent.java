@@ -18,8 +18,11 @@ package jvmmonitor;/*
 
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
+import org.apache.log4j.Logger;
 
 public class Agent {
+
+    final static Logger logger = Logger.getLogger(Agent.class);
 
     static String pid = "6102";
 
@@ -36,10 +39,13 @@ public class Agent {
             return;
         }
         */
+        logger.error("This is error : " );
+        logger.error("This is error : " );
+        logger.error("This is error : " );
 
-        System.out.println("Currently running");
+        logger.info("Currently running");
         for (VirtualMachineDescriptor vmd : VirtualMachine.list())
-            System.out.println(vmd.id() + "\t" + vmd.displayName());
+            logger.info(vmd.id() + "\t" + vmd.displayName());
 
     }
 
