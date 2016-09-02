@@ -257,8 +257,12 @@ public class GarbageCollectionLog {
         }
     }
 
+    //====================setters and getters=============================
+    public List<GarbageCollectorMXBean> getGcBeans() {
+        return gcBeans;
+    }
 
-
-
-
+    public void setGcBeans(List<GarbageCollectorMXBean> gcBeans) {
+        this.gcBeans = gcBeans;
+    }
 }
