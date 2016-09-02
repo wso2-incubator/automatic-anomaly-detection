@@ -101,4 +101,12 @@ public class MemoryUsageLog {
         System.out.println("Pending Finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
     }
 
+    //===========getters and setters====================
+    public MemoryMXBean getMemoryMXBean() {
+        return memoryMXBean;
+    }
+
+    public void setMemoryMXBean(MemoryMXBean memoryMXBean) {
+        this.memoryMXBean = memoryMXBean;
+    }
 }
