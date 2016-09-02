@@ -1,4 +1,4 @@
-package sendData;
+package communicator;
 
 /*
 *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -29,9 +29,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.io.File;
-import java.lang.management.MemoryMXBean;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class HttpdLogAgent {
@@ -39,7 +37,7 @@ public class HttpdLogAgent {
     private static final String VERSION = "1.0.0";
     private static final int defaultThriftPort = 7611;
     private static final int defaultBinaryPort = 9611;
-    private static final String pid = "10999";
+    private static final String pid = "14005";
 
     public static void main(String[] args) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -96,9 +94,9 @@ public class HttpdLogAgent {
         while (true) {
             System.out.println("Publish Memory data : " + i);
 
-            MemoryMonitor agentObj = new MemoryMonitor();
-            MemoryMXBean mxb = agentObj.getMemoryBean(pid);
-            ArrayList gcData = agentObj.getRamInfoHtml(mxb);
+//            MemoryMonitor agentObj = new MemoryMonitor();
+//            MemoryMXBean mxb = agentObj.getMemoryBean(pid);
+//            ArrayList gcData = agentObj.getRamInfoHtml(mxb);
 
 //            Event event = new Event(streamId, System.currentTimeMillis(), new Object[]{"external"}, null,
 //                    new Object[]{gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
