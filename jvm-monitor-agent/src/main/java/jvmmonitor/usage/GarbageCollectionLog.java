@@ -1,4 +1,4 @@
-package monitor.beans;
+package jvmmonitor.usage;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -43,7 +43,7 @@ import java.util.Set;
  * Manage the Garbage Collection logs from any connected JVMs
  *
  */
-public class GarbageCollectorBean {
+public class GarbageCollectionLog {
 
     List<GarbageCollectorMXBean> gcBeans;
     List<Map<String, String>> gcUsages;
@@ -96,7 +96,7 @@ public class GarbageCollectorBean {
      * @throws InterruptedException
      * @throws MalformedObjectNameException
      */
-    public GarbageCollectorBean(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
+    public GarbageCollectionLog(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
 
         this.gcUsages = new ArrayList<Map<String, String>>();
 
@@ -115,6 +115,7 @@ public class GarbageCollectorBean {
             emitter.addNotificationListener(listener, null, null);
         }
     }
+
 
     /**
      * Implements a notification listener to listen notifications happens after Garbage collection
@@ -235,6 +236,9 @@ public class GarbageCollectorBean {
             }
         }
     }
-    
+
+
+
+
 
 }

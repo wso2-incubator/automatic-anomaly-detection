@@ -1,4 +1,4 @@
-package monitor.server;
+package jvmmonitor.server;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -35,12 +35,12 @@ import java.util.Properties;
 /**
  * Provide the connection to running JVMs
  */
-public class Connector {
+public class Connection {
 
     private String pid;
     private VirtualMachine vm;
 
-    private static Connector connector;
+    private static Connection connection;
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
 
     /**
@@ -48,7 +48,7 @@ public class Connector {
      *
      * @param pid process id of monitoring VM
      */
-    private Connector(String pid) throws IOException, AttachNotSupportedException {
+    private Connection(String pid) throws IOException, AttachNotSupportedException {
         this.pid = pid;
         vm = VirtualMachine.attach(pid);
     }
@@ -63,15 +63,15 @@ public class Connector {
      *
      * @return Connector obj
      */
-    static Connector getConnector(String pid){
+    static Connection getConnector(String pid){
         if (pid != null){
 
             try {
-                if (connector != null){
-                    connector.disconnectFromVM();
+                if (connection != null){
+                    connection.disconnectFromVM();
                 }
-                connector = new Connector(pid);
-                return  connector;
+                connection = new Connection(pid);
+                return  connection;
 
             } catch (IOException e) {
                 e.printStackTrace();

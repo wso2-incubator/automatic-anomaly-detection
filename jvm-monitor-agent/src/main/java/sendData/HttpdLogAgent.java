@@ -18,7 +18,6 @@ package sendData;
 * under the License.
 */
 
-import monitor.MemoryMonitor;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;

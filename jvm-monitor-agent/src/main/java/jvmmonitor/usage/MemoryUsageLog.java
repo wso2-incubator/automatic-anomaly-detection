@@ -1,4 +1,4 @@
-package monitor.beans;
+package jvmmonitor.usage;
 
 /*
 *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -18,24 +18,12 @@ package monitor.beans;
 * under the License.
 */
 
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import org.omg.CORBA.PUBLIC_MEMBER;
-
 import javax.management.MBeanServerConnection;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
-import java.io.File;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import static java.lang.management.ManagementFactory.MEMORY_MXBEAN_NAME;
 import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
@@ -43,7 +31,7 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 /**
  * Manage MemoryMXBeans from given JVM Connections
  */
-public class MemoryBean {
+public class MemoryUsageLog {
 
     private MemoryMXBean memoryMXBean ;
 
@@ -66,7 +54,7 @@ public class MemoryBean {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MemoryBean(MBeanServerConnection serverConnection) throws InterruptedException, IOException  {
+    public MemoryUsageLog(MBeanServerConnection serverConnection) throws InterruptedException, IOException  {
         this.memoryMXBean = newPlatformMXBeanProxy(serverConnection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
     }
 
