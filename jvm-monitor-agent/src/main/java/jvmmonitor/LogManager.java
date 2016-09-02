@@ -9,15 +9,11 @@ import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.management.GarbageCollectionLog;
 import jvmmonitor.management.MemoryUsageLog;
 import jvmmonitor.server.Connection;
-
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
-import java.lang.management.GarbageCollectorMXBean;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -69,6 +65,7 @@ public class LogManager {
 
         MBeanServerConnection serverConnection;
         try {
+
             serverConnection = this.connection.getServerConnection();
             if (serverConnection != null) {
                 this.garbageCollectionLog = new GarbageCollectionLog(serverConnection);
@@ -110,5 +107,7 @@ public class LogManager {
         }
     }
 
-
+    public MemoryUsageLog getMemoryUsageLog() {
+        return memoryUsageLog;
+    }
 }

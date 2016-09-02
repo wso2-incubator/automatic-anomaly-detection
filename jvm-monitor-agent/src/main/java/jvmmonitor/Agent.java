@@ -16,30 +16,58 @@ package jvmmonitor;/*
 * under the License.
 */
 
+import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
+import jvmmonitor.exceptions.MonitoringNotStartedException;
+import jvmmonitor.management.MemoryUsageLog;
+import org.apache.log4j.Logger;
+
+import javax.management.MalformedObjectNameException;
+import java.io.IOException;
+import java.util.Map;
 
 public class Agent {
 
-    static String pid = "6102";
+    final static Logger logger = Logger.getLogger(Agent.class);
+
+    static String pid = "6251";
 
     //private static MemoryMonitor memoryMonitor = new MemoryMonitor();
 
     public static void main(String[] args) throws InterruptedException {
 
-        /*
-        if(args.length!=1) {
-            System.err.println("Usage: java Agent <pid>");
-        }
-        else
-        if (memoryMonitor.printStats(pid)) {
-            return;
-        }
-        */
 
-        System.out.println("Currently running");
+        logger.info("Currently running");
         for (VirtualMachineDescriptor vmd : VirtualMachine.list())
-            System.out.println(vmd.id() + "\t" + vmd.displayName());
+            logger.info(vmd.id() + "\t" + vmd.displayName());
+
+        try {
+            LogManager logManager = new LogManager(pid);
+            logManager.stratMonitoring();
+
+
+            while (true) {
+                logManager.getMemoryUsageLog().printMemoryUsage();
+                Map<String,Long> mem_usage = (Map<String,Long>)logManager.getUsageLog().get(LogManager.MEMORY_USAGE_LOG);
+                logger.info(MemoryUsageLog.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.ALLOCATED_HEAP_MEMORY))));
+                logger.info(MemoryUsageLog.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.USED_HEAP_MEMORY))));
+                logger.info(MemoryUsageLog.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.MAX_HEAP_MEMORY))));
+                logger.info(MemoryUsageLog.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.PENDING_FINALIZATIONS))));
+
+                Thread.sleep(500);
+
+                logger.info("");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AttachNotSupportedException e) {
+            e.printStackTrace();
+        } catch (MalformedObjectNameException e) {
+            e.printStackTrace();
+        } catch (MonitoringNotStartedException e) {
+            e.printStackTrace();
+        }
 
     }
 
