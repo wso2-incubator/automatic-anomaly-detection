@@ -1,4 +1,4 @@
-package jvmmonitor.usage;
+package jvmmonitor.management;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -74,7 +74,7 @@ public class GarbageCollectionLog {
     public final static String OLD_GEN_MAX_MEMORY_BEFORE_GC = "old gen max mem before GC";
 
 
-    //Memory usage types
+    //Memory management types
     private final static String EDEN_SPACE = "PS Eden Space";
     private final static String CODE_CACHE= "Code Cache";
     private final static String COMPRESSED_CLASS_SPACE = "Compressed Class Space";
@@ -118,6 +118,26 @@ public class GarbageCollectionLog {
 
 
     /**
+     * Return garbage collection usages and clean the history of management data
+     * Therefore cant return the same set management data twice
+     */
+    public List<Map<String, String>> popGCUsages() {
+
+        List<Map<String, String>> gcUsages = new ArrayList<Map<String, String>>(this.gcUsages);
+        gcUsages.clear();
+        return gcUsages;
+    }
+
+    /**
+     * return gc management logs without clearing the history
+     */
+    public List<Map<String,String>> peekGCUsage(){
+        List<Map<String, String>> gcUsages = new ArrayList<Map<String, String>>(this.gcUsages);
+        return gcUsages;
+    }
+
+
+    /**
      * Implements a notification listener to listen notifications happens after Garbage collection
      *
      */
@@ -157,20 +177,20 @@ public class GarbageCollectionLog {
                 //=========memory Usage After GC==============================
                 memoryUsageMap= gcInfo.getMemoryUsageAfterGc();
 
-                //eden space memory usage
+                //eden space memory management
                 memoryUsage = memoryUsageMap.get(EDEN_SPACE);
                 gcUsage.put(EDEN_SPACE_USED_MEMORY_AFTER_GC, String.valueOf(memoryUsage.getUsed()));
                 gcUsage.put(EDEN_SPACE_COMMITTED_MEMORY_AFTER_GC, String.valueOf(memoryUsage.getCommitted()));
                 gcUsage.put(EDEN_SPACE_MAX_MEMORY_AFTER_GC, String.valueOf(memoryUsage.getMax()));
 
 
-                //survivor space memory usage
+                //survivor space memory management
                 memoryUsage = memoryUsageMap.get(SURVIVOR_SPACE);
                 gcUsage.put(SURVIVOR_SPACE_USED_MEMORY_AFTER_GC ,String.valueOf(memoryUsage.getUsed()));
                 gcUsage.put(SURVIVOR_SPACE_COMMITTED_MEMORY_AFTER_GC, String.valueOf(memoryUsage.getCommitted()));
                 gcUsage.put(SURVIVOR_SPACE_MAX_MEMORY_AFTER_GC, String.valueOf(memoryUsage.getMax()));
 
-                //old gen space memory usage
+                //old gen space memory management
                 memoryUsage = memoryUsageMap.get(OLD_GENERATION_SPACE);
                 gcUsage.put(OLD_GEN_USED_MEMORY_AFTER_GC ,String.valueOf(memoryUsage.getUsed()));
                 gcUsage.put(OLD_GEN_COMMITTED_MEMORY_AFTER_GC, String.valueOf(memoryUsage.getCommitted()));
@@ -178,23 +198,23 @@ public class GarbageCollectionLog {
 
                 //============================================================
 
-                //===========memory usage before GC============================
+                //===========memory management before GC============================
                 memoryUsageMap= gcInfo.getMemoryUsageBeforeGc();
 
-                //eden space memory usage
+                //eden space memory management
                 memoryUsage = memoryUsageMap.get(EDEN_SPACE);
                 gcUsage.put(EDEN_SPACE_USED_MEMORY_BEFORE_GC, String.valueOf(memoryUsage.getUsed()));
                 gcUsage.put(EDEN_SPACE_COMMITTED_MEMORY_BEFORE_GC, String.valueOf(memoryUsage.getCommitted()));
                 gcUsage.put(EDEN_SPACE_MAX_MEMORY_BEFORE_GC, String.valueOf(memoryUsage.getMax()));
 
 
-                //survivor space memory usage
+                //survivor space memory management
                 memoryUsage = memoryUsageMap.get(SURVIVOR_SPACE);
                 gcUsage.put(SURVIVOR_SPACE_USED_MEMORY_BEFORE_GC ,String.valueOf(memoryUsage.getUsed()));
                 gcUsage.put(SURVIVOR_SPACE_COMMITTED_MEMORY_BEFORE_GC, String.valueOf(memoryUsage.getCommitted()));
                 gcUsage.put(SURVIVOR_SPACE_MAX_MEMORY_BEFORE_GC, String.valueOf(memoryUsage.getMax()));
 
-                //old gen space memory usage
+                //old gen space memory management
                 memoryUsage = memoryUsageMap.get(OLD_GENERATION_SPACE);
                 gcUsage.put(OLD_GEN_USED_MEMORY_BEFORE_GC ,String.valueOf(memoryUsage.getUsed()));
                 gcUsage.put(OLD_GEN_COMMITTED_MEMORY_BEFORE_GC, String.valueOf(memoryUsage.getCommitted()));
