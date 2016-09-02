@@ -1,4 +1,4 @@
-package jvmmonitor.usage;
+package jvmmonitor.management;
 
 /*
 *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -48,7 +48,7 @@ public class MemoryUsageLog {
      * Constructor
      *
      * Create a MemoryMXBean provided the ServerConnection
-     * Object created can be used to collect the Memory usage data
+     * Object created can be used to collect the Memory management data
      *
      * @param serverConnection
      * @throws InterruptedException
@@ -59,7 +59,7 @@ public class MemoryUsageLog {
     }
 
     /**
-     * Calculate the memory usage using the MemoryMXBean
+     * Calculate the memory management using the MemoryMXBean
      *
      * @return {Map<String, Long>} hash map with memory usages
      */
@@ -69,13 +69,13 @@ public class MemoryUsageLog {
 
         MemoryUsage mu;
 
-        //heap memory usage data
+        //heap memory management data
         mu = memoryMXBean.getHeapMemoryUsage();
         memUsageMap.put(MAX_HEAP_MEMORY,mu.getMax());
         memUsageMap.put(ALLOCATED_HEAP_MEMORY,mu.getCommitted());
         memUsageMap.put(USED_HEAP_MEMORY,mu.getUsed() );
 
-        //non heap memory usage data
+        //non heap memory management data
         mu = memoryMXBean.getNonHeapMemoryUsage();
         memUsageMap.put(MAX_NON_HEAP_MEMORY,mu.getMax());
         memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY,mu.getCommitted());
