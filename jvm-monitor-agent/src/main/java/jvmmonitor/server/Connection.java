@@ -63,7 +63,7 @@ public class Connection {
      *
      * @return Connector obj
      */
-    static Connection getConnector(String pid){
+    public static Connection getConnection(String pid){
         if (pid != null){
 
             try {
