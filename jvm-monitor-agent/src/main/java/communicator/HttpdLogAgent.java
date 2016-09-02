@@ -49,7 +49,7 @@ public class HttpdLogAgent {
 
         System.out.println("Starting DAS HttpLog Agent");
         String currentDir = System.getProperty("user.dir");
-        System.setProperty("javax.net.ssl.trustStore", currentDir + "/src/main/resources/client-truststore.jks");
+        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
 
         AgentHolder.setConfigPath(getDataAgentConfigPath());
@@ -75,7 +75,7 @@ public class HttpdLogAgent {
     }
 
     public static String getDataAgentConfigPath() {
-        File filePath = new File("src" + File.separator + "main" + File.separator + "resources");
+        File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
         }
@@ -104,7 +104,7 @@ public class HttpdLogAgent {
 //            dataPublisher.publish(event);
 
             Event event = new Event( streamId, System.currentTimeMillis(), null, null,
-                    new Object[]{1, "testNew7"} );
+                    new Object[]{1, "testNew8"} );
             dataPublisher.publish(event);
 
             i++;
