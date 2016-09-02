@@ -1,10 +1,16 @@
 package jvmmonitor;
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
+import com.sun.tools.attach.VirtualMachine;
+import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.management.GarbageCollectionLog;
 import jvmmonitor.management.MemoryUsageLog;
 import jvmmonitor.server.Connection;
 
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
 import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
 
@@ -32,13 +38,33 @@ public class LogManager {
     private MemoryUsageLog memoryUsageLog;
 
 
-
     public LogManager(String pid) throws IOException, AttachNotSupportedException {
-
         connection = Connection.getConnection(pid);
+    }
 
+    public boolean stratMonitoring() throws MalformedObjectNameException, InterruptedException {
 
+        MBeanServerConnection serverConnection;
+        try {
+            serverConnection = connection.getServerConnection();
+            if (serverConnection != null) {
+                garbageCollectionLog = new GarbageCollectionLog(serverConnection);
+                memoryUsageLog = new MemoryUsageLog(serverConnection);
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AgentLoadException e) {
+            e.printStackTrace();
+        } catch (AgentInitializationException e) {
+            e.printStackTrace();
+        }
 
+        System.out.println("Currently running");
+        for (VirtualMachineDescriptor vmd : VirtualMachine.list())
+            System.out.println(vmd.id() + "\t" + vmd.displayName());
+
+        return false;
 
     }
 
