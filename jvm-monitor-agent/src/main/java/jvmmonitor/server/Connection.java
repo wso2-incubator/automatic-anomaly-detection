@@ -4,6 +4,7 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
+import org.apache.log4j.Logger;
 
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
@@ -42,6 +43,9 @@ public class Connection {
 
     private static Connection connection;
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
+
+    private final static Logger logger = Logger.getLogger(Connection.class);
+
 
     /**
      * Constructor to create Connector
@@ -96,20 +100,21 @@ public class Connection {
 
 
         //print properties of connected VM
-        System.out.println("Connected to "+vm.id());
-        System.out.println("System Properties:");
+        logger.info("Connected to "+vm.id());
+        logger.debug("System Properties:");
 
         for(Map.Entry<?,?> en:vm.getSystemProperties().entrySet())
-            System.out.println("\t"+en.getKey()+" = "+en.getValue());
+            logger.debug("\t"+en.getKey()+" = "+en.getValue());
 
-        System.out.println();
+        logger.debug("==================================================");
 
 
         String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
 
         if(connectorAddress == null)
         {
-            System.out.println("loading agent");
+            logger.info("loading agent");
+
             Properties props = vm.getSystemProperties();
             String home  = props.getProperty("java.home");
             String agent = home+ File.separator+"lib"+File.separator+"management-agent.jar";

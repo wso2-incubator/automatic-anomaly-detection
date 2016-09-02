@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -66,6 +65,7 @@ public class LogManager {
 
         MBeanServerConnection serverConnection;
         try {
+
             serverConnection = this.connection.getServerConnection();
             if (serverConnection != null) {
                 this.garbageCollectionLog = new GarbageCollectionLog(serverConnection);
@@ -107,5 +107,7 @@ public class LogManager {
         }
     }
 
-
+    public MemoryUsageLog getMemoryUsageLog() {
+        return memoryUsageLog;
+    }
 }

@@ -1,5 +1,17 @@
 package jvmmonitor.management;
 
+
+import org.apache.log4j.Logger;
+import javax.management.MBeanServerConnection;
+import java.io.IOException;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.lang.management.ManagementFactory.MEMORY_MXBEAN_NAME;
+import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
+
 /*
 *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -18,15 +30,7 @@ package jvmmonitor.management;
 * under the License.
 */
 
-import javax.management.MBeanServerConnection;
-import java.io.IOException;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
-import java.util.HashMap;
-import java.util.Map;
 
-import static java.lang.management.ManagementFactory.MEMORY_MXBEAN_NAME;
-import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 
 /**
  * Manage MemoryMXBeans from given JVM Connections
@@ -43,7 +47,7 @@ public class MemoryUsageLog {
     public final static String USED_NON_HEAP_MEMORY = "used_non_heap";
     public final static String PENDING_FINALIZATIONS = "pending_final";
 
-
+    final static Logger logger = Logger.getLogger(MemoryUsageLog.class);
     /**
      * Constructor
      *
@@ -86,20 +90,20 @@ public class MemoryUsageLog {
         return memUsageMap;
     }
 
-
     /**
      *  @Test - Only for test purposes
      */
     public void printMemoryUsage(){
 
-        System.out.print("Heap:\t");
+        logger.info("Heap:\t");
         MemoryUsage mu = memoryMXBean.getHeapMemoryUsage();
-        System.out.println("allocated " + mu.getCommitted() + ", used " + mu.getUsed() + ", max " + mu.getMax());
-        System.out.print("Non-Heap:\t");
+        logger.info("allocated " + mu.getCommitted() + ", used " + mu.getUsed() + ", max " + mu.getMax());
+        logger.info("Non-Heap:\t");
         mu = memoryMXBean.getNonHeapMemoryUsage();
-        System.out.println("allocated " + mu.getCommitted() + ", used " + mu.getUsed() + ", max " + mu.getMax());
-        System.out.println("Pending Finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
+        logger.info("allocated " + mu.getCommitted() + ", used " + mu.getUsed() + ", max " + mu.getMax());
+        logger.info("Pending Finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
     }
+
 
     //===========getters and setters====================
     public MemoryMXBean getMemoryMXBean() {
