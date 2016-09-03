@@ -6,7 +6,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
-import jvmmonitor.management.GarbageCollectionLog;
+import jvmmonitor.management.GarbageCollectionMonitor;
 import jvmmonitor.management.MemoryUsageLog;
 import jvmmonitor.server.Connection;
 import javax.management.MBeanServerConnection;
@@ -39,7 +39,7 @@ import java.util.Map;
 public class LogManager {
 
     private Connection connection;
-    private GarbageCollectionLog garbageCollectionLog;
+    private GarbageCollectionMonitor garbageCollectionLog;
     private MemoryUsageLog memoryUsageLog;
 
     public final static String MEMORY_USAGE_LOG = "mem usage";
@@ -68,7 +68,7 @@ public class LogManager {
 
             serverConnection = this.connection.getServerConnection();
             if (serverConnection != null) {
-                this.garbageCollectionLog = new GarbageCollectionLog(serverConnection);
+                this.garbageCollectionLog = new GarbageCollectionMonitor(serverConnection);
                 this.memoryUsageLog = new MemoryUsageLog(serverConnection);
                 return true;
             }

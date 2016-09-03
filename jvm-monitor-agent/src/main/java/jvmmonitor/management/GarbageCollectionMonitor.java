@@ -44,7 +44,7 @@ import java.util.Set;
  * Manage the Garbage Collection logs from any connected JVMs
  *
  */
-public class GarbageCollectionLog {
+public class GarbageCollectionMonitor {
 
     List<GarbageCollectorMXBean> gcBeans;
     List<Map<String, String>> gcUsages;
@@ -97,7 +97,7 @@ public class GarbageCollectionLog {
      * @throws InterruptedException
      * @throws MalformedObjectNameException
      */
-    public GarbageCollectionLog(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
+    public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
 
         this.gcUsages = new ArrayList<Map<String, String>>();
 
