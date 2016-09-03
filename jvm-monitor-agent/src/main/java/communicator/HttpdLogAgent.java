@@ -19,10 +19,10 @@ package communicator;
 */
 
 import com.sun.tools.attach.AttachNotSupportedException;
-import jvmmonitor.LogManager;
+import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
-import jvmmonitor.management.GarbageCollectionLog;
-import jvmmonitor.management.MemoryUsageLog;
+import jvmmonitor.management.GarbageCollectionMonitor;
+import jvmmonitor.management.MemoryUsageMonitor;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -99,10 +99,10 @@ public class HttpdLogAgent {
 
     private static void publishLogEvents(DataPublisher dataPublisher, String streamId) {
 
-        LogManager logObj = null;
+        UsageMonitor logObj = null;
 
         try {
-            logObj = new LogManager(pid);
+            logObj = new UsageMonitor(pid);
             logObj.stratMonitoring();
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,19 +121,19 @@ public class HttpdLogAgent {
             try {
 
                 Map<String, Object> usagesData = logObj.getUsageLog();
-                ArrayList<Map<String, String>> gcLog = (ArrayList<Map<String, String>>) usagesData.get(LogManager.GARBAGE_COLLECTION_LOG);
-                Map<String, Long> memoryUL = (Map<String, Long>) usagesData.get(LogManager.MEMORY_USAGE_LOG);
+                ArrayList<Map<String, String>> gcLog = (ArrayList<Map<String, String>>) usagesData.get(UsageMonitor.GARBAGE_COLLECTION_LOG);
+                Map<String, Long> memoryUL = (Map<String, Long>) usagesData.get(UsageMonitor.MEMORY_USAGE_LOG);
 
                 if (gcLog.isEmpty()) {
 
                     Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                            new Object[]{memoryUL.get(MemoryUsageLog.MAX_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageLog.ALLOCATED_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageLog.USED_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageLog.MAX_NON_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageLog.ALLOCATED_NON_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageLog.USED_NON_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageLog.PENDING_FINALIZATIONS)
+                            new Object[]{memoryUL.get(MemoryUsageMonitor.MAX_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageMonitor.USED_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageMonitor.MAX_NON_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageMonitor.ALLOCATED_NON_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageMonitor.USED_NON_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageMonitor.PENDING_FINALIZATIONS)
                             });
                     dataPublisher.publish(event);
 
@@ -141,35 +141,35 @@ public class HttpdLogAgent {
                     for (Map<String, String> gcmap : gcLog) {
 
                         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                                new Object[]{gcmap.get(GarbageCollectionLog.GC_TYPE)
-                                        , gcmap.get(GarbageCollectionLog.GC_DURATION)
-                                        , gcmap.get(GarbageCollectionLog.GC_START_TIME)
-                                        , gcmap.get(GarbageCollectionLog.GC_CAUSE)
-                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_USED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_USED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_USED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_USED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_USED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_USED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_COMMITTED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_COMMITTED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_COMMITTED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_COMMITTED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_COMMITTED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_COMMITTED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_MAX_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_MAX_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_MAX_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_MAX_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_MAX_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_MAX_MEMORY_BEFORE_GC)
-                                        , memoryUL.get(MemoryUsageLog.MAX_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageLog.ALLOCATED_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageLog.USED_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageLog.MAX_NON_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageLog.ALLOCATED_NON_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageLog.USED_NON_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageLog.PENDING_FINALIZATIONS)
+                                new Object[]{gcmap.get(GarbageCollectionMonitor.GC_TYPE)
+                                        , gcmap.get(GarbageCollectionMonitor.GC_DURATION)
+                                        , gcmap.get(GarbageCollectionMonitor.GC_START_TIME)
+                                        , gcmap.get(GarbageCollectionMonitor.GC_CAUSE)
+                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_USED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_USED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_USED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_USED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_USED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_USED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_COMMITTED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_COMMITTED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_COMMITTED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_COMMITTED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_COMMITTED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_COMMITTED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_MAX_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_MAX_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_MAX_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_MAX_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_MAX_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_MAX_MEMORY_BEFORE_GC)
+                                        , memoryUL.get(MemoryUsageMonitor.MAX_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageMonitor.USED_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageMonitor.MAX_NON_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageMonitor.ALLOCATED_NON_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageMonitor.USED_NON_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageMonitor.PENDING_FINALIZATIONS)
                                 });
                         dataPublisher.publish(event);
 
