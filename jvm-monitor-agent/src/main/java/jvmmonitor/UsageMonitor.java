@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Monitor the JVM usage metrics using the Usage Log classes
  */
-public class LogManager {
+public class UsageMonitor {
 
     private Connection connection;
     private GarbageCollectionMonitor garbageCollectionMonitor;
@@ -50,7 +50,7 @@ public class LogManager {
      * @throws IOException
      * @throws AttachNotSupportedException
      */
-    public LogManager(String pid) throws IOException, AttachNotSupportedException {
+    public UsageMonitor(String pid) throws IOException, AttachNotSupportedException {
         this.connection = Connection.getConnection(pid);
     }
 
