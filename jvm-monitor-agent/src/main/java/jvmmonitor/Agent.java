@@ -20,7 +20,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
-import jvmmonitor.management.MemoryUsageLog;
+import jvmmonitor.management.MemoryUsageMonitor;
 import org.apache.log4j.Logger;
 
 import javax.management.MalformedObjectNameException;
@@ -43,17 +43,17 @@ public class Agent {
             logger.info(vmd.id() + "\t" + vmd.displayName());
 
         try {
-            LogManager logManager = new LogManager(pid);
-            logManager.stratMonitoring();
+            UsageMonitor usageMonitor = new UsageMonitor(pid);
+            usageMonitor.stratMonitoring();
 
 
             while (true) {
-                logManager.getMemoryUsageLog().printMemoryUsage();
-                Map<String,Long> mem_usage = (Map<String,Long>)logManager.getUsageLog().get(LogManager.MEMORY_USAGE_LOG);
-                logger.info(MemoryUsageLog.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.ALLOCATED_HEAP_MEMORY))));
-                logger.info(MemoryUsageLog.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.USED_HEAP_MEMORY))));
-                logger.info(MemoryUsageLog.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.MAX_HEAP_MEMORY))));
-                logger.info(MemoryUsageLog.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageLog.PENDING_FINALIZATIONS))));
+
+                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitor.MEMORY_USAGE_LOG);
+                logger.info(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY))));
+                logger.info(MemoryUsageMonitor.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.USED_HEAP_MEMORY))));
+                logger.info(MemoryUsageMonitor.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.MAX_HEAP_MEMORY))));
+                logger.info(MemoryUsageMonitor.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.PENDING_FINALIZATIONS))));
 
                 Thread.sleep(500);
 

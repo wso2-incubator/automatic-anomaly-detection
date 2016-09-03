@@ -97,7 +97,7 @@ public class GarbageCollectionMonitor {
      * @throws InterruptedException
      * @throws MalformedObjectNameException
      */
-    public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws InterruptedException, MalformedObjectNameException, IOException {
+    public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
 
         this.gcUsages = new ArrayList<Map<String, String>>();
 

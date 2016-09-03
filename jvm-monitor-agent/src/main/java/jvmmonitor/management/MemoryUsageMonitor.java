@@ -57,7 +57,7 @@ public class MemoryUsageMonitor {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MemoryUsageMonitor(MBeanServerConnection serverConnection) throws InterruptedException, IOException  {
+    public MemoryUsageMonitor(MBeanServerConnection serverConnection) throws IOException  {
         this.memoryMXBean = newPlatformMXBeanProxy(serverConnection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
     }
 
@@ -66,27 +66,31 @@ public class MemoryUsageMonitor {
      *
      * @return {Map<String, Long>} hash map with memory usages
      */
-    public Map<String, Long> getMemoryUsage(){
+    public Map<String, Long> getMemoryUsage() {
 
         Map<String,Long> memUsageMap = new HashMap<String,Long>();
 
         MemoryUsage mu;
 
-        //heap memory management data
-        mu = memoryMXBean.getHeapMemoryUsage();
-        memUsageMap.put(MAX_HEAP_MEMORY,mu.getMax());
-        memUsageMap.put(ALLOCATED_HEAP_MEMORY,mu.getCommitted());
-        memUsageMap.put(USED_HEAP_MEMORY,mu.getUsed() );
+        if (memoryMXBean != null) {
+            //heap memory management data
+            mu = memoryMXBean.getHeapMemoryUsage();
+            memUsageMap.put(MAX_HEAP_MEMORY, mu.getMax());
+            memUsageMap.put(ALLOCATED_HEAP_MEMORY, mu.getCommitted());
+            memUsageMap.put(USED_HEAP_MEMORY, mu.getUsed());
 
-        //non heap memory management data
-        mu = memoryMXBean.getNonHeapMemoryUsage();
-        memUsageMap.put(MAX_NON_HEAP_MEMORY,mu.getMax());
-        memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY,mu.getCommitted());
-        memUsageMap.put(USED_NON_HEAP_MEMORY,mu.getUsed());
+            //non heap memory management data
+            mu = memoryMXBean.getNonHeapMemoryUsage();
+            memUsageMap.put(MAX_NON_HEAP_MEMORY, mu.getMax());
+            memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY, mu.getCommitted());
+            memUsageMap.put(USED_NON_HEAP_MEMORY, mu.getUsed());
 
-        memUsageMap.put(PENDING_FINALIZATIONS,(long)(memoryMXBean.getObjectPendingFinalizationCount()));
+            memUsageMap.put(PENDING_FINALIZATIONS, (long) (memoryMXBean.getObjectPendingFinalizationCount()));
 
-        return memUsageMap;
+            return memUsageMap;
+        }else{
+            throw new NullPointerException();
+        }
     }
 
     /**
