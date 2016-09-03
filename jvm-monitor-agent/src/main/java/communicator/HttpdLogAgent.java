@@ -18,6 +18,11 @@ package communicator;
 * under the License.
 */
 
+import com.sun.tools.attach.AttachNotSupportedException;
+import jvmmonitor.LogManager;
+import jvmmonitor.exceptions.MonitoringNotStartedException;
+import jvmmonitor.management.GarbageCollectionLog;
+import jvmmonitor.management.MemoryUsageLog;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -28,9 +33,13 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
+import javax.management.MalformedObjectNameException;
 import java.io.File;
+import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Map;
 
 public class HttpdLogAgent {
     private static final String HTTPD_LOG_STREAM = "testS";
@@ -90,24 +99,87 @@ public class HttpdLogAgent {
 
     private static void publishLogEvents(DataPublisher dataPublisher, String streamId) {
 
+        LogManager logObj = null;
+
+        try {
+            logObj = new LogManager(pid);
+            logObj.stratMonitoring();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (AttachNotSupportedException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (MalformedObjectNameException e) {
+            e.printStackTrace();
+        }
+
         int i = 1;
         while (true) {
-            System.out.println("Publish Memory data : " + i);
+            System.out.println("Publish Memory data : " + i++);
 
-//            MemoryMonitor agentObj = new MemoryMonitor();
-//            MemoryMXBean mxb = agentObj.getMemoryBean(pid);
-//            ArrayList gcData = agentObj.getRamInfoHtml(mxb);
+            try {
 
-//            Event event = new Event(streamId, System.currentTimeMillis(), new Object[]{"external"}, null,
-//                    new Object[]{gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
-//                            gcData.get(5), gcData.get(6)});
-//            dataPublisher.publish(event);
+                Map<String, Object> usagesData = logObj.getUsageLog();
+                ArrayList<Map<String, String>> gcLog = (ArrayList<Map<String, String>>) usagesData.get(LogManager.GARBAGE_COLLECTION_LOG);
+                Map<String, Long> memoryUL = (Map<String, Long>) usagesData.get(LogManager.MEMORY_USAGE_LOG);
 
-            Event event = new Event( streamId, System.currentTimeMillis(), null, null,
-                    new Object[]{1, "testNew8"} );
-            dataPublisher.publish(event);
+                if (gcLog.isEmpty()) {
 
-            i++;
+                    Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                            new Object[]{memoryUL.get(MemoryUsageLog.MAX_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageLog.ALLOCATED_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageLog.USED_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageLog.MAX_NON_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageLog.ALLOCATED_NON_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageLog.USED_NON_HEAP_MEMORY)
+                                    , memoryUL.get(MemoryUsageLog.PENDING_FINALIZATIONS)
+                            });
+                    dataPublisher.publish(event);
+
+                } else {
+                    for (Map<String, String> gcmap : gcLog) {
+
+                        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                                new Object[]{gcmap.get(GarbageCollectionLog.GC_TYPE)
+                                        , gcmap.get(GarbageCollectionLog.GC_DURATION)
+                                        , gcmap.get(GarbageCollectionLog.GC_START_TIME)
+                                        , gcmap.get(GarbageCollectionLog.GC_CAUSE)
+                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_USED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_USED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_USED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_USED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_USED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_USED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_COMMITTED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_COMMITTED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_COMMITTED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_COMMITTED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_COMMITTED_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_COMMITTED_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_MAX_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.EDEN_SPACE_MAX_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_MAX_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.SURVIVOR_SPACE_MAX_MEMORY_BEFORE_GC)
+                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_MAX_MEMORY_AFTER_GC)
+                                        , gcmap.get(GarbageCollectionLog.OLD_GEN_MAX_MEMORY_BEFORE_GC)
+                                        , memoryUL.get(MemoryUsageLog.MAX_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageLog.ALLOCATED_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageLog.USED_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageLog.MAX_NON_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageLog.ALLOCATED_NON_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageLog.USED_NON_HEAP_MEMORY)
+                                        , memoryUL.get(MemoryUsageLog.PENDING_FINALIZATIONS)
+                                });
+                        dataPublisher.publish(event);
+
+                    }
+                }
+
+
+            } catch (MonitoringNotStartedException e) {
+                e.printStackTrace();
+            }
 
             try {
                 Thread.sleep(1000);
