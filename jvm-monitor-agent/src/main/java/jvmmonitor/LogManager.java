@@ -7,7 +7,7 @@ import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.management.GarbageCollectionMonitor;
-import jvmmonitor.management.MemoryUsageLog;
+import jvmmonitor.management.MemoryUsageMonitor;
 import jvmmonitor.server.Connection;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -39,8 +39,8 @@ import java.util.Map;
 public class LogManager {
 
     private Connection connection;
-    private GarbageCollectionMonitor garbageCollectionLog;
-    private MemoryUsageLog memoryUsageLog;
+    private GarbageCollectionMonitor garbageCollectionMonitor;
+    private MemoryUsageMonitor memoryUsageMonitor;
 
     public final static String MEMORY_USAGE_LOG = "mem usage";
     public final static String GARBAGE_COLLECTION_LOG = "gc_usage";
@@ -68,8 +68,8 @@ public class LogManager {
 
             serverConnection = this.connection.getServerConnection();
             if (serverConnection != null) {
-                this.garbageCollectionLog = new GarbageCollectionMonitor(serverConnection);
-                this.memoryUsageLog = new MemoryUsageLog(serverConnection);
+                this.garbageCollectionMonitor = new GarbageCollectionMonitor(serverConnection);
+                this.memoryUsageMonitor = new MemoryUsageMonitor(serverConnection);
                 return true;
             }
         } catch (IOException e) {
@@ -94,11 +94,11 @@ public class LogManager {
      */
     public Map<String, Object> getUsageLog() throws MonitoringNotStartedException {
 
-        if (memoryUsageLog != null && garbageCollectionLog != null){
+        if (memoryUsageMonitor != null && garbageCollectionMonitor != null){
             Map<String , Object> usages = new HashMap<String, Object>();
 
-            usages.put(MEMORY_USAGE_LOG , memoryUsageLog.getMemoryUsage());
-            usages.put(GARBAGE_COLLECTION_LOG , garbageCollectionLog.popGCUsages());
+            usages.put(MEMORY_USAGE_LOG , memoryUsageMonitor.getMemoryUsage());
+            usages.put(GARBAGE_COLLECTION_LOG , garbageCollectionMonitor.popGCUsages());
 
             return usages;
         }
@@ -107,7 +107,5 @@ public class LogManager {
         }
     }
 
-    public MemoryUsageLog getMemoryUsageLog() {
-        return memoryUsageLog;
-    }
+
 }

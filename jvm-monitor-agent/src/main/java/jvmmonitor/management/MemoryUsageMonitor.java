@@ -1,6 +1,5 @@
 package jvmmonitor.management;
 
-
 import org.apache.log4j.Logger;
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -13,7 +12,7 @@ import static java.lang.management.ManagementFactory.MEMORY_MXBEAN_NAME;
 import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 
 /*
-*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -35,7 +34,7 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 /**
  * Manage MemoryMXBeans from given JVM Connections
  */
-public class MemoryUsageLog {
+public class MemoryUsageMonitor {
 
     private MemoryMXBean memoryMXBean ;
 
@@ -47,7 +46,7 @@ public class MemoryUsageLog {
     public final static String USED_NON_HEAP_MEMORY = "used_non_heap";
     public final static String PENDING_FINALIZATIONS = "pending_final";
 
-    final static Logger logger = Logger.getLogger(MemoryUsageLog.class);
+    final static Logger logger = Logger.getLogger(MemoryUsageMonitor.class);
     /**
      * Constructor
      *
@@ -58,7 +57,7 @@ public class MemoryUsageLog {
      * @throws InterruptedException
      * @throws IOException
      */
-    public MemoryUsageLog(MBeanServerConnection serverConnection) throws InterruptedException, IOException  {
+    public MemoryUsageMonitor(MBeanServerConnection serverConnection) throws InterruptedException, IOException  {
         this.memoryMXBean = newPlatformMXBeanProxy(serverConnection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
     }
 
