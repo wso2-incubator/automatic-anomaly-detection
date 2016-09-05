@@ -1,4 +1,4 @@
-package jvmmonitor.management;
+package jvmmonitor.io;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
