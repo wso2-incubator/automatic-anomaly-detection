@@ -114,6 +114,7 @@ public class HttpdLogAgent {
             e.printStackTrace();
         }
 
+        /*
         int i = 1;
         while (true) {
             System.out.println("Publish Memory data : " + i++);
@@ -187,6 +188,7 @@ public class HttpdLogAgent {
                 e.printStackTrace();
             }
         }
+        */
 
 
     }

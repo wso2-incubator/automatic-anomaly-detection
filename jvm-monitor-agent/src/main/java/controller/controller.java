@@ -1,4 +1,4 @@
-package jvmmonitor.io;
+package controller;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,7 +17,5 @@ package jvmmonitor.io;
 * specific language governing permissions and limitations
 * under the License.
 */
-
-public class ServerGCLogMonitor {
-    private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/gc.log.2.current";
+public class controller {
 }
