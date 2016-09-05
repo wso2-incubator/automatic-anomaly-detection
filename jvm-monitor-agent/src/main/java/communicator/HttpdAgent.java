@@ -92,7 +92,7 @@ public class HttpdAgent {
 
     }
 
-    public void publishLogEvents(CPULoadLog cpuLog) throws DataEndpointException,
+    public void publishLogEvents(long date, CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -100,9 +100,10 @@ public class HttpdAgent {
 
         DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-        //publishLogEvents(dataPublisher, streamId);
 
-
+        Event event = new Event(streamId, date, null, null,
+                new Object[]{ cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad() });
+        dataPublisher.publish(event);
 
         dataPublisher.shutdown();
 
@@ -116,15 +117,37 @@ public class HttpdAgent {
 
         DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-        //publishLogEvents(dataPublisher, streamId);
 
-
+        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                new Object[]{ gcLog.getGcType(),
+                        gcLog.getDuration(),
+                        gcLog.getStartTime(),
+                        gcLog.getGcCause(),
+                        gcLog.getEdenUsedMemoryAfterGC(),
+                        gcLog.getEdenUsedMemoryBeforeGC(),
+                        gcLog.getSurvivorUsedMemoryAfterGC(),
+                        gcLog.getSurvivorUsedMemoryBeforeGC(),
+                        gcLog.getOldGenUsedMemoryAfterGC(),
+                        gcLog.getOldGenUsedMemoryBeforeGC(),
+                        gcLog.getEdenCommittedMemoryAfterGC(),
+                        gcLog.getEdenCommittedMemoryBeforeGC(),
+                        gcLog.getSurvivorCommittedMemoryAfterGC(),
+                        gcLog.getSurvivorCommittedMemoryBeforeGC(),
+                        gcLog.getOldGenCommittedMemoryAfterGC(),
+                        gcLog.getOldGenCommittedMemoryBeforeGC(),
+                        gcLog.getEdenMaxMemoryAfterGC(),
+                        gcLog.getEdenMaxMemoryBeforeGC(),
+                        gcLog.getSurvivorMaxMemoryAfterGC(),
+                        gcLog.getSurvivorMaxMemoryBeforeGC(),
+                        gcLog.getOldGenMaxMemoryAfterGC(),
+                        gcLog.getOldGenMaxMemoryBeforeGC()});
+        dataPublisher.publish(event);
 
         dataPublisher.shutdown();
 
     }
 
-    public void publishLogEvents(MemoryUsageLog memoryLog) throws DataEndpointException,
+    public void publishLogEvents(long date, MemoryUsageLog memoryLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -132,9 +155,17 @@ public class HttpdAgent {
 
         DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-        //publishLogEvents(dataPublisher, streamId);
 
+        Event event = new Event(streamId, date, null, null,
+                new Object[]{ memoryLog.getMaxHeapMemory(),
+                        memoryLog.getAllocatedHeapMemory(),
+                        memoryLog.getUsedHeapMemory(),
+                        memoryLog.getMaxNonHeapMemory(),
+                        memoryLog.getAllocatedNonHeapMemory(),
+                        memoryLog.getUsedNonHeapMemory(),
+                        memoryLog.getPendingFinalizations()});
 
+        dataPublisher.publish(event);
 
         dataPublisher.shutdown();
 
