@@ -21,6 +21,7 @@ package communicator;
 import com.sun.tools.attach.AttachNotSupportedException;
 import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
+import jvmmonitor.io.ExtractGCData;
 import jvmmonitor.management.GarbageCollectionMonitor;
 import jvmmonitor.management.MemoryUsageMonitor;
 import jvmmonitor.model.CPULoadLog;
@@ -39,11 +40,14 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import javax.management.MalformedObjectNameException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Scanner;
 
 public class HttpdAgent {
 
@@ -166,6 +170,48 @@ public class HttpdAgent {
                         memoryLog.getPendingFinalizations()});
 
         dataPublisher.publish(event);
+
+        dataPublisher.shutdown();
+
+    }
+
+    public void publishLogEvents(String fileName) throws DataEndpointException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointConfigurationException,
+            FileNotFoundException {
+
+        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+
+        Scanner scanner = new Scanner(new FileInputStream(fileName));
+        int i = 1;
+        while (scanner.hasNextLine()) {
+
+            String stringLog = scanner.nextLine();
+            System.out.println("Publish log event : " + i + " : " + stringLog);
+
+            ExtractGCData eObj = new ExtractGCData();
+            ArrayList gcData = eObj.getGCData(stringLog);
+
+            if(gcData==null){
+                continue;
+            }
+
+            Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                    new Object[]{ gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
+                            gcData.get(5), gcData.get(6), gcData.get(7), gcData.get(8), gcData.get(9), gcData.get(10),
+                            gcData.get(11), gcData.get(12), gcData.get(13), gcData.get(14), gcData.get(15), gcData.get(16),
+                            gcData.get(17), gcData.get(18), gcData.get(19), gcData.get(20), gcData.get(21) });
+
+            dataPublisher.publish(event);
+
+            i++;
+        }
+
+        scanner.close();
+
 
         dataPublisher.shutdown();
 
