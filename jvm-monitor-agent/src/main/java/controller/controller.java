@@ -18,4 +18,10 @@ package controller;
 * under the License.
 */
 public class controller {
+
+    public void sendUsageData(){
+
+
+    }
+
 }
