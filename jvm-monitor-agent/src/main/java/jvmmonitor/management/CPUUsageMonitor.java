@@ -1,11 +1,10 @@
 package jvmmonitor.management;
 
 import com.sun.management.OperatingSystemMXBean;
+import jvmmonitor.model.CPULoadLog;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
-import java.lang.management.MemoryMXBean;
-import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.management.ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME;
@@ -32,8 +31,6 @@ public class CPUUsageMonitor {
 
     private OperatingSystemMXBean osMXBean;
 
-    public final static String PROCESS_CPU_LOAD = "process.load";
-    public final static String SYSTEM_CPU_LOAD = "system.load";
 
     /**
      * Constructor
@@ -47,15 +44,14 @@ public class CPUUsageMonitor {
      * Return CPU load precentages of the System and the process
      * @return
      */
-    public Map<String , Double> getCPULoads(){
+    public CPULoadLog getCPULoads(){
 
         if (osMXBean != null){
-            Map<String,Double> cpuLoads = new HashMap<String, Double>();
+            CPULoadLog cpuLoadLog = new CPULoadLog();
+            cpuLoadLog.setProcessCPULoad(osMXBean.getProcessCpuLoad());
+            cpuLoadLog.setSystemCPULoad(osMXBean.getSystemCpuLoad());
 
-            cpuLoads.put(PROCESS_CPU_LOAD , osMXBean.getProcessCpuLoad());
-            cpuLoads.put(SYSTEM_CPU_LOAD , osMXBean.getSystemCpuLoad());
-
-            return cpuLoads;
+            return cpuLoadLog;
         }else {
             throw new NullPointerException();
         }
