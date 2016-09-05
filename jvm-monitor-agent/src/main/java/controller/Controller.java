@@ -32,7 +32,7 @@ import java.io.IOException;
 * under the License.
 */
 
-public class controller {
+public class Controller {
 
     private static final String pid="33";
 
@@ -55,8 +55,8 @@ public class controller {
 
                 DASPublisher dasPublisherObj = new DASPublisher();
 
-                dasPublisherObj.publishMemoryData(usageLogObj.getMemoryUsageLog());
-                dasPublisherObj.publishCPUData(usageLogObj.getCpuLoadLog());
+                dasPublisherObj.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+                dasPublisherObj.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
                 dasPublisherObj.publishGCData(usageLogObj.getGarbageCollectionLog());
 
             try {
