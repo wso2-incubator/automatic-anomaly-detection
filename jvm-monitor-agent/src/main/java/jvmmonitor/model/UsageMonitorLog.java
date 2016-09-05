@@ -48,4 +48,12 @@ public class UsageMonitorLog {
     public void setGarbageCollectionLog(List<GarbageCollectionLog> garbageCollectionLog) {
         this.garbageCollectionLog = garbageCollectionLog;
     }
+
+    public CPULoadLog getCpuLoadLog() {
+        return cpuLoadLog;
+    }
+
+    public void setCpuLoadLog(CPULoadLog cpuLoadLog) {
+        this.cpuLoadLog = cpuLoadLog;
+    }
 }

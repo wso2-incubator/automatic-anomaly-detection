@@ -48,16 +48,16 @@ public class Agent {
 
 
             while (true) {
-
-                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitor.MEMORY_USAGE_LOG);
-                logger.info(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY))));
-                logger.info(MemoryUsageMonitor.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.USED_HEAP_MEMORY))));
-                logger.info(MemoryUsageMonitor.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.MAX_HEAP_MEMORY))));
-                logger.info(MemoryUsageMonitor.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.PENDING_FINALIZATIONS))));
-
-                Thread.sleep(500);
-
-                logger.info("");
+//
+//                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitor.MEMORY_USAGE_LOG);
+//                logger.info(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY))));
+//                logger.info(MemoryUsageMonitor.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.USED_HEAP_MEMORY))));
+//                logger.info(MemoryUsageMonitor.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.MAX_HEAP_MEMORY))));
+//                logger.info(MemoryUsageMonitor.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.PENDING_FINALIZATIONS))));
+//
+//                Thread.sleep(500);
+//
+//                logger.info("");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,8 +65,8 @@ public class Agent {
             e.printStackTrace();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
-        } catch (MonitoringNotStartedException e) {
-            e.printStackTrace();
+//        } catch (MonitoringNotStartedException e) {
+//            e.printStackTrace();
         }
 
     }
