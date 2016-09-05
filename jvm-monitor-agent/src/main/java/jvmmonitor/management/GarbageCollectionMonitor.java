@@ -3,6 +3,7 @@ package jvmmonitor.management;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import jvmmonitor.model.GarbageCollectionLog;
+import org.apache.log4j.Logger;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,9 +49,9 @@ import java.util.Set;
  */
 public class GarbageCollectionMonitor {
 
-    List<GarbageCollectorMXBean> gcBeans;
-    List<GarbageCollectionLog> gcUsages;
-
+    private List<GarbageCollectorMXBean> gcBeans;
+    private List<GarbageCollectionLog> gcUsages;
+    private long jvmStartTime;
 
     //  --<! DO NOT CHANGE!>-- Memory management types
     private final static String EDEN_SPACE = "PS Eden Space";
@@ -58,6 +60,8 @@ public class GarbageCollectionMonitor {
     private final static String SURVIVOR_SPACE = "PS Survivor Space";
     private final static String OLD_GENERATION_SPACE = "PS Old Gen";
     private final static String METASPACE = "Metaspace";
+
+    final static Logger logger = Logger.getLogger(GarbageCollectionMonitor.class);
 
 
     /**
@@ -91,6 +95,10 @@ public class GarbageCollectionMonitor {
             NotificationListener listener = new GCNotificationListener();
             emitter.addNotificationListener(listener, null, null);
         }
+
+
+        this.jvmStartTime = ManagementFactory.newPlatformMXBeanProxy(serverConnection, ManagementFactory.RUNTIME_MXBEAN_NAME , RuntimeMXBean.class).getStartTime();
+        logger.info("Start time jvm " + jvmStartTime );
     }
 
 
@@ -116,8 +124,6 @@ public class GarbageCollectionMonitor {
          */
         public void handleNotification(Notification notification, Object handback) {
 
-            System.out.println("handleNotification started");
-
             //only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
             if (notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
 
@@ -139,6 +145,9 @@ public class GarbageCollectionMonitor {
                 MemoryUsage memoryUsage;
 
                 gcInfo = info.getGcInfo();
+
+                logger.info("GC collected >> GC type :".concat(gctype).concat(" GC Start Time :")
+                        .concat(String.valueOf(gcInfo.getStartTime())) );
 
                 //=========memory Usage After GC==============================
                 memoryUsageMap= gcInfo.getMemoryUsageAfterGc();
@@ -192,10 +201,9 @@ public class GarbageCollectionMonitor {
 
 
                 //=====================general info===========================
-
                 gclog.setDuration(gcInfo.getDuration());
                 gclog.setGcCause(info.getGcCause());
-                gclog.setStartTime(gcInfo.getStartTime());
+                gclog.setStartTime(gcInfo.getStartTime() + jvmStartTime );
                 gclog.setGcType(gctype);
                 //============================================================
 
