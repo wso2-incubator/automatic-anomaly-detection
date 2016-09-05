@@ -41,7 +41,7 @@ public class GarbageCollectionLog {
     private long OldGenMaxMemoryBeforeGC;
 
     private String gcType;
-    private String startTime;
+    private long startTime;
     private double duration;
     private String gcCause;
 
@@ -197,11 +197,11 @@ public class GarbageCollectionLog {
         this.gcType = gcType;
     }
 
-    public String getStartTime() {
+    public long getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
 
