@@ -9,6 +9,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 
+import java.io.FileNotFoundException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -90,6 +91,26 @@ public class DASPublisher {
 
         agent.initialize();
         agent.publishLogEvents(date, cpuLoadLog);
+
+    }
+
+    public void publishXXgcLogData(String fileName) throws SocketException,
+            UnknownHostException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            DataEndpointException,
+            DataEndpointConfigurationException,
+            TransportException,
+            FileNotFoundException {
+
+        String HTTPD_LOG_STREAM="gcLogStream";
+        String VERSION="1.0.0";
+        int defaultThriftPort=7611;
+        int defaultBinaryPort=9611;
+        HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
+
+        agent.initialize();
+        agent.publishLogEvents(fileName);
 
     }
 
