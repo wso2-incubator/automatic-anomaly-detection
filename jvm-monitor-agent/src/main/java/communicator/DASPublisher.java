@@ -1,5 +1,7 @@
 package communicator;
 
+import jvmmonitor.model.MemoryUsageLog;
+
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -18,4 +20,6 @@ package communicator;
 * under the License.
 */
 public class DASPublisher {
+    public void publishMemoryData(MemoryUsageLog memoryUsageLog) {
+    }
 }
