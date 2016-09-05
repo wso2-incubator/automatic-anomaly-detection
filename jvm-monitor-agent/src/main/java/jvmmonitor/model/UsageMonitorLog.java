@@ -1,5 +1,7 @@
 package jvmmonitor.model;
 
+import java.util.List;
+
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -21,10 +23,10 @@ public class UsageMonitorLog {
 
 
     private MemoryUsageLog memoryUsageLog;
-    private GarbageCollectionLog garbageCollectionLog;
+    private List<GarbageCollectionLog> garbageCollectionLog;
 
 
-    public UsageMonitorLog(MemoryUsageLog memoryLog, GarbageCollectionLog garbageCollectionLog) {
+    public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog) {
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
     }
@@ -37,11 +39,11 @@ public class UsageMonitorLog {
         this.memoryUsageLog = memoryUsageLog;
     }
 
-    public GarbageCollectionLog getGarbageCollectionLog() {
+    public List<GarbageCollectionLog> getGarbageCollectionLog() {
         return garbageCollectionLog;
     }
 
-    public void setGarbageCollectionLog(GarbageCollectionLog garbageCollectionLog) {
+    public void setGarbageCollectionLog(List<GarbageCollectionLog> garbageCollectionLog) {
         this.garbageCollectionLog = garbageCollectionLog;
     }
 }
