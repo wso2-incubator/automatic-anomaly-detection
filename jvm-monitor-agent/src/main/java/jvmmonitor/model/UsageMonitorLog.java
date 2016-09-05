@@ -1,5 +1,6 @@
 package jvmmonitor.model;
 
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -21,16 +22,17 @@ import java.util.List;
 */
 public class UsageMonitorLog {
 
-
     private MemoryUsageLog memoryUsageLog;
     private List<GarbageCollectionLog> garbageCollectionLog;
     private CPULoadLog cpuLoadLog;
+    private Date date;
 
 
     public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog, CPULoadLog cpuLoadLog) {
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
         this.cpuLoadLog = cpuLoadLog;
+        this.date = new Date();
     }
 
     public MemoryUsageLog getMemoryUsageLog() {
@@ -47,6 +49,14 @@ public class UsageMonitorLog {
 
     public void setGarbageCollectionLog(List<GarbageCollectionLog> garbageCollectionLog) {
         this.garbageCollectionLog = garbageCollectionLog;
+    }
+
+    public long getDate() {
+        return date.getTime();
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public CPULoadLog getCpuLoadLog() {
