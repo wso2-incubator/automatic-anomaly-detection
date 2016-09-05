@@ -17,7 +17,7 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class CPULog {
+public class CPULoadLog {
 
     private double processCPULoad;
     private double systemCPULoad;
