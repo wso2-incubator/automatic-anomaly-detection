@@ -1,5 +1,10 @@
 package communicator;
 
+import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.model.MemoryUsageLog;
+
+import java.util.List;
+
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,5 +22,11 @@ package communicator;
 * specific language governing permissions and limitations
 * under the License.
 */
+
 public class DASPublisher {
+    public void publishMemoryData(MemoryUsageLog memoryUsageLog) {
+    }
+
+    public void publishGCData(List<GarbageCollectionLog> garbageCollectionLog) {
+    }
 }
