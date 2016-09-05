@@ -4,6 +4,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import communicator.DASPublisher;
 import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
+import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -13,6 +14,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
+import java.util.LinkedList;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -34,7 +36,7 @@ import java.io.IOException;
 
 public class Controller {
 
-    private static final String pid="33";
+    private static final String pid = "11395";
 
     public void sendUsageData() throws IOException,
             AttachNotSupportedException,
@@ -47,17 +49,17 @@ public class Controller {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        while(true){
+        while (true) {
 
-                UsageMonitor usageObj = new UsageMonitor(pid);
-                usageObj.stratMonitoring();
-                UsageMonitorLog usageLogObj = usageObj.getUsageLog();
+            UsageMonitor usageObj = new UsageMonitor(pid);
+            usageObj.stratMonitoring();
+            UsageMonitorLog usageLogObj = usageObj.getUsageLog();
 
-                DASPublisher dasPublisherObj = new DASPublisher();
+            DASPublisher dasPublisherObj = new DASPublisher();
 
-                dasPublisherObj.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
-                dasPublisherObj.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
-                dasPublisherObj.publishGCData(usageLogObj.getGarbageCollectionLog());
+            dasPublisherObj.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+            dasPublisherObj.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
+            dasPublisherObj.publishGCData(( LinkedList<GarbageCollectionLog>)usageLogObj.getGarbageCollectionLog() );
 
             try {
                 Thread.sleep(1000);
@@ -67,6 +69,21 @@ public class Controller {
 
         }
 
+
+    }
+
+    public static void main(String[] args) throws IOException,
+            AttachNotSupportedException,
+            MalformedObjectNameException,
+            InterruptedException,
+            MonitoringNotStartedException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointException,
+            DataEndpointConfigurationException{
+
+        new Controller().sendUsageData();
 
     }
 
