@@ -24,11 +24,13 @@ public class UsageMonitorLog {
 
     private MemoryUsageLog memoryUsageLog;
     private List<GarbageCollectionLog> garbageCollectionLog;
+    private CPULoadLog cpuLoadLog;
 
 
-    public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog) {
+    public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog, CPULoadLog cpuLoadLog) {
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
+        this.cpuLoadLog = cpuLoadLog;
     }
 
     public MemoryUsageLog getMemoryUsageLog() {

@@ -16,7 +16,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,7 +75,7 @@ public class GarbageCollectionMonitor {
      */
     public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
 
-        this.gcUsages = new ArrayList<GarbageCollectionLog>();
+        this.gcUsages = new LinkedList<GarbageCollectionLog>();
 
         Set<ObjectName> gcnames = serverConnection.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
         this.gcBeans = new ArrayList<GarbageCollectorMXBean>(gcnames.size());
@@ -95,23 +95,12 @@ public class GarbageCollectionMonitor {
 
 
     /**
-     * Return garbage collection usages and clean the history of management data
-     * Therefore cant return the same set management data twice
+     * Return garbage collection usages reference
      */
-    public List<GarbageCollectionLog> popGCUsages() {
-
-        List<GarbageCollectionLog> gcUsages = new ArrayList<GarbageCollectionLog>(this.gcUsages);
-        gcUsages.clear();
+    public List<GarbageCollectionLog> getGCUsages() {
         return gcUsages;
     }
 
-    /**
-     * return gc management logs without clearing the history
-     */
-    public List<GarbageCollectionLog> peekGCUsage(){
-        List<GarbageCollectionLog> gcUsages = new ArrayList<GarbageCollectionLog>(this.gcUsages);
-        return gcUsages;
-    }
 
 
     /**
