@@ -19,4 +19,5 @@ package jvmmonitor.io;
 */
 
 public class ServerGCLogMonitor {
+    private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/gc.log.2.current";
 }
