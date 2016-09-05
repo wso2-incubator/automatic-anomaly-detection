@@ -108,4 +108,16 @@ public class UsageMonitor {
     }
 
 
+    // ====================================Getters=======================
+    public GarbageCollectionMonitor getGarbageCollectionMonitor() {
+        return garbageCollectionMonitor;
+    }
+
+    public MemoryUsageMonitor getMemoryUsageMonitor() {
+        return memoryUsageMonitor;
+    }
+
+    public CPUUsageMonitor getCpuUsageMonitor() {
+        return cpuUsageMonitor;
+    }
 }
