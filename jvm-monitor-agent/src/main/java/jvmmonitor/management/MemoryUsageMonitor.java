@@ -67,9 +67,9 @@ public class MemoryUsageMonitor {
      *
      * @return {Map<String, Long>} hash map with memory usages
      */
-    public Map<String, Long> getMemoryUsage() {
+    public MemoryLog getMemoryUsage() {
 
-        Map<String,Long> memUsageMap = new HashMap<String,Long>();
+//        Map<String,Long> memUsageMap = new HashMap<String,Long>();
 
         MemoryUsage mu;
         MemoryLog memoryLog;
@@ -100,7 +100,8 @@ public class MemoryUsageMonitor {
 //            memUsageMap.put(PENDING_FINALIZATIONS, (long) (memoryMXBean.getObjectPendingFinalizationCount()));
             memoryLog.setPendingFinalizations(memoryMXBean.getObjectPendingFinalizationCount());
 
-            return memUsageMap;
+            return memoryLog;
+
         }else{
             throw new NullPointerException();
         }
