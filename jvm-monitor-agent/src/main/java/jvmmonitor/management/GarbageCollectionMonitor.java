@@ -51,7 +51,7 @@ public class GarbageCollectionMonitor {
     List<GarbageCollectionLog> gcUsages;
 
 
-    //Memory management types
+    //  --<! DO NOT CHANGE!>-- Memory management types
     private final static String EDEN_SPACE = "PS Eden Space";
     private final static String CODE_CACHE= "Code Cache";
     private final static String COMPRESSED_CLASS_SPACE = "Compressed Class Space";

@@ -45,8 +45,8 @@ public class UsageMonitor {
     private MemoryUsageMonitor memoryUsageMonitor;
     private CPUUsageMonitor cpuUsageMonitor;
 
-    public final static String MEMORY_USAGE_LOG = "mem usage";
-    public final static String GARBAGE_COLLECTION_LOG = "gc_usage";
+    public final static String MEMORY_USAGE_LOG = "memory.usage";
+    public final static String GARBAGE_COLLECTION_LOG = "gc.usage";
     /**
      * Constructor
      * @param pid
