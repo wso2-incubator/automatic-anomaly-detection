@@ -1,5 +1,19 @@
 package controller;
 
+import com.sun.tools.attach.AttachNotSupportedException;
+import communicator.DASPublisher;
+import jvmmonitor.UsageMonitor;
+import jvmmonitor.exceptions.MonitoringNotStartedException;
+import jvmmonitor.model.UsageMonitorLog;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.commons.exception.TransportException;
+
+import javax.management.MalformedObjectNameException;
+import java.io.IOException;
+
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -17,9 +31,41 @@ package controller;
 * specific language governing permissions and limitations
 * under the License.
 */
+
 public class controller {
 
-    public void sendUsageData(){
+    private static final String pid="33";
+
+    public void sendUsageData() throws IOException,
+            AttachNotSupportedException,
+            MalformedObjectNameException,
+            InterruptedException,
+            MonitoringNotStartedException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointException,
+            DataEndpointConfigurationException {
+
+        while(true){
+
+                UsageMonitor usageObj = new UsageMonitor(pid);
+                usageObj.stratMonitoring();
+                UsageMonitorLog usageLogObj = usageObj.getUsageLog();
+
+                DASPublisher dasPublisherObj = new DASPublisher();
+
+                dasPublisherObj.publishMemoryData(usageLogObj.getMemoryUsageLog());
+                dasPublisherObj.publishCPUData(usageLogObj.getCpuLoadLog());
+                dasPublisherObj.publishGCData(usageLogObj.getGarbageCollectionLog());
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
 
 
     }
