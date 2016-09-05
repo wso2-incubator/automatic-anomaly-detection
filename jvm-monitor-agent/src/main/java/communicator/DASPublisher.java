@@ -33,7 +33,7 @@ import java.util.List;
 
 public class DASPublisher {
 
-    public void publishMemoryData(MemoryUsageLog memoryUsageLog) throws SocketException,
+    public void publishMemoryData(long date, MemoryUsageLog memoryUsageLog) throws SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -48,16 +48,50 @@ public class DASPublisher {
         HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
 
         agent.initialize();
-
-        agent.publishLogEvents(memoryUsageLog);
+        agent.publishLogEvents(date, memoryUsageLog);
 
 
     }
 
-    public void publishGCData(List<GarbageCollectionLog> garbageCollectionLog) {
+    public void publishGCData(List<GarbageCollectionLog> garbageCollectionLog) throws SocketException,
+            UnknownHostException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            DataEndpointException,
+            DataEndpointConfigurationException,
+            TransportException {
+
+        String HTTPD_LOG_STREAM="gcStream";
+        String VERSION="1.0.0";
+        int defaultThriftPort=7611;
+        int defaultBinaryPort=9611;
+        HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
+
+        agent.initialize();
+        for (GarbageCollectionLog gc:garbageCollectionLog) {
+            agent.publishLogEvents(gc);
+        }
+
     }
 
-    public void publishCPUData(CPULoadLog cpuLoadLog) {
+    public void publishCPUData(long date, CPULoadLog cpuLoadLog) throws SocketException,
+            UnknownHostException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            DataEndpointException,
+            DataEndpointConfigurationException,
+            TransportException {
+
+        String HTTPD_LOG_STREAM="cpuStream";
+        String VERSION="1.0.0";
+        int defaultThriftPort=7611;
+        int defaultBinaryPort=9611;
+        HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
+
+        agent.initialize();
+        agent.publishLogEvents(date, cpuLoadLog);
+
     }
+
 
 }
