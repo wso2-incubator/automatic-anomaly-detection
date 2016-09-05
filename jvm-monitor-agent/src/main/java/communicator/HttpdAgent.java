@@ -23,6 +23,10 @@ import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.management.GarbageCollectionMonitor;
 import jvmmonitor.management.MemoryUsageMonitor;
+import jvmmonitor.model.CPULoadLog;
+import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.model.MemoryUsageLog;
+import jvmmonitor.model.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -88,19 +92,54 @@ public class HttpdAgent {
 
     }
 
-    public void publishLogEvents() throws DataEndpointException,
+    public void publishLogEvents(CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
         DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-        publishLogEvents(dataPublisher, streamId);
+        //publishLogEvents(dataPublisher, streamId);
+
+
+
         dataPublisher.shutdown();
 
     }
+
+    public void publishLogEvents(GarbageCollectionLog gcLog) throws DataEndpointException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointConfigurationException {
+
+        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+        //publishLogEvents(dataPublisher, streamId);
+
+
+
+        dataPublisher.shutdown();
+
+    }
+
+    public void publishLogEvents(MemoryUsageLog memoryLog) throws DataEndpointException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointConfigurationException {
+
+        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+        //publishLogEvents(dataPublisher, streamId);
+
+
+
+        dataPublisher.shutdown();
+
+    }
+
 
     public static String getDataAgentConfigPath() {
         File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
