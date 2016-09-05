@@ -17,7 +17,7 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class MemoryLog {
+public class MemoryUsageLog {
 
     private long maxHeapMemory;
     private long allocatedHeapMemory;
@@ -27,7 +27,7 @@ public class MemoryLog {
     private long usedNonHeapMemory;
     private long pendingFinalizations;
 
-    public MemoryLog() {
+    public MemoryUsageLog() {
         this.maxHeapMemory = 0;
         this.allocatedHeapMemory = 0;
         this.usedHeapMemory = 0;

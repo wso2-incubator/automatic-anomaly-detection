@@ -1,13 +1,11 @@
 package jvmmonitor.management;
 
-import jvmmonitor.model.MemoryLog;
+import jvmmonitor.model.MemoryUsageLog;
 import org.apache.log4j.Logger;
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.lang.management.ManagementFactory.MEMORY_MXBEAN_NAME;
 import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
@@ -67,24 +65,24 @@ public class MemoryUsageMonitor {
      *
      * @return {Map<String, Long>} hash map with memory usages
      */
-    public MemoryLog getMemoryUsage() {
+    public MemoryUsageLog getMemoryUsage() {
 
 //        Map<String,Long> memUsageMap = new HashMap<String,Long>();
 
         MemoryUsage mu;
-        MemoryLog memoryLog;
+        MemoryUsageLog memoryUsageLog;
 
         if (memoryMXBean != null) {
-            memoryLog = new MemoryLog();
+            memoryUsageLog = new MemoryUsageLog();
 
             //heap memory management data
             mu = memoryMXBean.getHeapMemoryUsage();
 //            memUsageMap.put(MAX_HEAP_MEMORY, mu.getMax());
 //            memUsageMap.put(ALLOCATED_HEAP_MEMORY, mu.getCommitted());
 //            memUsageMap.put(USED_HEAP_MEMORY, mu.getUsed());
-            memoryLog.setMaxHeapMemory(mu.getMax());
-            memoryLog.setAllocatedHeapMemory(mu.getCommitted());
-            memoryLog.setUsedHeapMemory(mu.getUsed());
+            memoryUsageLog.setMaxHeapMemory(mu.getMax());
+            memoryUsageLog.setAllocatedHeapMemory(mu.getCommitted());
+            memoryUsageLog.setUsedHeapMemory(mu.getUsed());
 
 
             //non heap memory management data
@@ -92,15 +90,15 @@ public class MemoryUsageMonitor {
 //            memUsageMap.put(MAX_NON_HEAP_MEMORY, mu.getMax());
 //            memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY, mu.getCommitted());
 //            memUsageMap.put(USED_NON_HEAP_MEMORY, mu.getUsed());
-            memoryLog.setMaxNonHeapMemory(mu.getMax());
-            memoryLog.setAllocatedNonHeapMemory(mu.getCommitted());
-            memoryLog.setUsedNonHeapMemory(mu.getUsed());
+            memoryUsageLog.setMaxNonHeapMemory(mu.getMax());
+            memoryUsageLog.setAllocatedNonHeapMemory(mu.getCommitted());
+            memoryUsageLog.setUsedNonHeapMemory(mu.getUsed());
 
 
 //            memUsageMap.put(PENDING_FINALIZATIONS, (long) (memoryMXBean.getObjectPendingFinalizationCount()));
-            memoryLog.setPendingFinalizations(memoryMXBean.getObjectPendingFinalizationCount());
+            memoryUsageLog.setPendingFinalizations(memoryMXBean.getObjectPendingFinalizationCount());
 
-            return memoryLog;
+            return memoryUsageLog;
 
         }else{
             throw new NullPointerException();
