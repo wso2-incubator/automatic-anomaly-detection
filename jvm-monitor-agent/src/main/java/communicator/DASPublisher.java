@@ -12,6 +12,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import java.io.FileNotFoundException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -42,10 +43,10 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        String HTTPD_LOG_STREAM="memoryStream";
-        String VERSION="1.0.0";
-        int defaultThriftPort=7611;
-        int defaultBinaryPort=9611;
+        String HTTPD_LOG_STREAM = "memoryStream";
+        String VERSION = "1.0.0";
+        int defaultThriftPort = 7611;
+        int defaultBinaryPort = 9611;
         HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
 
         agent.initialize();
@@ -54,7 +55,7 @@ public class DASPublisher {
 
     }
 
-    public void publishGCData(List<GarbageCollectionLog> garbageCollectionLog) throws SocketException,
+    public void publishGCData(LinkedList<GarbageCollectionLog> garbageCollectionLog) throws SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -62,15 +63,15 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        String HTTPD_LOG_STREAM="gcStream";
-        String VERSION="1.0.0";
-        int defaultThriftPort=7611;
-        int defaultBinaryPort=9611;
+        String HTTPD_LOG_STREAM = "gcStream";
+        String VERSION = "1.0.0";
+        int defaultThriftPort = 7611;
+        int defaultBinaryPort = 9611;
         HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
 
-        agent.initialize();
-        for (GarbageCollectionLog gc:garbageCollectionLog) {
-            agent.publishLogEvents(gc);
+
+        while(!garbageCollectionLog.isEmpty()){
+            agent.publishLogEvents( garbageCollectionLog.poll() );
         }
 
     }
@@ -83,10 +84,10 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        String HTTPD_LOG_STREAM="cpuStream";
-        String VERSION="1.0.0";
-        int defaultThriftPort=7611;
-        int defaultBinaryPort=9611;
+        String HTTPD_LOG_STREAM = "cpuStream";
+        String VERSION = "1.0.0";
+        int defaultThriftPort = 7611;
+        int defaultBinaryPort = 9611;
         HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
 
         agent.initialize();
@@ -103,10 +104,10 @@ public class DASPublisher {
             TransportException,
             FileNotFoundException {
 
-        String HTTPD_LOG_STREAM="gcLogStream";
-        String VERSION="1.0.0";
-        int defaultThriftPort=7611;
-        int defaultBinaryPort=9611;
+        String HTTPD_LOG_STREAM = "gcLogStream";
+        String VERSION = "1.0.0";
+        int defaultThriftPort = 7611;
+        int defaultBinaryPort = 9611;
         HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
 
         agent.initialize();
