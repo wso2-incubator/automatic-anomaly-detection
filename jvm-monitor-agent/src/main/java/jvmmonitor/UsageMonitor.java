@@ -6,6 +6,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
+import jvmmonitor.management.CPUUsageMonitor;
 import jvmmonitor.management.GarbageCollectionMonitor;
 import jvmmonitor.management.MemoryUsageMonitor;
 import jvmmonitor.model.UsageMonitorLog;
@@ -42,6 +43,7 @@ public class UsageMonitor {
     private Connection connection;
     private GarbageCollectionMonitor garbageCollectionMonitor;
     private MemoryUsageMonitor memoryUsageMonitor;
+    private CPUUsageMonitor cpuUsageMonitor;
 
     public final static String MEMORY_USAGE_LOG = "mem usage";
     public final static String GARBAGE_COLLECTION_LOG = "gc_usage";
@@ -71,6 +73,7 @@ public class UsageMonitor {
             if (serverConnection != null) {
                 this.garbageCollectionMonitor = new GarbageCollectionMonitor(serverConnection);
                 this.memoryUsageMonitor = new MemoryUsageMonitor(serverConnection);
+                this.cpuUsageMonitor = new CPUUsageMonitor(serverConnection);
                 return true;
             }
         } catch (IOException e) {
@@ -95,8 +98,8 @@ public class UsageMonitor {
      */
     public UsageMonitorLog getUsageLog() throws MonitoringNotStartedException {
 
-        if (memoryUsageMonitor != null && garbageCollectionMonitor != null){
-            UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(),garbageCollectionMonitor.popGCUsages());
+        if (memoryUsageMonitor != null && garbageCollectionMonitor != null && cpuUsageMonitor != null){
+            UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(),garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getCPULoads());
             return usageMonitorLog;
         }
         else{
