@@ -8,6 +8,7 @@ import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.management.GarbageCollectionMonitor;
 import jvmmonitor.management.MemoryUsageMonitor;
+import jvmmonitor.model.UsageMonitorLog;
 import jvmmonitor.server.Connection;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -92,15 +93,11 @@ public class UsageMonitor {
      * @return
      * @throws MonitoringNotStartedException
      */
-    public Map<String, Object> getUsageLog() throws MonitoringNotStartedException {
+    public UsageMonitorLog getUsageLog() throws MonitoringNotStartedException {
 
         if (memoryUsageMonitor != null && garbageCollectionMonitor != null){
-            Map<String , Object> usages = new HashMap<String, Object>();
-
-            usages.put(MEMORY_USAGE_LOG , memoryUsageMonitor.getMemoryUsage());
-            usages.put(GARBAGE_COLLECTION_LOG , garbageCollectionMonitor.popGCUsages());
-
-            return usages;
+            UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(),garbageCollectionMonitor.popGCUsages());
+            return usageMonitorLog;
         }
         else{
             throw new MonitoringNotStartedException();
