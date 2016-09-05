@@ -152,6 +152,7 @@ public class HttpdAgent {
         return filePath.getAbsolutePath() + File.separator + "data-agent-conf.xml";
     }
 
+    /*
     private static void publishLogEvents(DataPublisher dataPublisher, String streamId) {
 
         UsageMonitor logObj = null;
@@ -245,6 +246,7 @@ public class HttpdAgent {
 
 
     }
+    */
 
     public static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
         Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
