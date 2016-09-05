@@ -1,5 +1,6 @@
 package jvmmonitor.management;
 
+import jvmmonitor.model.MemoryLog;
 import org.apache.log4j.Logger;
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -38,13 +39,13 @@ public class MemoryUsageMonitor {
 
     private MemoryMXBean memoryMXBean ;
 
-    public final static String MAX_HEAP_MEMORY = "max_heap";
-    public final static String ALLOCATED_HEAP_MEMORY = "alloc_heap";
-    public final static String USED_HEAP_MEMORY = "used_heap";
-    public final static String MAX_NON_HEAP_MEMORY = "max_non_heap";
-    public final static String ALLOCATED_NON_HEAP_MEMORY = "alloc_non_heap";
-    public final static String USED_NON_HEAP_MEMORY = "used_non_heap";
-    public final static String PENDING_FINALIZATIONS = "pending_final";
+//    public final static String MAX_HEAP_MEMORY = "max_heap";
+//    public final static String ALLOCATED_HEAP_MEMORY = "alloc_heap";
+//    public final static String USED_HEAP_MEMORY = "used_heap";
+//    public final static String MAX_NON_HEAP_MEMORY = "max_non_heap";
+//    public final static String ALLOCATED_NON_HEAP_MEMORY = "alloc_non_heap";
+//    public final static String USED_NON_HEAP_MEMORY = "used_non_heap";
+//    public final static String PENDING_FINALIZATIONS = "pending_final";
 
     final static Logger logger = Logger.getLogger(MemoryUsageMonitor.class);
     /**
@@ -66,28 +67,41 @@ public class MemoryUsageMonitor {
      *
      * @return {Map<String, Long>} hash map with memory usages
      */
-    public Map<String, Long> getMemoryUsage() {
+    public MemoryLog getMemoryUsage() {
 
-        Map<String,Long> memUsageMap = new HashMap<String,Long>();
+//        Map<String,Long> memUsageMap = new HashMap<String,Long>();
 
         MemoryUsage mu;
+        MemoryLog memoryLog;
 
         if (memoryMXBean != null) {
+            memoryLog = new MemoryLog();
+
             //heap memory management data
             mu = memoryMXBean.getHeapMemoryUsage();
-            memUsageMap.put(MAX_HEAP_MEMORY, mu.getMax());
-            memUsageMap.put(ALLOCATED_HEAP_MEMORY, mu.getCommitted());
-            memUsageMap.put(USED_HEAP_MEMORY, mu.getUsed());
+//            memUsageMap.put(MAX_HEAP_MEMORY, mu.getMax());
+//            memUsageMap.put(ALLOCATED_HEAP_MEMORY, mu.getCommitted());
+//            memUsageMap.put(USED_HEAP_MEMORY, mu.getUsed());
+            memoryLog.setMaxHeapMemory(mu.getMax());
+            memoryLog.setAllocatedHeapMemory(mu.getCommitted());
+            memoryLog.setUsedHeapMemory(mu.getUsed());
+
 
             //non heap memory management data
             mu = memoryMXBean.getNonHeapMemoryUsage();
-            memUsageMap.put(MAX_NON_HEAP_MEMORY, mu.getMax());
-            memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY, mu.getCommitted());
-            memUsageMap.put(USED_NON_HEAP_MEMORY, mu.getUsed());
+//            memUsageMap.put(MAX_NON_HEAP_MEMORY, mu.getMax());
+//            memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY, mu.getCommitted());
+//            memUsageMap.put(USED_NON_HEAP_MEMORY, mu.getUsed());
+            memoryLog.setMaxNonHeapMemory(mu.getMax());
+            memoryLog.setAllocatedNonHeapMemory(mu.getCommitted());
+            memoryLog.setUsedNonHeapMemory(mu.getUsed());
 
-            memUsageMap.put(PENDING_FINALIZATIONS, (long) (memoryMXBean.getObjectPendingFinalizationCount()));
 
-            return memUsageMap;
+//            memUsageMap.put(PENDING_FINALIZATIONS, (long) (memoryMXBean.getObjectPendingFinalizationCount()));
+            memoryLog.setPendingFinalizations(memoryMXBean.getObjectPendingFinalizationCount());
+
+            return memoryLog;
+
         }else{
             throw new NullPointerException();
         }

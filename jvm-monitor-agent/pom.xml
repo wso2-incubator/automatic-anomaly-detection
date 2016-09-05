@@ -63,6 +63,12 @@
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
 
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>LATEST</version>
+        </dependency>
+
         <!--<dependency>-->
         <!--<groupId>com.sun</groupId>-->
         <!--<artifactId>tools</artifactId>-->
