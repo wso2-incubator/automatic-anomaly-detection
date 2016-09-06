@@ -42,7 +42,7 @@ public class GarbageCollectionLog {
 
     private String gcType;
     private long startTime;
-    private double duration;
+    private long duration;
     private String gcCause;
 
     public long getEdenUsedMemoryAfterGC() {
@@ -205,11 +205,11 @@ public class GarbageCollectionLog {
         this.startTime = startTime;
     }
 
-    public double getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
