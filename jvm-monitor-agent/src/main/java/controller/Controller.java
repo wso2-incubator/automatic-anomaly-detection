@@ -36,9 +36,8 @@ import java.util.LinkedList;
 
 public class Controller {
 
-    private static final String pid = "11395";
 
-    public void sendUsageData() throws IOException,
+    public void sendUsageData(String pid) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
             InterruptedException,
@@ -83,7 +82,7 @@ public class Controller {
             DataEndpointException,
             DataEndpointConfigurationException{
 
-        new Controller().sendUsageData();
+        new Controller().sendUsageData("1234");
 
     }
 
