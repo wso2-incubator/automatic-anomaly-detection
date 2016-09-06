@@ -69,20 +69,6 @@ public class Controller {
         }
 
 
-    }
-
-    public static void main(String[] args) throws IOException,
-            AttachNotSupportedException,
-            MalformedObjectNameException,
-            InterruptedException,
-            MonitoringNotStartedException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointException,
-            DataEndpointConfigurationException{
-
-        new Controller().sendUsageData("1234");
 
     }
 
