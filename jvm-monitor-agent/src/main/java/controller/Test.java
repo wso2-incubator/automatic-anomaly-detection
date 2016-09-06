@@ -30,7 +30,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
 
-public class test {
+public class Test {
 
     public static void main(String[] args) throws IOException,
             AttachNotSupportedException,
@@ -43,7 +43,7 @@ public class test {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        Runtime.getRuntime().exec("java -jar /home/buddhi/work/wso2/automatic-anomaly-detection/test/BadCode.jar");
+        Runtime.getRuntime().exec("java -jar /home/buddhi/work/wso2/automatic-anomaly-detection/Test/BadCode.jar");
         String pid = null;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
