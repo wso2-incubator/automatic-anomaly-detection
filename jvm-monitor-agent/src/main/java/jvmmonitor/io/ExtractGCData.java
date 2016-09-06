@@ -48,7 +48,7 @@ public class ExtractGCData {
     private double GCEventRealTimes;
     private ArrayList gcData = new ArrayList(22);
 
-    final static Logger logger = Logger.getLogger( ExtractGCData.class );
+    final static Logger logger = Logger.getLogger(ExtractGCData.class);
 
     public ArrayList getGCData(String message) {
 
@@ -170,13 +170,13 @@ public class ExtractGCData {
             gcData.add(GCEventRealTimes);
 
         } catch (IndexOutOfBoundsException e) {
-            System.out.println(e);
+            logger.error(e);
             return null;
         } catch (NumberFormatException e) {
-            System.out.println(e);
+            logger.error(e);
             return null;
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e);
             return null;
         }
 
