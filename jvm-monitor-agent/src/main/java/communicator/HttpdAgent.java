@@ -18,16 +18,11 @@ package communicator;
 * under the License.
 */
 
-import com.sun.tools.attach.AttachNotSupportedException;
-import jvmmonitor.UsageMonitor;
-import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.io.ExtractGCData;
-import jvmmonitor.management.GarbageCollectionMonitor;
-import jvmmonitor.management.MemoryUsageMonitor;
 import jvmmonitor.model.CPULoadLog;
 import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.MemoryUsageLog;
-import jvmmonitor.model.UsageMonitorLog;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -38,15 +33,12 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
-import javax.management.MalformedObjectNameException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Scanner;
 
 public class HttpdAgent {
@@ -55,6 +47,8 @@ public class HttpdAgent {
     private static String VERSION;
     private static int defaultThriftPort;
     private static int defaultBinaryPort;
+
+    final static Logger logger = Logger.getLogger( HttpdAgent.class );
 
     private String type;
     private String url;
@@ -73,7 +67,7 @@ public class HttpdAgent {
 
     public void initialize() throws SocketException, UnknownHostException {
 
-        System.out.println("Starting DAS HttpLog Agent");
+        logger.info("Starting DAS HttpLog Agent");
         String currentDir = System.getProperty("user.dir");
         System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
@@ -106,7 +100,7 @@ public class HttpdAgent {
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, date, null, null,
-                new Object[]{ cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad() });
+                new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad()});
         dataPublisher.publish(event);
 
         dataPublisher.shutdown();
@@ -123,7 +117,7 @@ public class HttpdAgent {
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{ gcLog.getGcType(),
+                new Object[]{gcLog.getGcType(),
                         gcLog.getDuration(),
                         gcLog.getStartTime(),
                         gcLog.getGcCause(),
@@ -161,7 +155,7 @@ public class HttpdAgent {
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, date, null, null,
-                new Object[]{ memoryLog.getMaxHeapMemory(),
+                new Object[]{memoryLog.getMaxHeapMemory(),
                         memoryLog.getAllocatedHeapMemory(),
                         memoryLog.getUsedHeapMemory(),
                         memoryLog.getMaxNonHeapMemory(),
@@ -195,15 +189,15 @@ public class HttpdAgent {
             ExtractGCData eObj = new ExtractGCData();
             ArrayList gcData = eObj.getGCData(stringLog);
 
-            if(gcData==null){
+            if (gcData == null) {
                 continue;
             }
 
             Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                    new Object[]{ gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
+                    new Object[]{gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
                             gcData.get(5), gcData.get(6), gcData.get(7), gcData.get(8), gcData.get(9), gcData.get(10),
                             gcData.get(11), gcData.get(12), gcData.get(13), gcData.get(14), gcData.get(15), gcData.get(16),
-                            gcData.get(17), gcData.get(18), gcData.get(19), gcData.get(20), gcData.get(21) });
+                            gcData.get(17), gcData.get(18), gcData.get(19), gcData.get(20), gcData.get(21)});
 
             dataPublisher.publish(event);
 
@@ -229,102 +223,6 @@ public class HttpdAgent {
         return filePath.getAbsolutePath() + File.separator + "data-agent-conf.xml";
     }
 
-    /*
-    private static void publishLogEvents(DataPublisher dataPublisher, String streamId) {
-
-        UsageMonitor logObj = null;
-
-        try {
-            logObj = new UsageMonitor("");
-            logObj.stratMonitoring();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AttachNotSupportedException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
-        }
-
-        int i = 1;
-        while (true) {
-            System.out.println("Publish Memory data : " + i++);
-
-            try {
-
-                Map<String, Object> usagesData = logObj.getUsageLog();
-                ArrayList<Map<String, String>> gcLog = (ArrayList<Map<String, String>>) usagesData.get(UsageMonitor.GARBAGE_COLLECTION_LOG);
-                Map<String, Long> memoryUL = (Map<String, Long>) usagesData.get(UsageMonitor.MEMORY_USAGE_LOG);
-
-                if (gcLog.isEmpty()) {
-
-                    Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                            new Object[]{memoryUL.get(MemoryUsageMonitor.MAX_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageMonitor.USED_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageMonitor.MAX_NON_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageMonitor.ALLOCATED_NON_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageMonitor.USED_NON_HEAP_MEMORY)
-                                    , memoryUL.get(MemoryUsageMonitor.PENDING_FINALIZATIONS)
-                            });
-                    dataPublisher.publish(event);
-
-                } else {
-                    for (Map<String, String> gcmap : gcLog) {
-
-                        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                                new Object[]{gcmap.get(GarbageCollectionMonitor.GC_TYPE)
-                                        , gcmap.get(GarbageCollectionMonitor.GC_DURATION)
-                                        , gcmap.get(GarbageCollectionMonitor.GC_START_TIME)
-                                        , gcmap.get(GarbageCollectionMonitor.GC_CAUSE)
-                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_USED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_USED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_USED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_USED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_USED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_USED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_COMMITTED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_COMMITTED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_COMMITTED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_COMMITTED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_COMMITTED_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_COMMITTED_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_MAX_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.EDEN_SPACE_MAX_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_MAX_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.SURVIVOR_SPACE_MAX_MEMORY_BEFORE_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_MAX_MEMORY_AFTER_GC)
-                                        , gcmap.get(GarbageCollectionMonitor.OLD_GEN_MAX_MEMORY_BEFORE_GC)
-                                        , memoryUL.get(MemoryUsageMonitor.MAX_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageMonitor.USED_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageMonitor.MAX_NON_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageMonitor.ALLOCATED_NON_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageMonitor.USED_NON_HEAP_MEMORY)
-                                        , memoryUL.get(MemoryUsageMonitor.PENDING_FINALIZATIONS)
-                                });
-                        dataPublisher.publish(event);
-
-                    }
-                }
-
-
-            } catch (MonitoringNotStartedException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-    */
-
     public static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
         Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
         while (ifaces.hasMoreElements()) {
@@ -348,9 +246,6 @@ public class HttpdAgent {
         }
         return result;
     }
-
-
-
 
 
 }
