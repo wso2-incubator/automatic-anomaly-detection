@@ -44,9 +44,10 @@ public class ServerGCLogMonitor {
             DataEndpointAgentConfigurationException,
             TransportException {
 
-        DASPublisher dasPublisherObj = new DASPublisher();
+        DASPublisher dasPublisherObj = new DASPublisher(7611, 9611, "admin", "admin");
         logger.info("Read log file : "+SAMPLE_LOG_PATH);
         dasPublisherObj.publishXXgcLogData(SAMPLE_LOG_PATH);
+        dasPublisherObj.shutdownDataPublisher();
 
     }
 }
