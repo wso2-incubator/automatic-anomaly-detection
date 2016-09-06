@@ -48,7 +48,7 @@ public class HttpdAgent {
     private static int defaultThriftPort;
     private static int defaultBinaryPort;
 
-    final static Logger logger = Logger.getLogger( HttpdAgent.class );
+    final static Logger logger = Logger.getLogger(HttpdAgent.class);
 
     private String type;
     private String url;
@@ -86,7 +86,6 @@ public class HttpdAgent {
         authURL = getProperty("authURL", "ssl://" + host + ":" + securePort);
         username = getProperty("username", "admin");
         password = getProperty("password", "admin");
-
 
     }
 
@@ -180,11 +179,8 @@ public class HttpdAgent {
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Scanner scanner = new Scanner(new FileInputStream(fileName));
-        int i = 1;
         while (scanner.hasNextLine()) {
-
             String stringLog = scanner.nextLine();
-            System.out.println("Publish log event : " + i + " : " + stringLog);
 
             ExtractGCData eObj = new ExtractGCData();
             ArrayList gcData = eObj.getGCData(stringLog);
@@ -201,7 +197,6 @@ public class HttpdAgent {
 
             dataPublisher.publish(event);
 
-            i++;
         }
 
         scanner.close();
