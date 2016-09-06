@@ -111,6 +111,7 @@ public class EventPublisher {
                 new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad(), date});
 
         dataPublisher.publish(event);
+        logger.info("publish CPU data : "+cpuLog.getProcessCPULoad()+"\t"+cpuLog.getSystemCPULoad()+"\t"+date);
         //dataPublisher.shutdown();
 
     }
@@ -149,6 +150,7 @@ public class EventPublisher {
                         gcLog.getOldGenMaxMemoryBeforeGC()});
 
         dataPublisher.publish(event);
+        logger.info("publish GC data : "+gcLog.getGcType()+"\t"+gcLog.getDuration()+"\t"+gcLog.getStartTime());
         //dataPublisher.shutdown();
 
     }
