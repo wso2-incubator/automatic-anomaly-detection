@@ -98,10 +98,10 @@ public class HttpdAgent {
         DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
-        Event event = new Event(streamId, date, null, null,
-                new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad()});
-        dataPublisher.publish(event);
+        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad(), date});
 
+        dataPublisher.publish(event);
         dataPublisher.shutdown();
 
     }
@@ -138,8 +138,8 @@ public class HttpdAgent {
                         gcLog.getSurvivorMaxMemoryBeforeGC(),
                         gcLog.getOldGenMaxMemoryAfterGC(),
                         gcLog.getOldGenMaxMemoryBeforeGC()});
-        dataPublisher.publish(event);
 
+        dataPublisher.publish(event);
         dataPublisher.shutdown();
 
     }
@@ -153,17 +153,17 @@ public class HttpdAgent {
         DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
         String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
-        Event event = new Event(streamId, date, null, null,
+        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{memoryLog.getMaxHeapMemory(),
                         memoryLog.getAllocatedHeapMemory(),
                         memoryLog.getUsedHeapMemory(),
                         memoryLog.getMaxNonHeapMemory(),
                         memoryLog.getAllocatedNonHeapMemory(),
                         memoryLog.getUsedNonHeapMemory(),
-                        memoryLog.getPendingFinalizations()});
+                        memoryLog.getPendingFinalizations(),
+                        date});
 
         dataPublisher.publish(event);
-
         dataPublisher.shutdown();
 
     }
