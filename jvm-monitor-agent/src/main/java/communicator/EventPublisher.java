@@ -41,28 +41,36 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Scanner;
 
-public class HttpdAgent {
+public class EventPublisher {
 
+    /*
     private static String HTTPD_LOG_STREAM;
     private static String VERSION;
     private static int defaultThriftPort;
     private static int defaultBinaryPort;
-
-    final static Logger logger = Logger.getLogger(HttpdAgent.class);
 
     private String type;
     private String url;
     private String authURL;
     private String username;
     private String password;
+    */
 
-    public HttpdAgent(String HTTPD_LOG_STREAM, String VERSION, int defaultThriftPort, int defaultBinaryPort) {
+    final static Logger logger = Logger.getLogger(EventPublisher.class);
+
+    /*
+    public EventPublisher(String HTTPD_LOG_STREAM, String VERSION, int defaultThriftPort, int defaultBinaryPort) {
 
         this.HTTPD_LOG_STREAM = HTTPD_LOG_STREAM;
         this.VERSION = VERSION;
         this.defaultThriftPort = defaultThriftPort;
         this.defaultBinaryPort = defaultBinaryPort;
 
+    }
+
+    public EventPublisher(int defaultThriftPort, int defaultBinaryPort) {
+        this.defaultThriftPort = defaultThriftPort;
+        this.defaultBinaryPort = defaultBinaryPort;
     }
 
     public void initialize() throws SocketException, UnknownHostException {
@@ -88,32 +96,33 @@ public class HttpdAgent {
         password = getProperty("password", "admin");
 
     }
+    */
 
-    public void publishLogEvents(long date, CPULoadLog cpuLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
-        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+        //DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+        //String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad(), date});
 
         dataPublisher.publish(event);
-        dataPublisher.shutdown();
+        //dataPublisher.shutdown();
 
     }
 
-    public void publishLogEvents(GarbageCollectionLog gcLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, GarbageCollectionLog gcLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
-        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+//        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+//        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{gcLog.getGcType(),
@@ -140,18 +149,18 @@ public class HttpdAgent {
                         gcLog.getOldGenMaxMemoryBeforeGC()});
 
         dataPublisher.publish(event);
-        dataPublisher.shutdown();
+        //dataPublisher.shutdown();
 
     }
 
-    public void publishLogEvents(long date, MemoryUsageLog memoryLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, MemoryUsageLog memoryLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
-        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+//        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+//        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{memoryLog.getMaxHeapMemory(),
@@ -168,15 +177,15 @@ public class HttpdAgent {
 
     }
 
-    public void publishLogEvents(String fileName) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, String fileName) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException,
             FileNotFoundException {
 
-        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+//        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
+//        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Scanner scanner = new Scanner(new FileInputStream(fileName));
         while (scanner.hasNextLine()) {
@@ -201,12 +210,11 @@ public class HttpdAgent {
 
         scanner.close();
 
-
-        dataPublisher.shutdown();
+        //dataPublisher.shutdown();
 
     }
 
-
+    /*
     public static String getDataAgentConfigPath() {
         File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
         if (!filePath.exists()) {
@@ -241,6 +249,6 @@ public class HttpdAgent {
         }
         return result;
     }
-
+    */
 
 }
