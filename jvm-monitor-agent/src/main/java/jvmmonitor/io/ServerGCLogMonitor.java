@@ -1,7 +1,7 @@
 package jvmmonitor.io;
 
 /*
-*  Copyright (c) ${YEAR}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -19,6 +19,7 @@ package jvmmonitor.io;
 */
 
 import communicator.DASPublisher;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -31,7 +32,8 @@ import java.net.UnknownHostException;
 
 public class ServerGCLogMonitor {
 
-    private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/gc.log.2.current";
+    private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/test/log/gc.log";
+    final static Logger logger = Logger.getLogger(ServerGCLogMonitor.class);
 
     public static void main(String[] args) throws DataEndpointException,
             SocketException,
@@ -43,6 +45,7 @@ public class ServerGCLogMonitor {
             TransportException {
 
         DASPublisher dasPublisherObj = new DASPublisher();
+        logger.info("Read log file : "+SAMPLE_LOG_PATH);
         dasPublisherObj.publishXXgcLogData(SAMPLE_LOG_PATH);
 
     }
