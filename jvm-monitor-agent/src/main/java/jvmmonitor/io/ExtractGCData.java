@@ -18,6 +18,8 @@ package jvmmonitor.io;
 * under the License.
 */
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 
 public class ExtractGCData {
@@ -46,10 +48,13 @@ public class ExtractGCData {
     private double GCEventRealTimes;
     private ArrayList gcData = new ArrayList(22);
 
+    final static Logger logger = Logger.getLogger( ExtractGCData.class );
+
     public ArrayList getGCData(String message) {
 
         //message = "2016-08-29T17:05:46.296+0530: 8.769: [GC (Allocation Failure) [PSYoungGen: 580951K->2541K(642560K)] 637171K->84387K(726016K), 0.0060124 secs] [Times: user=0.01 sys=0.01, real=0.00 secs]";
         //message = "16-08-29T17:05:46.302+0530: 8.775: [Full GC (Ergonomics) [PSYoungGen: 2541K->0K(642560K)] [ParOldGen: 81845K->21174K(69632K)] 84387K->21174K(712192K), [Metaspace: 3063K->3063K(1056768K)], 0.0068595 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]";
+        logger.info("GC log : " + message );
 
         try {
 
