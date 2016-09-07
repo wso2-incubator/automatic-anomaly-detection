@@ -37,6 +37,7 @@ import java.util.Scanner;
 
 public class Controller {
 
+    private static long startTime;
 
     public void sendUsageData(String pid) throws IOException,
             AttachNotSupportedException,
@@ -51,23 +52,21 @@ public class Controller {
 
         UsageMonitor usageObj = new UsageMonitor(pid);
         usageObj.stratMonitoring();
-        UsageMonitorLog usageLogObj = usageObj.getUsageLog();
+        UsageMonitorLog usageLogObj;
 
         DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
         DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
         DASPublisher dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
 
-        Scanner reader = new Scanner(System.in);  // Reading from System.in
-        System.out.println("Press any key to finish data collecting...");
-        String userInput = "Start";
+        startTime = System.currentTimeMillis();
 
-        while (userInput=="Start") {
+        while ((System.currentTimeMillis() - startTime) < 60000) {
 
-            userInput = reader.next();
+            usageLogObj = usageObj.getUsageLog();
 
-            //dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+            dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
             dasCPUPublisher.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
-            //dasGCPublisher.publishGCData(( LinkedList<GarbageCollectionLog>)usageLogObj.getGarbageCollectionLog() );
+            dasGCPublisher.publishGCData((LinkedList<GarbageCollectionLog>) usageLogObj.getGarbageCollectionLog());
 
             try {
                 Thread.sleep(1000);
@@ -80,8 +79,6 @@ public class Controller {
         dasMemoryPublisher.shutdownDataPublisher();
         dasCPUPublisher.shutdownDataPublisher();
         dasGCPublisher.shutdownDataPublisher();
-
-
 
     }
 
