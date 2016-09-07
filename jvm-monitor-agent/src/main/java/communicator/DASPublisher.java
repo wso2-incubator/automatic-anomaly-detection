@@ -42,7 +42,7 @@ public class DASPublisher {
 
     private static int defaultThriftPort = 7611;
     private static int defaultBinaryPort = 9611;
-    private static EventPublisher eventAgent;
+    private EventPublisher eventAgent;
     private static String memoryStream;
     private static String gcStream;
     private static String cpuStream;
