@@ -60,10 +60,31 @@ public class DASPublisher {
 
     public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException, UnknownHostException, DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
 
-        this.defaultThriftPort = defaultThriftPort;
-        this.defaultBinaryPort = defaultBinaryPort;
+        //this.defaultThriftPort = defaultThriftPort;
+        //this.defaultBinaryPort = defaultBinaryPort;
 
-        initialize(username, password);
+        logger.info("Starting DAS HttpLog Agent");
+        String currentDir = System.getProperty("user.dir");
+        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
+
+        AgentHolder.setConfigPath(getDataAgentConfigPath());
+        String host = getLocalAddress().getHostAddress();
+
+        String type = getProperty("type", "Thrift");
+        int receiverPort = defaultThriftPort;
+        if (type.equals("Binary")) {
+            receiverPort = defaultBinaryPort;
+        }
+        int securePort = receiverPort + 100;
+
+        String url = getProperty("url", "tcp://" + host + ":" + receiverPort);
+        String authURL = getProperty("authURL", "ssl://" + host + ":" + securePort);
+        username = getProperty("username", username);
+        password = getProperty("password", password);
+
+
+        //initialize(username, password);
         setMemoryStream();
         setGcStream();
         setCpuStream();
@@ -78,6 +99,7 @@ public class DASPublisher {
         dataPublisher.shutdown();
     }
 
+    /*
     public void initialize(String username, String password) throws SocketException, UnknownHostException {
 
         logger.info("Starting DAS HttpLog Agent");
@@ -101,6 +123,7 @@ public class DASPublisher {
         this.password = getProperty("password", password);
 
     }
+    */
 
     public static void setMemoryStream() {
         String HTTPD_LOG_STREAM = "memoryStream";
