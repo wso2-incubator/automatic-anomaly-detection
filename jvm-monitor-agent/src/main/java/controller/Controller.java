@@ -50,23 +50,79 @@ public class Controller {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        UsageMonitor usageObj = new UsageMonitor(pid);
+        final UsageMonitor usageObj = new UsageMonitor(pid);
         usageObj.stratMonitoring();
-        UsageMonitorLog usageLogObj;
 
-        DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
-        DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
-        DASPublisher dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        final DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        final DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        final DASPublisher dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
 
         startTime = System.currentTimeMillis();
 
         while ((System.currentTimeMillis() - startTime) < 60000) {
 
-            usageLogObj = usageObj.getUsageLog();
+            final UsageMonitorLog usageLogObj = usageObj.getUsageLog();
 
-            dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
-            dasCPUPublisher.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
-            dasGCPublisher.publishGCData((LinkedList<GarbageCollectionLog>) usageLogObj.getGarbageCollectionLog());
+            Thread memoryThread = new Thread() {
+                public void run() {
+                    try {
+                        dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+                    } catch (DataEndpointAuthenticationException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointAgentConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (TransportException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            memoryThread.start();
+
+            Thread cpuThread = new Thread() {
+                public void run() {
+                    try {
+                        dasCPUPublisher.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
+                    } catch (DataEndpointAuthenticationException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointAgentConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (TransportException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            cpuThread.start();
+
+            Thread gcThread = new Thread() {
+                public void run() {
+                    try {
+                        dasGCPublisher.publishGCData((LinkedList<GarbageCollectionLog>) usageLogObj.getGarbageCollectionLog());
+                    } catch (DataEndpointAuthenticationException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointAgentConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointException e) {
+                        e.printStackTrace();
+                    } catch (DataEndpointConfigurationException e) {
+                        e.printStackTrace();
+                    } catch (TransportException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            gcThread.start();
+
+            //dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+            //dasCPUPublisher.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
+            //dasGCPublisher.publishGCData((LinkedList<GarbageCollectionLog>) usageLogObj.getGarbageCollectionLog());
 
             try {
                 Thread.sleep(1000);
