@@ -23,7 +23,6 @@ import jvmmonitor.model.CPULoadLog;
 import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.MemoryUsageLog;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -31,14 +30,10 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.*;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Scanner;
 
 public class EventPublisher {
