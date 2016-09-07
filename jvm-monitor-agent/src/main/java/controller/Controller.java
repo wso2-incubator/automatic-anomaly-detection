@@ -15,6 +15,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -48,17 +49,25 @@ public class Controller {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        while (true) {
+        UsageMonitor usageObj = new UsageMonitor(pid);
+        usageObj.stratMonitoring();
+        UsageMonitorLog usageLogObj = usageObj.getUsageLog();
 
-            UsageMonitor usageObj = new UsageMonitor(pid);
-            usageObj.stratMonitoring();
-            UsageMonitorLog usageLogObj = usageObj.getUsageLog();
+        DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        DASPublisher dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
 
-            DASPublisher dasPublisherObj = new DASPublisher();
+        Scanner reader = new Scanner(System.in);  // Reading from System.in
+        System.out.println("Press any key to finish data collecting...");
+        String userInput = "Start";
 
-            dasPublisherObj.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
-            dasPublisherObj.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
-            dasPublisherObj.publishGCData(( LinkedList<GarbageCollectionLog>)usageLogObj.getGarbageCollectionLog() );
+        while (userInput=="Start") {
+
+            userInput = reader.next();
+
+            //dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+            dasCPUPublisher.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
+            //dasGCPublisher.publishGCData(( LinkedList<GarbageCollectionLog>)usageLogObj.getGarbageCollectionLog() );
 
             try {
                 Thread.sleep(1000);
@@ -67,6 +76,10 @@ public class Controller {
             }
 
         }
+
+        dasMemoryPublisher.shutdownDataPublisher();
+        dasCPUPublisher.shutdownDataPublisher();
+        dasGCPublisher.shutdownDataPublisher();
 
 
 
