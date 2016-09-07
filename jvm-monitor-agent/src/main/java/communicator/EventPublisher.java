@@ -111,7 +111,7 @@ public class EventPublisher {
                 new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad(), date});
 
         dataPublisher.publish(event);
-        logger.info("publish CPU data : "+cpuLog.getProcessCPULoad()+"\t"+cpuLog.getSystemCPULoad()+"\t"+date);
+        logger.info("publish CPU data : " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad() + " , " + date);
         //dataPublisher.shutdown();
 
     }
@@ -150,7 +150,18 @@ public class EventPublisher {
                         gcLog.getOldGenMaxMemoryBeforeGC()});
 
         dataPublisher.publish(event);
-        logger.info("publish GC data : "+gcLog.getGcType()+"\t"+gcLog.getDuration()+"\t"+gcLog.getStartTime());
+
+        logger.info("publish GC data : " + gcLog.getGcType() + " , " + gcLog.getDuration() + " , " + gcLog.getStartTime()
+                + " , " + gcLog.getGcCause() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
+                + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
+                + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
+                + " , " + gcLog.getEdenCommittedMemoryAfterGC() + " , " + gcLog.getEdenCommittedMemoryBeforeGC()
+                + " , " + gcLog.getSurvivorCommittedMemoryAfterGC() + " , " + gcLog.getSurvivorCommittedMemoryBeforeGC()
+                + " , " + gcLog.getOldGenCommittedMemoryAfterGC() + " , " + gcLog.getOldGenCommittedMemoryBeforeGC()
+                + " , " + gcLog.getEdenMaxMemoryAfterGC() + " , " + gcLog.getEdenMaxMemoryBeforeGC()
+                + " , " + gcLog.getSurvivorMaxMemoryAfterGC() + " , " + gcLog.getSurvivorMaxMemoryBeforeGC()
+                + " , " + gcLog.getOldGenMaxMemoryAfterGC() + " , " + gcLog.getOldGenMaxMemoryBeforeGC());
+
         //dataPublisher.shutdown();
 
     }
@@ -175,7 +186,11 @@ public class EventPublisher {
                         date});
 
         dataPublisher.publish(event);
-        dataPublisher.shutdown();
+
+        logger.info("publish Memory data : " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
+                + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
+                + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations() + " , " + date);
+        //dataPublisher.shutdown();
 
     }
 
