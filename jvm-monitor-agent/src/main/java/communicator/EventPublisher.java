@@ -38,60 +38,7 @@ import java.util.Scanner;
 
 public class EventPublisher {
 
-    /*
-    private static String HTTPD_LOG_STREAM;
-    private static String VERSION;
-    private static int defaultThriftPort;
-    private static int defaultBinaryPort;
-
-    private String type;
-    private String url;
-    private String authURL;
-    private String username;
-    private String password;
-    */
-
     final static Logger logger = Logger.getLogger(EventPublisher.class);
-
-    /*
-    public EventPublisher(String HTTPD_LOG_STREAM, String VERSION, int defaultThriftPort, int defaultBinaryPort) {
-
-        this.HTTPD_LOG_STREAM = HTTPD_LOG_STREAM;
-        this.VERSION = VERSION;
-        this.defaultThriftPort = defaultThriftPort;
-        this.defaultBinaryPort = defaultBinaryPort;
-
-    }
-
-    public EventPublisher(int defaultThriftPort, int defaultBinaryPort) {
-        this.defaultThriftPort = defaultThriftPort;
-        this.defaultBinaryPort = defaultBinaryPort;
-    }
-
-    public void initialize() throws SocketException, UnknownHostException {
-
-        logger.info("Starting DAS HttpLog Agent");
-        String currentDir = System.getProperty("user.dir");
-        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
-
-        AgentHolder.setConfigPath(getDataAgentConfigPath());
-        String host = getLocalAddress().getHostAddress();
-
-        type = getProperty("type", "Thrift");
-        int receiverPort = defaultThriftPort;
-        if (type.equals("Binary")) {
-            receiverPort = defaultBinaryPort;
-        }
-        int securePort = receiverPort + 100;
-
-        url = getProperty("url", "tcp://" + host + ":" + receiverPort);
-        authURL = getProperty("authURL", "ssl://" + host + ":" + securePort);
-        username = getProperty("username", "admin");
-        password = getProperty("password", "admin");
-
-    }
-    */
 
     public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
@@ -99,15 +46,12 @@ public class EventPublisher {
             TransportException,
             DataEndpointConfigurationException {
 
-        //DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-        //String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad(), date});
 
         dataPublisher.publish(event);
+
         logger.info("publish CPU data : " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad() + " , " + date);
-        //dataPublisher.shutdown();
 
     }
 
@@ -116,9 +60,6 @@ public class EventPublisher {
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
-
-//        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-//        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{gcLog.getGcType(),
@@ -157,8 +98,6 @@ public class EventPublisher {
                 + " , " + gcLog.getSurvivorMaxMemoryAfterGC() + " , " + gcLog.getSurvivorMaxMemoryBeforeGC()
                 + " , " + gcLog.getOldGenMaxMemoryAfterGC() + " , " + gcLog.getOldGenMaxMemoryBeforeGC());
 
-        //dataPublisher.shutdown();
-
     }
 
     public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, MemoryUsageLog memoryLog) throws DataEndpointException,
@@ -166,9 +105,6 @@ public class EventPublisher {
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
-
-//        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-//        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
                 new Object[]{memoryLog.getMaxHeapMemory(),
@@ -185,7 +121,6 @@ public class EventPublisher {
         logger.info("publish Memory data : " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
                 + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
                 + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations() + " , " + date);
-        //dataPublisher.shutdown();
 
     }
 
@@ -195,9 +130,6 @@ public class EventPublisher {
             TransportException,
             DataEndpointConfigurationException,
             FileNotFoundException {
-
-//        DataPublisher dataPublisher = new DataPublisher(type, url, authURL, username, password);
-//        String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
 
         Scanner scanner = new Scanner(new FileInputStream(fileName));
         while (scanner.hasNextLine()) {
@@ -225,48 +157,9 @@ public class EventPublisher {
             dataPublisher.publish(event);
 
         }
-
         scanner.close();
 
-        //dataPublisher.shutdown();
-
     }
 
-    /*
-    public static String getDataAgentConfigPath() {
-        File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
-        if (!filePath.exists()) {
-            filePath = new File("test" + File.separator + "resources");
-        }
-        if (!filePath.exists()) {
-            filePath = new File("resources");
-        }
-        return filePath.getAbsolutePath() + File.separator + "data-agent-conf.xml";
-    }
-
-    public static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
-        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-        while (ifaces.hasMoreElements()) {
-            NetworkInterface iface = ifaces.nextElement();
-            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-                    return addr;
-                }
-            }
-        }
-        return InetAddress.getLocalHost();
-    }
-
-    private static String getProperty(String name, String def) {
-        String result = System.getProperty(name);
-        if (result == null || result.length() == 0 || result == "") {
-            result = def;
-        }
-        return result;
-    }
-    */
 
 }
