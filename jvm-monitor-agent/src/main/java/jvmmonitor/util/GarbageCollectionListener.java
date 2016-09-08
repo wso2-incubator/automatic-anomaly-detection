@@ -2,6 +2,7 @@ package jvmmonitor.util;
 
 import jvmmonitor.model.GarbageCollectionLog;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -23,5 +24,5 @@ import java.util.List;
 */
 public interface GarbageCollectionListener {
 
-    void processGClogs(List<GarbageCollectionLog> gcLogList);
+    void processGClogs(LinkedList<GarbageCollectionLog> gcLogList);
 }
