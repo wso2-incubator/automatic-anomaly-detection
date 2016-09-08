@@ -24,5 +24,5 @@ import java.util.LinkedList;
 
 public interface GarbageCollectionListener {
 
-    void processGClogs(final LinkedList<GarbageCollectionLog> gcLogList);
+    void processGClogs(LinkedList<GarbageCollectionLog> gcLogList);
 }
