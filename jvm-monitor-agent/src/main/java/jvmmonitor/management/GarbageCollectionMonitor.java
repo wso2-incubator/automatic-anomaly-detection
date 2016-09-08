@@ -138,9 +138,9 @@ public class GarbageCollectionMonitor {
                 String gctype = info.getGcAction();
 
                 if ("end of minor GC".equals(gctype)) {
-                    gctype = "Minor GC";
+                    gctype = "minor";
                 } else if ("end of major GC".equals(gctype)) {
-                    gctype = "Major GC";
+                    gctype = "major";
                 }
 
                 GarbageCollectionLog gclog = new GarbageCollectionLog();
