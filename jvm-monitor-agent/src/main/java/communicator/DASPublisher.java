@@ -1,25 +1,5 @@
 package communicator;
 
-import jvmmonitor.model.CPULoadLog;
-import jvmmonitor.model.GarbageCollectionLog;
-import jvmmonitor.model.MemoryUsageLog;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.databridge.agent.AgentHolder;
-import org.wso2.carbon.databridge.agent.DataPublisher;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
-import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
-import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.*;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -38,6 +18,25 @@ import java.util.List;
 * under the License.
 */
 
+import jvmmonitor.model.CPULoadLog;
+import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.model.MemoryUsageLog;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.databridge.agent.AgentHolder;
+import org.wso2.carbon.databridge.agent.DataPublisher;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.commons.exception.TransportException;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.*;
+import java.util.Enumeration;
+import java.util.LinkedList;
+
 public class DASPublisher {
 
     private EventPublisher eventAgent;
@@ -50,7 +49,13 @@ public class DASPublisher {
 
     final static Logger logger = Logger.getLogger(DASPublisher.class);
 
-    public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException, UnknownHostException, DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
+    public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException,
+            UnknownHostException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointException,
+            DataEndpointConfigurationException {
 
         logger.info("Starting DAS HttpLog Agent");
         String currentDir = System.getProperty("user.dir");
