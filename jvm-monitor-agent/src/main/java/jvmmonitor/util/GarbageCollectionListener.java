@@ -17,7 +17,7 @@ package jvmmonitor.util;
 * specific language governing permissions and limitations
 * under the License.
 */
-public interface GCCollectionListener {
+public interface GarbageCollectionListener {
 
     void processGClogs();
 }
