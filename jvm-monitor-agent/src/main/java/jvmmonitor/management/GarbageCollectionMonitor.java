@@ -3,6 +3,7 @@ package jvmmonitor.management;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.util.GCCollectionListener;
 import org.apache.log4j.Logger;
 
 import javax.management.MBeanServerConnection;
@@ -51,6 +52,8 @@ public class GarbageCollectionMonitor {
 
     private List<GarbageCollectorMXBean> gcBeans;
     private List<GarbageCollectionLog> gcUsages;
+    private List<GCCollectionListener> listeners;
+
     private long jvmStartTime;
 
     //  --<! DO NOT CHANGE!>-- Memory management types
@@ -80,6 +83,7 @@ public class GarbageCollectionMonitor {
     public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
 
         this.gcUsages = new LinkedList<GarbageCollectionLog>();
+        this.listeners = new ArrayList<GCCollectionListener>();
 
         Set<ObjectName> gcnames = serverConnection.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
         this.gcBeans = new ArrayList<GarbageCollectorMXBean>(gcnames.size());
@@ -210,6 +214,12 @@ public class GarbageCollectionMonitor {
                 synchronized (gcUsages){
                     gcUsages.add(gclog);
                 }
+                if (gcUsages.size() > 0){
+                    for ( GCCollectionListener l : listeners) {
+                        l.processGClogs();
+                    }
+                }
+
 
 //                //Get the information about each memory space
 //                Map<String, MemoryUsage> membefore = info.getGcInfo().getMemoryUsageBeforeGc();
