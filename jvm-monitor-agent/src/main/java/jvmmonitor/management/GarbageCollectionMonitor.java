@@ -216,7 +216,7 @@ public class GarbageCollectionMonitor {
                 }
                 if (gcUsages.size() > 0){
                     for ( GarbageCollectionListener l : listeners) {
-                        l.processGClogs();
+                        l.processGClogs((LinkedList<GarbageCollectionLog>) gcUsages);
                     }
                 }
 
