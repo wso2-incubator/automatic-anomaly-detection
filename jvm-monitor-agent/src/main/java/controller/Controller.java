@@ -67,6 +67,7 @@ public class Controller implements GarbageCollectionListener {
             DataEndpointException {
 
         final UsageMonitor usageObj = new UsageMonitor(pid);
+        usageObj.registerGCNotifications(this);
         usageObj.stratMonitoring();
 
         //final DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
