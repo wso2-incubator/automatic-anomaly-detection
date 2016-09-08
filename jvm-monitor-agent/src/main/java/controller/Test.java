@@ -54,7 +54,8 @@ public class Test {
             }
         }
 
-        new Controller().sendUsageData(pid);
+        Controller controllerObj = new Controller();
+        controllerObj.sendUsageData(pid, controllerObj);
 
         Runtime.getRuntime().exec("kill -9 " + pid);
 
