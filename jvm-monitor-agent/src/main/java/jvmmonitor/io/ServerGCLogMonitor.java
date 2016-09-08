@@ -32,7 +32,7 @@ import java.net.UnknownHostException;
 
 public class ServerGCLogMonitor {
 
-    private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/test/log/gc.log";
+    private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/jvm-monitor-agent/src/samples/log/gc.log";
     final static Logger logger = Logger.getLogger(ServerGCLogMonitor.class);
 
     public static void main(String[] args) throws DataEndpointException,
