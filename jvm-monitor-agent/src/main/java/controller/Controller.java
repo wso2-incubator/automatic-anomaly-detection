@@ -59,7 +59,7 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
-    public void sendUsageData(String pid) throws IOException,
+    public void sendUsageData(String pid, Controller controllerObj) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
             InterruptedException,
@@ -67,8 +67,9 @@ public class Controller implements GarbageCollectionListener {
             DataEndpointException {
 
         final UsageMonitor usageObj = new UsageMonitor(pid);
-        usageObj.registerGCNotifications(this);
         usageObj.stratMonitoring();
+        usageObj.registerGCNotifications(controllerObj);
+
 
         //final DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
         //final DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
@@ -154,25 +155,23 @@ public class Controller implements GarbageCollectionListener {
     }
 
 
-    public void processGClogs(final LinkedList<GarbageCollectionLog> gcLogList) {
+    public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
 
-        Thread gcThread = new Thread() {
-            public void run() {
-                try {
-                    dasGCPublisher.publishGCData(gcLogList);
-                } catch (DataEndpointAuthenticationException e) {
-                    e.printStackTrace();
-                } catch (DataEndpointAgentConfigurationException e) {
-                    e.printStackTrace();
-                } catch (DataEndpointException e) {
-                    e.printStackTrace();
-                } catch (DataEndpointConfigurationException e) {
-                    e.printStackTrace();
-                } catch (TransportException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        try {
+            dasGCPublisher.publishGCData(gcLogList);
+        } catch (DataEndpointAuthenticationException e) {
+            e.printStackTrace();
+        } catch (DataEndpointAgentConfigurationException e) {
+            e.printStackTrace();
+        } catch (DataEndpointException e) {
+            e.printStackTrace();
+        } catch (DataEndpointConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransportException e) {
+            e.printStackTrace();
+        }
 
     }
+
+
 }
