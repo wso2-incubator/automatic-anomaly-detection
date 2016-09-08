@@ -207,7 +207,9 @@ public class GarbageCollectionMonitor {
                 gclog.setGcType(gctype);
                 //============================================================
 
-                gcUsages.add(gclog);
+                synchronized (gcUsages){
+                    gcUsages.add(gclog);
+                }
 
 //                //Get the information about each memory space
 //                Map<String, MemoryUsage> membefore = info.getGcInfo().getMemoryUsageBeforeGc();
