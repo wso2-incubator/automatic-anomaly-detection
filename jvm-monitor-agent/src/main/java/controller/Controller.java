@@ -15,7 +15,6 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -120,10 +119,6 @@ public class Controller {
             };
             gcThread.start();
 
-            //dasMemoryPublisher.publishMemoryData(usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
-            //dasCPUPublisher.publishCPUData(usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
-            //dasGCPublisher.publishGCData((LinkedList<GarbageCollectionLog>) usageLogObj.getGarbageCollectionLog());
-
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -137,5 +132,6 @@ public class Controller {
         dasGCPublisher.shutdownDataPublisher();
 
     }
+
 
 }
