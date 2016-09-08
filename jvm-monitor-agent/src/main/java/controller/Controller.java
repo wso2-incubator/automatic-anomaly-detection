@@ -45,6 +45,19 @@ public class Controller implements GarbageCollectionListener {
 
     private static long startTime;
 
+    public Controller() throws DataEndpointException,
+            SocketException,
+            UnknownHostException,
+            DataEndpointConfigurationException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException {
+
+        dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+
+    }
 
     public void sendUsageData(String pid) throws IOException,
             AttachNotSupportedException,
