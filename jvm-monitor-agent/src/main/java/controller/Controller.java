@@ -6,6 +6,7 @@ import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.UsageMonitorLog;
+import jvmmonitor.util.GarbageCollectionListener;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -14,6 +15,8 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 /*
@@ -34,27 +37,28 @@ import java.util.LinkedList;
 * under the License.
 */
 
-public class Controller {
+public class Controller implements GarbageCollectionListener {
+
+    private final DASPublisher dasGCPublisher;
+    private final DASPublisher dasMemoryPublisher;
+    private final DASPublisher dasCPUPublisher;
 
     private static long startTime;
+
 
     public void sendUsageData(String pid) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
             InterruptedException,
             MonitoringNotStartedException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointException,
-            DataEndpointConfigurationException {
+            DataEndpointException {
 
         final UsageMonitor usageObj = new UsageMonitor(pid);
         usageObj.stratMonitoring();
 
-        final DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
-        final DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
-        final DASPublisher dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        //final DASPublisher dasMemoryPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        //final DASPublisher dasCPUPublisher = new DASPublisher(7611, 9611, "admin", "admin");
+        //dasGCPublisher = new DASPublisher(7611, 9611, "admin", "admin");
 
         startTime = System.currentTimeMillis();
 
@@ -100,6 +104,7 @@ public class Controller {
             };
             cpuThread.start();
 
+            /*
             Thread gcThread = new Thread() {
                 public void run() {
                     try {
@@ -118,6 +123,7 @@ public class Controller {
                 }
             };
             gcThread.start();
+            */
 
             try {
                 Thread.sleep(1000);
@@ -134,4 +140,25 @@ public class Controller {
     }
 
 
+    public void processGClogs(final LinkedList<GarbageCollectionLog> gcLogList) {
+
+        Thread gcThread = new Thread() {
+            public void run() {
+                try {
+                    dasGCPublisher.publishGCData(gcLogList);
+                } catch (DataEndpointAuthenticationException e) {
+                    e.printStackTrace();
+                } catch (DataEndpointAgentConfigurationException e) {
+                    e.printStackTrace();
+                } catch (DataEndpointException e) {
+                    e.printStackTrace();
+                } catch (DataEndpointConfigurationException e) {
+                    e.printStackTrace();
+                } catch (TransportException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+    }
 }

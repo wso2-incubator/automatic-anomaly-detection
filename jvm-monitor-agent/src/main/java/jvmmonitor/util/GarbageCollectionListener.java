@@ -3,7 +3,6 @@ package jvmmonitor.util;
 import jvmmonitor.model.GarbageCollectionLog;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -22,7 +21,8 @@ import java.util.List;
 * specific language governing permissions and limitations
 * under the License.
 */
+
 public interface GarbageCollectionListener {
 
-    void processGClogs(LinkedList<GarbageCollectionLog> gcLogList);
+    void processGClogs(final LinkedList<GarbageCollectionLog> gcLogList);
 }
