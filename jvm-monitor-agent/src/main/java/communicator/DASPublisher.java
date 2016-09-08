@@ -40,28 +40,17 @@ import java.util.List;
 
 public class DASPublisher {
 
-    private static int defaultThriftPort = 7611;
-    private static int defaultBinaryPort = 9611;
     private EventPublisher eventAgent;
-    private static String memoryStream;
-    private static String gcStream;
-    private static String cpuStream;
-    private static String gcLogStream;
-
-    private String type;
-    private String url;
-    private String authURL;
-    private String username;
-    private String password;
+    private String memoryStream;
+    private String gcStream;
+    private String cpuStream;
+    private String gcLogStream;
 
     private DataPublisher dataPublisher;
 
     final static Logger logger = Logger.getLogger(DASPublisher.class);
 
     public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException, UnknownHostException, DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, TransportException, DataEndpointException, DataEndpointConfigurationException {
-
-        //this.defaultThriftPort = defaultThriftPort;
-        //this.defaultBinaryPort = defaultBinaryPort;
 
         logger.info("Starting DAS HttpLog Agent");
         String currentDir = System.getProperty("user.dir");
@@ -83,14 +72,13 @@ public class DASPublisher {
         username = getProperty("username", username);
         password = getProperty("password", password);
 
+        dataPublisher = new DataPublisher(type, url, authURL, username, password);
 
-        //initialize(username, password);
         setMemoryStream();
         setGcStream();
         setCpuStream();
         setGcLogStream();
 
-        dataPublisher = new DataPublisher(type, url, authURL, username, password);
         eventAgent = new EventPublisher();
 
     }
@@ -99,54 +87,28 @@ public class DASPublisher {
         dataPublisher.shutdown();
     }
 
-    /*
-    public void initialize(String username, String password) throws SocketException, UnknownHostException {
-
-        logger.info("Starting DAS HttpLog Agent");
-        String currentDir = System.getProperty("user.dir");
-        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
-
-        AgentHolder.setConfigPath(getDataAgentConfigPath());
-        String host = getLocalAddress().getHostAddress();
-
-        type = getProperty("type", "Thrift");
-        int receiverPort = defaultThriftPort;
-        if (type.equals("Binary")) {
-            receiverPort = defaultBinaryPort;
-        }
-        int securePort = receiverPort + 100;
-
-        url = getProperty("url", "tcp://" + host + ":" + receiverPort);
-        authURL = getProperty("authURL", "ssl://" + host + ":" + securePort);
-        this.username = getProperty("username", username);
-        this.password = getProperty("password", password);
-
-    }
-    */
-
-    public static void setMemoryStream() {
+    private void setMemoryStream() {
         String HTTPD_LOG_STREAM = "memoryStream";
         String VERSION = "1.0.0";
-        memoryStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);;
+        memoryStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
-    public static void setGcStream() {
+    private void setGcStream() {
         String HTTPD_LOG_STREAM = "gcStream";
         String VERSION = "1.0.0";
-        gcStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);;
+        gcStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
-    public static void setCpuStream() {
+    private void setCpuStream() {
         String HTTPD_LOG_STREAM = "cpuStream";
         String VERSION = "1.0.0";
-        cpuStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);;
+        cpuStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
-    public static void setGcLogStream() {
+    private void setGcLogStream() {
         String HTTPD_LOG_STREAM = "gcLogStream";
         String VERSION = "1.0.0";
-        gcLogStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);;
+        gcLogStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
     public void publishMemoryData(long date, MemoryUsageLog memoryUsageLog) throws DataEndpointAuthenticationException,
@@ -155,15 +117,10 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-//        String HTTPD_LOG_STREAM = "memoryStream";
-//        String VERSION = "1.0.0";
-//        int defaultThriftPort = 7611;
-//        int defaultBinaryPort = 9611;
-//        HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
+        //HTTPD_LOG_STREAM = "memoryStream"
+        //VERSION = "1.0.0"
 
-        //agent.initialize();
         eventAgent.publishLogEvents(dataPublisher, memoryStream, date, memoryUsageLog);
-
 
     }
 
@@ -173,15 +130,11 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-//        String HTTPD_LOG_STREAM = "gcStream";
-//        String VERSION = "1.0.0";
-//        int defaultThriftPort = 7611;
-//        int defaultBinaryPort = 9611;
-//        HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
+        //HTTPD_LOG_STREAM = "gcStream"
+        //VERSION = "1.0.0"
 
-
-        while(!garbageCollectionLog.isEmpty()){
-            eventAgent.publishLogEvents( dataPublisher, gcStream,garbageCollectionLog.poll() );
+        while (!garbageCollectionLog.isEmpty()) {
+            eventAgent.publishLogEvents(dataPublisher, gcStream, garbageCollectionLog.poll());
         }
 
     }
@@ -192,15 +145,9 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        //String HTTPD_LOG_STREAM = "cpuStream";
-        //String VERSION = "1.0.0";
+        //HTTPD_LOG_STREAM = "cpuStream"
+        //VERSION = "1.0.0"
 
-        //String streamId = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-        //int defaultThriftPort = 7611;
-        //int defaultBinaryPort = 9611;
-        //HttpdAgent agent = new HttpdAgent(defaultThriftPort, defaultBinaryPort);
-
-        //agent.initialize();
         eventAgent.publishLogEvents(dataPublisher, cpuStream, date, cpuLoadLog);
 
     }
@@ -212,13 +159,9 @@ public class DASPublisher {
             DataEndpointException,
             DataEndpointAgentConfigurationException {
 
-//        String HTTPD_LOG_STREAM = "gcLogStream";
-//        String VERSION = "1.0.0";
-//        int defaultThriftPort = 7611;
-//        int defaultBinaryPort = 9611;
-//        HttpdAgent agent = new HttpdAgent(HTTPD_LOG_STREAM, VERSION, defaultThriftPort, defaultBinaryPort);
+        //HTTPD_LOG_STREAM = "gcLogStream"
+        //VERSION = "1.0.0"
 
-        //agent.initialize();
         eventAgent.publishLogEvents(dataPublisher, gcLogStream, fileName);
 
     }
