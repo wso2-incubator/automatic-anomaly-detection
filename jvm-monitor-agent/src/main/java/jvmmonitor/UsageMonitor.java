@@ -11,6 +11,8 @@ import jvmmonitor.management.GarbageCollectionMonitor;
 import jvmmonitor.management.MemoryUsageMonitor;
 import jvmmonitor.model.UsageMonitorLog;
 import jvmmonitor.server.Connection;
+import jvmmonitor.util.GarbageCollectionListener;
+
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
@@ -107,6 +109,15 @@ public class UsageMonitor {
         }
     }
 
+    public void registerGCNotifications(GarbageCollectionListener listener) throws MonitoringNotStartedException {
+
+        if (garbageCollectionMonitor != null){
+            this.garbageCollectionMonitor.registerListener(listener);
+        }else{
+            throw new MonitoringNotStartedException();
+        }
+
+    }
 
     // ====================================Getters=======================
     public GarbageCollectionMonitor getGarbageCollectionMonitor() {
