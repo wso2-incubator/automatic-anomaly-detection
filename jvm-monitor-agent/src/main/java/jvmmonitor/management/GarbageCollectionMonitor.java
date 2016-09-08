@@ -3,7 +3,7 @@ package jvmmonitor.management;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import jvmmonitor.model.GarbageCollectionLog;
-import jvmmonitor.util.GCCollectionListener;
+import jvmmonitor.util.GarbageCollectionListener;
 import org.apache.log4j.Logger;
 
 import javax.management.MBeanServerConnection;
@@ -52,7 +52,7 @@ public class GarbageCollectionMonitor {
 
     private List<GarbageCollectorMXBean> gcBeans;
     private List<GarbageCollectionLog> gcUsages;
-    private List<GCCollectionListener> listeners;
+    private List<GarbageCollectionListener> listeners;
 
     private long jvmStartTime;
 
@@ -83,7 +83,7 @@ public class GarbageCollectionMonitor {
     public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
 
         this.gcUsages = new LinkedList<GarbageCollectionLog>();
-        this.listeners = new ArrayList<GCCollectionListener>();
+        this.listeners = new ArrayList<GarbageCollectionListener>();
 
         Set<ObjectName> gcnames = serverConnection.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
         this.gcBeans = new ArrayList<GarbageCollectorMXBean>(gcnames.size());
@@ -215,7 +215,7 @@ public class GarbageCollectionMonitor {
                     gcUsages.add(gclog);
                 }
                 if (gcUsages.size() > 0){
-                    for ( GCCollectionListener l : listeners) {
+                    for ( GarbageCollectionListener l : listeners) {
                         l.processGClogs();
                     }
                 }
@@ -245,6 +245,9 @@ public class GarbageCollectionMonitor {
         }
     }
 
+    public void registerListener(GarbageCollectionListener listener){
+        this.listeners.add(listener);
+    }
     //====================setters and getters=============================
     public List<GarbageCollectorMXBean> getGcBeans() {
         return gcBeans;
