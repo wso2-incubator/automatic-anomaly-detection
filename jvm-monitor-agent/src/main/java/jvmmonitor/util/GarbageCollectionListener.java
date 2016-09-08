@@ -1,5 +1,9 @@
 package jvmmonitor.util;
 
+import jvmmonitor.model.GarbageCollectionLog;
+
+import java.util.List;
+
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -19,5 +23,5 @@ package jvmmonitor.util;
 */
 public interface GarbageCollectionListener {
 
-    void processGClogs();
+    void processGClogs(List<GarbageCollectionLog> gcLogList);
 }
