@@ -82,6 +82,9 @@ public class ExtractGCData {
             CaseCollection = message.substring(index + 1, index = message.indexOf(')'));
             message = message.substring(index + 1);
 
+            /**
+             * Extract data according Minor GC
+             */
             if (GCFlage.equals("GC")) {
 
                 GCName = message.substring(message.indexOf('[') + 1, index = message.indexOf(':'));
@@ -107,6 +110,9 @@ public class ExtractGCData {
 
             }
 
+            /**
+             * Extract data according Major GC
+             */
             if (GCFlage.equals("FullGC")) {
 
                 GCName = message.substring(message.indexOf('[') + 1, index = message.indexOf(':'));

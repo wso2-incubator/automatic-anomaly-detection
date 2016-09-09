@@ -49,6 +49,21 @@ public class DASPublisher {
 
     final static Logger logger = Logger.getLogger(DASPublisher.class);
 
+    /**
+     * Need to set client-truststore.jks file located path
+     *
+     * @param defaultThriftPort
+     * @param defaultBinaryPort
+     * @param username
+     * @param password
+     * @throws SocketException
+     * @throws UnknownHostException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointException
+     * @throws DataEndpointConfigurationException
+     */
     public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -88,34 +103,126 @@ public class DASPublisher {
 
     }
 
+    /**
+     * Shutdown the DataPublisher
+     *
+     * @throws DataEndpointException
+     */
     public void shutdownDataPublisher() throws DataEndpointException {
         dataPublisher.shutdown();
     }
 
+    /**
+     * Generate StreamId for Memory data
+     * <p>
+     * Data format must be in the following order in given types in "memoryStream":-
+     * <p>
+     * long  MAX_HEAP_MEMORY
+     * long  ALLOCATED_HEAP_MEMORY
+     * long  USED_HEAP_MEMORY
+     * long  MAX_NON_HEAP_MEMORY
+     * long  ALLOCATED_NON_HEAP_MEMORY
+     * long  USED_NON_HEAP_MEMORY
+     * long  PENDING_FINALIZATIONS
+     */
     private void setMemoryStream() {
         String HTTPD_LOG_STREAM = "memoryStream";
         String VERSION = "1.0.0";
         memoryStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
+    /**
+     * Generate StreamId for Garbage Collection data
+     * <p>
+     * Data format must be in the following order in given types in "gcStream":-
+     * <p>
+     * String	GC_TYPE
+     * long     GC_DURATION
+     * long     GC_START_TIME
+     * String	GC_CAUSE
+     * long     EDEN_USED_MEMORY_AFTER_GC
+     * long     EDEN_USED_MEMORY_BEFORE_GC
+     * long	    SURVIVOR_USED_MEMORY_AFTER_GC
+     * long	    SURVIVOR_USED_MEMORY_BEFORE_GC
+     * long	    OLD_GEN_USED_MEMORY_AFTER_GC
+     * long  	OLD_GEN_USED_MEMORY_BEFORE_GC
+     * long 	EDEN_COMMITTED_MEMORY_AFTER_GC
+     * long 	EDEN_COMMITTED_MEMORY_BEFORE_GC
+     * long 	SURVIVOR_COMMITTED_MEMORY_AFTER_GC
+     * long 	SURVIVOR_COMMITTED_MEMORY_BEFORE_GC
+     * long 	OLD_GEN_COMMITTED_MEMORY_AFTER_GC
+     * long 	OLD_GEN_COMMITTED_MEMORY_BEFORE_GC
+     * long 	EDEN_MAX_MEMORY_AFTER_GC
+     * long 	EDEN_MAX_MEMORY_BEFORE_GC
+     * long 	SURVIVOR_MAX_MEMORY_AFTER_GC
+     * long 	SURVIVOR_MAX_MEMORY_BEFORE_GC
+     * long 	OLD_GEN_MAX_MEMORY_AFTER_GC
+     * long 	OLD_GEN_MAX_MEMORY_BEFORE_GC
+     */
     private void setGcStream() {
         String HTTPD_LOG_STREAM = "gcStream";
         String VERSION = "1.0.0";
         gcStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
+    /**
+     * Generate StreamId for CPU data
+     * <p>
+     * Data format must be in the following order in given types in "cpuStream":-
+     * <p>
+     * double   processCPULoad
+     * double   systemCPULoad
+     */
     private void setCpuStream() {
         String HTTPD_LOG_STREAM = "cpuStream";
         String VERSION = "1.0.0";
         cpuStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
+    /**
+     * Generate StreamId for Garbage Collection data
+     * Garbage Collection data should be in format -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps
+     * <p>
+     * Data format must be in the following order in given types in "gcLogStream":-
+     * <p>
+     * String	Date
+     * String   TimeStarted
+     * double   TimePass
+     * String   GCFlage
+     * String   CaseCollection
+     * String   GCName
+     * long     YoungGenerationBefore
+     * long     YoungGenerationAfter
+     * long     TotalYoungGeneration
+     * long     OldGenerationBefore
+     * long     OldGenerationAfter
+     * long     TotalOldGeneration
+     * long     MetaspaceGenerationBefore
+     * long     MetaspaceGenerationAfter
+     * long     TotalMetaspaceGeneration
+     * long     TotalUsedHeapBefore
+     * long     TotalUsedHeapAfter
+     * long     TotalAvailableHeap
+     * double   GCEventDuration
+     * double   GCEventUserTimes
+     * double   GCEventSysTimes
+     * double   GCEventRealTimes
+     */
     private void setGcLogStream() {
         String HTTPD_LOG_STREAM = "gcLogStream";
         String VERSION = "1.0.0";
         gcLogStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
+    /**
+     * @param date
+     * @param memoryUsageLog
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws DataEndpointException
+     * @throws DataEndpointConfigurationException
+     * @throws TransportException
+     */
     public void publishMemoryData(long date, MemoryUsageLog memoryUsageLog) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             DataEndpointException,
@@ -129,6 +236,14 @@ public class DASPublisher {
 
     }
 
+    /**
+     * @param garbageCollectionLog
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws DataEndpointException
+     * @throws DataEndpointConfigurationException
+     * @throws TransportException
+     */
     public void publishGCData(LinkedList<GarbageCollectionLog> garbageCollectionLog) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             DataEndpointException,
@@ -144,6 +259,15 @@ public class DASPublisher {
 
     }
 
+    /**
+     * @param date
+     * @param cpuLoadLog
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws DataEndpointException
+     * @throws DataEndpointConfigurationException
+     * @throws TransportException
+     */
     public void publishCPUData(long date, CPULoadLog cpuLoadLog) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             DataEndpointException,
@@ -157,6 +281,15 @@ public class DASPublisher {
 
     }
 
+    /**
+     * @param fileName
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     * @throws FileNotFoundException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointException
+     * @throws DataEndpointAgentConfigurationException
+     */
     public void publishXXgcLogData(String fileName) throws TransportException,
             DataEndpointConfigurationException,
             FileNotFoundException,
@@ -171,6 +304,11 @@ public class DASPublisher {
 
     }
 
+    /**
+     * Need to set resource files located path
+     *
+     * @return
+     */
     public static String getDataAgentConfigPath() {
         File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
         if (!filePath.exists()) {

@@ -30,6 +30,10 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
 
+/**
+ * This class runs "BadCode.jar" file to get jvm usage data
+ * Need to set .jar file path
+ */
 public class Test {
 
     public static void main(String[] args) throws IOException,
@@ -44,6 +48,7 @@ public class Test {
             DataEndpointConfigurationException {
 
         String currentDir = System.getProperty("user.dir");
+        //Set jar file path
         Runtime.getRuntime().exec("java -jar " + currentDir + "/jvm-monitor-agent/src/samples/BadCode.jar");
         String pid = null;
 

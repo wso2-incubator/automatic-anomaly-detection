@@ -36,10 +36,26 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * This class creates Event according to Usage data and send to DataPublisher
+ */
 public class EventPublisher {
 
     final static Logger logger = Logger.getLogger(EventPublisher.class);
 
+    /**
+     * This method publish CPU Load Log data to DAS
+     *
+     * @param dataPublisher
+     * @param streamId
+     * @param date
+     * @param cpuLog
+     * @throws DataEndpointException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     */
     public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -55,6 +71,18 @@ public class EventPublisher {
 
     }
 
+    /**
+     * This method publish Garbage Collection Log data to DAS
+     *
+     * @param dataPublisher
+     * @param streamId
+     * @param gcLog
+     * @throws DataEndpointException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     */
     public void publishLogEvents(DataPublisher dataPublisher, String streamId, GarbageCollectionLog gcLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -100,6 +128,19 @@ public class EventPublisher {
 
     }
 
+    /**
+     * This method publish Memory Usage Log data to DAS
+     *
+     * @param dataPublisher
+     * @param streamId
+     * @param date
+     * @param memoryLog
+     * @throws DataEndpointException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     */
     public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, MemoryUsageLog memoryLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -124,6 +165,19 @@ public class EventPublisher {
 
     }
 
+    /**
+     * This method publish Garbage Collection Log data from file to DAS
+     *
+     * @param dataPublisher
+     * @param streamId
+     * @param fileName
+     * @throws DataEndpointException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     * @throws FileNotFoundException
+     */
     public void publishLogEvents(DataPublisher dataPublisher, String streamId, String fileName) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,

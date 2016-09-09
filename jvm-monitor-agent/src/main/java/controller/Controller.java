@@ -45,6 +45,18 @@ public class Controller implements GarbageCollectionListener {
 
     private static long startTime;
 
+    /**
+     * Constructor
+     * Initialize DASPublisher objects
+     *
+     * @throws DataEndpointException
+     * @throws SocketException
+     * @throws UnknownHostException
+     * @throws DataEndpointConfigurationException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     */
     public Controller() throws DataEndpointException,
             SocketException,
             UnknownHostException,
@@ -59,6 +71,18 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
+    /**
+     * Required Process ID to get Usage data
+     *
+     * @param pid
+     * @param controllerObj
+     * @throws IOException
+     * @throws AttachNotSupportedException
+     * @throws MalformedObjectNameException
+     * @throws InterruptedException
+     * @throws MonitoringNotStartedException
+     * @throws DataEndpointException
+     */
     public void sendUsageData(String pid, Controller controllerObj) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
@@ -154,7 +178,11 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
-
+    /**
+     *Implement method by GarbageCollectionListener interface
+     *
+     * @param gcLogList
+     **/
     public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
 
         try {
