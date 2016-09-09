@@ -1,5 +1,23 @@
 package controller;
 
+/*
+*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+
 import com.sun.tools.attach.AttachNotSupportedException;
 import communicator.DASPublisher;
 import jvmmonitor.UsageMonitor;
@@ -19,23 +37,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
-/*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
 
 public class Controller implements GarbageCollectionListener {
 
@@ -45,6 +46,18 @@ public class Controller implements GarbageCollectionListener {
 
     private static long startTime;
 
+    /**
+     * Constructor
+     * Initialize DASPublisher objects
+     *
+     * @throws DataEndpointException
+     * @throws SocketException
+     * @throws UnknownHostException
+     * @throws DataEndpointConfigurationException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     */
     public Controller() throws DataEndpointException,
             SocketException,
             UnknownHostException,
@@ -59,6 +72,18 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
+    /**
+     * Required Process ID to get Usage data
+     *
+     * @param pid
+     * @param controllerObj
+     * @throws IOException
+     * @throws AttachNotSupportedException
+     * @throws MalformedObjectNameException
+     * @throws InterruptedException
+     * @throws MonitoringNotStartedException
+     * @throws DataEndpointException
+     */
     public void sendUsageData(String pid, Controller controllerObj) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
@@ -154,7 +179,11 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
-
+    /**
+     * Implement method by GarbageCollectionListener interface
+     *
+     * @param gcLogList
+     **/
     public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
 
         try {

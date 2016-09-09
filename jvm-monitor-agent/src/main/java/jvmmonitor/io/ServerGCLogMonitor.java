@@ -30,8 +30,12 @@ import java.io.FileNotFoundException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+
 public class ServerGCLogMonitor {
 
+    /**
+     * Need to set .log file located path
+     */
     private static final String SAMPLE_LOG_PATH = System.getProperty("user.dir") + "/jvm-monitor-agent/src/samples/log/gc.log";
     final static Logger logger = Logger.getLogger(ServerGCLogMonitor.class);
 
@@ -45,7 +49,7 @@ public class ServerGCLogMonitor {
             TransportException {
 
         DASPublisher dasPublisherObj = new DASPublisher(7611, 9611, "admin", "admin");
-        logger.info("Read log file : "+SAMPLE_LOG_PATH);
+        logger.info("Read log file : " + SAMPLE_LOG_PATH);
         dasPublisherObj.publishXXgcLogData(SAMPLE_LOG_PATH);
         dasPublisherObj.shutdownDataPublisher();
 
