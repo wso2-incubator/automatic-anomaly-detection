@@ -127,7 +127,7 @@ public class DASPublisher {
      * long  PENDING_FINALIZATIONS
      */
     private void setMemoryStream() {
-        String HTTPD_LOG_STREAM = "memoryStream";
+        String HTTPD_LOG_STREAM = "MemoryUsageStream";
         String VERSION = "1.0.0";
         memoryStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
@@ -161,7 +161,7 @@ public class DASPublisher {
      * long 	OLD_GEN_MAX_MEMORY_BEFORE_GC
      */
     private void setGcStream() {
-        String HTTPD_LOG_STREAM = "gcStream";
+        String HTTPD_LOG_STREAM = "GarbageCollectionStream";
         String VERSION = "1.0.0";
         gcStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
@@ -175,7 +175,7 @@ public class DASPublisher {
      * double   systemCPULoad
      */
     private void setCpuStream() {
-        String HTTPD_LOG_STREAM = "cpuStream";
+        String HTTPD_LOG_STREAM = "CPUUsageStream";
         String VERSION = "1.0.0";
         cpuStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
