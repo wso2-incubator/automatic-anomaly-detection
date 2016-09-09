@@ -28,6 +28,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import javax.management.MalformedObjectNameException;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -47,20 +48,34 @@ public class Test {
             DataEndpointException,
             DataEndpointConfigurationException {
 
+        //Set jar file name & file located path relative to project directory
+        String fileName = "BadCode.jar";
+        String jarFilePath = "/jvm-monitor-agent/src/samples";
+
         String currentDir = System.getProperty("user.dir");
-        //Set jar file path
-        Runtime.getRuntime().exec("java -jar " + currentDir + "/jvm-monitor-agent/src/samples/BadCode.jar");
+        jarFilePath = currentDir + jarFilePath + "/" + fileName;
+
+        if (!(new File(jarFilePath).isFile())) {
+            System.err.println("Could not find .jar file in given directory: " + jarFilePath);
+            System.exit(0);
+        }
+
+        Runtime.getRuntime().exec("java -jar " + jarFilePath);
         String pid = null;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
-            if (vmd.displayName().indexOf("BadCode.jar") != -1) {
+            if (vmd.displayName().indexOf(fileName) != -1) {
                 pid = vmd.id();
                 System.out.println(vmd.id() + "\t" + vmd.displayName());
             }
         }
 
-        Controller controllerObj = new Controller();
-        controllerObj.sendUsageData(pid, controllerObj);
+        if (pid == null) {
+            System.err.println("Given .jar file is not running");
+        } else {
+            Controller controllerObj = new Controller();
+            controllerObj.sendUsageData(pid, controllerObj);
+        }
 
         Runtime.getRuntime().exec("kill -9 " + pid);
 
