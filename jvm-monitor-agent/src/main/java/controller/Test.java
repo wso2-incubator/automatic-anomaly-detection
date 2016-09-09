@@ -62,22 +62,25 @@ public class Test {
 
         Runtime.getRuntime().exec("java -jar " + jarFilePath);
         String pid = null;
+        int counter = 0;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
             if (vmd.displayName().indexOf(fileName) != -1) {
                 pid = vmd.id();
                 System.out.println(vmd.id() + "\t" + vmd.displayName());
+                counter++;
             }
         }
 
         if (pid == null) {
             System.err.println("Given .jar file is not running");
-        } else {
+        } else if (counter == 1) {
             Controller controllerObj = new Controller();
             controllerObj.sendUsageData(pid, controllerObj);
+            Runtime.getRuntime().exec("kill -9 " + pid);
+        } else {
+            System.err.println("You have multiple " + fileName + " Process");
         }
-
-        Runtime.getRuntime().exec("kill -9 " + pid);
 
     }
 }
