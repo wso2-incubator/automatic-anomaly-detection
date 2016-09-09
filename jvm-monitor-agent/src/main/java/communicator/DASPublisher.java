@@ -125,6 +125,7 @@ public class DASPublisher {
      * long  ALLOCATED_NON_HEAP_MEMORY
      * long  USED_NON_HEAP_MEMORY
      * long  PENDING_FINALIZATIONS
+     * long  timestamp
      */
     private void setMemoryStream() {
         String HTTPD_LOG_STREAM = "MemoryUsageStream";
@@ -173,6 +174,7 @@ public class DASPublisher {
      * <p>
      * double   processCPULoad
      * double   systemCPULoad
+     * long     timestamp
      */
     private void setCpuStream() {
         String HTTPD_LOG_STREAM = "CPUUsageStream";
