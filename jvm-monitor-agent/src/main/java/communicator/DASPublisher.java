@@ -116,7 +116,7 @@ public class DASPublisher {
     /**
      * Generate StreamId for Memory data
      * <p>
-     * Data format must be in the following order in given types in "memoryStream":-
+     * Data format must be in the following order in given types in "MemoryUsageStream":-
      * <p>
      * long  MAX_HEAP_MEMORY
      * long  ALLOCATED_HEAP_MEMORY
@@ -135,7 +135,7 @@ public class DASPublisher {
     /**
      * Generate StreamId for Garbage Collection data
      * <p>
-     * Data format must be in the following order in given types in "gcStream":-
+     * Data format must be in the following order in given types in "GarbageCollectionStream":-
      * <p>
      * String	GC_TYPE
      * long     GC_DURATION
@@ -169,7 +169,7 @@ public class DASPublisher {
     /**
      * Generate StreamId for CPU data
      * <p>
-     * Data format must be in the following order in given types in "cpuStream":-
+     * Data format must be in the following order in given types in "CPUUsageStream":-
      * <p>
      * double   processCPULoad
      * double   systemCPULoad
@@ -230,7 +230,7 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        //HTTPD_LOG_STREAM = "memoryStream"
+        //HTTPD_LOG_STREAM = "MemoryUsageStream"
         //VERSION = "1.0.0"
 
         eventAgent.publishLogEvents(dataPublisher, memoryStream, date, memoryUsageLog);
@@ -251,7 +251,7 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        //HTTPD_LOG_STREAM = "gcStream"
+        //HTTPD_LOG_STREAM = "GarbageCollectionStream"
         //VERSION = "1.0.0"
 
         while (!garbageCollectionLog.isEmpty()) {
@@ -275,7 +275,7 @@ public class DASPublisher {
             DataEndpointConfigurationException,
             TransportException {
 
-        //HTTPD_LOG_STREAM = "cpuStream"
+        //HTTPD_LOG_STREAM = "CPUUsageStream"
         //VERSION = "1.0.0"
 
         eventAgent.publishLogEvents(dataPublisher, cpuStream, date, cpuLoadLog);
