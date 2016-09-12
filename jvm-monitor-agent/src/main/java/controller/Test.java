@@ -21,6 +21,7 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -28,14 +29,18 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import javax.management.MalformedObjectNameException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * This class runs "BadCode.jar" file to get jvm usage data
  * Need to set .jar file path
  */
 public class Test {
+
+    final static Logger logger = Logger.getLogger(Test.class);
 
     public static void main(String[] args) throws IOException,
             AttachNotSupportedException,
@@ -48,6 +53,47 @@ public class Test {
             DataEndpointException,
             DataEndpointConfigurationException {
 
+        //If you use java code
+        //Set java file name & file located path relative to project directory
+        String fileName = "BadCode";
+        String jarFilePath = "/jvm-monitor-agent/src/samples/applications";
+        String currentDir = System.getProperty("user.dir");
+        jarFilePath = currentDir + jarFilePath + "/";
+
+        String error = null, out = "";
+        boolean isCompile = true;
+
+        if ((new File(jarFilePath + fileName + ".class").isFile())) {
+            String cmd = "java -classpath " + jarFilePath + " " + fileName;
+            logger.info(cmd);
+            Runtime.getRuntime().exec(cmd);
+        } else if ((new File(jarFilePath + fileName + ".java").isFile())) {
+            String cmd = "javac " + jarFilePath + fileName + ".java";
+            logger.info(cmd);
+
+            Process prc = Runtime.getRuntime().exec(cmd);
+            BufferedReader stdError = new BufferedReader(new InputStreamReader(prc.getErrorStream()));
+            while ((error = stdError.readLine()) != null) {
+                out += error + '\n';
+                isCompile = false;
+            }
+
+            if (!isCompile) {
+                logger.error(out);
+                System.exit(0);
+            }
+
+            Thread.sleep(3000);
+            cmd = "java -classpath " + jarFilePath + " " + fileName;
+            logger.info(cmd);
+            Runtime.getRuntime().exec(cmd);
+        } else {
+            System.err.println("Could not find .java file in given directory: " + jarFilePath);
+            System.exit(0);
+        }
+
+        /*
+        //If you use.Jar file pleases uncomment following part and comment above part
         //Set jar file name & file located path relative to project directory
         String fileName = "BadCode.jar";
         String jarFilePath = "/jvm-monitor-agent/src/samples";
@@ -61,13 +107,15 @@ public class Test {
         }
 
         Runtime.getRuntime().exec("java -jar " + jarFilePath);
+        */
+
         String pid = null;
         int counter = 0;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
             if (vmd.displayName().indexOf(fileName) != -1) {
                 pid = vmd.id();
-                System.out.println(vmd.id() + "\t" + vmd.displayName());
+                logger.info(vmd.id() + "\t" + vmd.displayName());
                 counter++;
             }
         }
