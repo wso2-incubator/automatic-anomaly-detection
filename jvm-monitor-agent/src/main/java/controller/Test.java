@@ -36,7 +36,7 @@ import java.io.InputStreamReader;
 
 /**
  * This class runs "BadCode.jar" file to get jvm usage data
- * Need to set .jar file path
+ * Need to set .java or .jar file path
  */
 public class Test {
 
@@ -55,11 +55,11 @@ public class Test {
 
         //If you use java code
         //Set java file name & file located path relative to project directory
-        String fileName = "BadCode";
+        String fileName = "BadCode1";
         String jarFilePath = "/jvm-monitor-agent/src/samples/applications";
+
         String currentDir = System.getProperty("user.dir");
         jarFilePath = currentDir + jarFilePath + "/";
-
         String error = null, out = "";
         boolean isCompile = true;
 
@@ -88,12 +88,12 @@ public class Test {
             logger.info(cmd);
             Runtime.getRuntime().exec(cmd);
         } else {
-            System.err.println("Could not find .java file in given directory: " + jarFilePath);
+            logger.error("Could not find \"" + fileName + "\" java file in given directory: " + jarFilePath);
             System.exit(0);
         }
 
         /*
-        //If you use.Jar file pleases uncomment following part and comment above part
+        //If you use .jar file pleases uncomment following part and comment above part
         //Set jar file name & file located path relative to project directory
         String fileName = "BadCode.jar";
         String jarFilePath = "/jvm-monitor-agent/src/samples";
@@ -121,13 +121,13 @@ public class Test {
         }
 
         if (pid == null) {
-            System.err.println("Given .jar file is not running");
+            logger.error("Given \"" + fileName + "\" file is not running");
         } else if (counter == 1) {
             Controller controllerObj = new Controller();
             controllerObj.sendUsageData(pid, controllerObj);
             Runtime.getRuntime().exec("kill -9 " + pid);
         } else {
-            System.err.println("You have multiple " + fileName + " Process");
+            logger.error("You have multiple \"" + fileName + "\" Process");
         }
 
     }
