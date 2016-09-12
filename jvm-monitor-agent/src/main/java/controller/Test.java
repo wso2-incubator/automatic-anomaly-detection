@@ -55,7 +55,7 @@ public class Test {
 
         //If you use java code
         //Set java file name & file located path relative to project directory
-        String fileName = "BadCode1";
+        String fileName = "BadCode";
         String jarFilePath = "/jvm-monitor-agent/src/samples/applications";
 
         String currentDir = System.getProperty("user.dir");
@@ -64,29 +64,41 @@ public class Test {
         boolean isCompile = true;
 
         if ((new File(jarFilePath + fileName + ".class").isFile())) {
+
             String cmd = "java -classpath " + jarFilePath + " " + fileName;
             logger.info(cmd);
-            Runtime.getRuntime().exec(cmd);
+            try {
+                Runtime.getRuntime().exec(cmd);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
         } else if ((new File(jarFilePath + fileName + ".java").isFile())) {
+
             String cmd = "javac " + jarFilePath + fileName + ".java";
             logger.info(cmd);
 
-            Process prc = Runtime.getRuntime().exec(cmd);
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(prc.getErrorStream()));
-            while ((error = stdError.readLine()) != null) {
-                out += error + '\n';
-                isCompile = false;
+            try {
+                Process prc = Runtime.getRuntime().exec(cmd);
+                BufferedReader stdError = new BufferedReader(new InputStreamReader(prc.getErrorStream()));
+                while ((error = stdError.readLine()) != null) {
+                    out += error + '\n';
+                    isCompile = false;
+                }
+
+                if (!isCompile) {
+                    logger.error(out);
+                    System.exit(0);
+                }
+
+                Thread.sleep(3000);
+                cmd = "java -classpath " + jarFilePath + " " + fileName;
+                logger.info(cmd);
+                Runtime.getRuntime().exec(cmd);
+            } catch (Exception e) {
+                logger.error(e);
             }
 
-            if (!isCompile) {
-                logger.error(out);
-                System.exit(0);
-            }
-
-            Thread.sleep(3000);
-            cmd = "java -classpath " + jarFilePath + " " + fileName;
-            logger.info(cmd);
-            Runtime.getRuntime().exec(cmd);
         } else {
             logger.error("Could not find \"" + fileName + "\" java file in given directory: " + jarFilePath);
             System.exit(0);
@@ -106,7 +118,11 @@ public class Test {
             System.exit(0);
         }
 
-        Runtime.getRuntime().exec("java -jar " + jarFilePath);
+        try {
+            Runtime.getRuntime().exec("java -jar " + jarFilePath);
+        } catch (Exception e) {
+            logger.error(e);
+        }
         */
 
         String pid = null;
@@ -125,7 +141,11 @@ public class Test {
         } else if (counter == 1) {
             Controller controllerObj = new Controller();
             controllerObj.sendUsageData(pid, controllerObj);
-            Runtime.getRuntime().exec("kill -9 " + pid);
+            try {
+                Runtime.getRuntime().exec("kill -9 " + pid);
+            } catch (Exception e) {
+                logger.error(e);
+            }
         } else {
             logger.error("You have multiple \"" + fileName + "\" Process");
         }
