@@ -19,9 +19,21 @@
 public class Executor {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("GenerateOOM started......");
         Thread.sleep(5000);
-        generateOOM(1.1,10000);
+
+        double x = 1;
+        int y = 10000;
+
+        if (args.length == 1){
+            x = Double.parseDouble(args[0]);
+        }
+        if (args.length > 1) {
+            x = Double.parseDouble(args[0]);
+            y = Integer.parseInt(args[1]);
+        }
+
+
+        generateOOM(x,y);
     }
 
 
