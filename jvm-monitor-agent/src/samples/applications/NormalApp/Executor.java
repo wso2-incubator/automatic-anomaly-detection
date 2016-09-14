@@ -26,14 +26,26 @@ import java.util.concurrent.Executors;
 /**
  * This class provides normal application scenarios
  */
-public class App1 {
+public class Executor {
 
+    /**
+     * Parameters:-
+     * <p>
+     * int  Numbers of Threads
+     * int  Thread Pool size
+     * int  Max main list size
+     * int  Array size
+     * long Threads sleep time
+     *
+     * eg:- 3 5 100000 10 1500
+     */
     public static void main(String[] args) {
 
-        int numbersOfThread = 8;
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        int numbersOfThread = Integer.parseInt(args[0]);
+        ExecutorService executor = Executors.newFixedThreadPool(Integer.parseInt(args[1]));
+        ListSort.maxMainlistSize = Integer.parseInt(args[2]);
         for (int i = 0; i < numbersOfThread; i++) {
-            Runnable worker = new NumberBuilder(100, 100);
+            Runnable worker = new NumberBuilder(Integer.parseInt(args[3]), Integer.parseInt(args[4]));
             executor.execute(worker);
         }
         executor.shutdown();
@@ -83,7 +95,7 @@ class NumberBuilder implements Runnable {
 class ListSort {
 
     public static CopyOnWriteArrayList<Integer> mainNumberList = new CopyOnWriteArrayList<Integer>();
-    private int maxMainlistSize = 100000;
+    public static int maxMainlistSize;
 
     public synchronized void addtoMainList(List<Integer> numbers) {
 
@@ -92,8 +104,7 @@ class ListSort {
         }
 
         mainNumberList.addAll(numbers);
-        ListSort listSort = new ListSort();
-        listSort.bubbleSort(mainNumberList);
+        bubbleSort(mainNumberList);
 
     }
 
