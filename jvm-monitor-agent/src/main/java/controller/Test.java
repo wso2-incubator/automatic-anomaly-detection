@@ -53,19 +53,24 @@ public class Test {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        //If you use java code
+
+
+         //If you use java code
         //Set java file name & file located path relative to project directory
-        String fileName = "BadCode";
-        String jarFilePath = "/jvm-monitor-agent/src/samples/applications";
+        String fileName = "Executor";
+        String jarFilePath = "/jvm-monitor-agent/src/samples/applications" + "/GenerateOOM";
+        String arg = "1 10000";
 
         String currentDir = System.getProperty("user.dir");
         jarFilePath = currentDir + jarFilePath + "/";
         String error = null, out = "";
         boolean isCompile = true;
+        boolean doCompile = true;
 
-        if ((new File(jarFilePath + fileName + ".class").isFile())) {
 
-            String cmd = "java -classpath " + jarFilePath + " " + fileName;
+        if ((new File(jarFilePath + fileName + ".class").isFile()) && !doCompile) {
+
+            String cmd = "java -classpath " + jarFilePath + " " + fileName + " " + arg;
             logger.info(cmd);
             try {
                 Runtime.getRuntime().exec(cmd);
@@ -92,7 +97,7 @@ public class Test {
                 }
 
                 Thread.sleep(3000);
-                cmd = "java -classpath " + jarFilePath + " " + fileName;
+                cmd = "java -classpath " + jarFilePath + " " + fileName + " "+ arg;
                 logger.info(cmd);
                 Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
@@ -133,6 +138,13 @@ public class Test {
                 pid = vmd.id();
                 logger.info(vmd.id() + "\t" + vmd.displayName());
                 counter++;
+
+                if (counter > 1){
+                    System.out.println(pid + " " + counter);
+                    Runtime.getRuntime().exec("kill -9 " + pid);
+                    counter--;
+                }
+
             }
         }
 
