@@ -25,6 +25,7 @@ import communicator.DASPublisher;
 import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.model.UsageMonitorLog;
 import jvmmonitor.util.GarbageCollectionListener;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -48,6 +49,18 @@ public class Controller implements GarbageCollectionListener {
     private final DAScpuPublisher dasCPUPublisher;
 
 
+    /**
+     * Constructor
+     * Initialize DASPublisher objects
+     *
+     * @throws DataEndpointException
+     * @throws SocketException
+     * @throws UnknownHostException
+     * @throws DataEndpointConfigurationException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     */
     public Controller() throws DataEndpointException,
             SocketException,
             UnknownHostException,
@@ -62,6 +75,18 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
+    /**
+     * This method sends CPU and Memory usage data per second
+     *
+     * @param pid
+     * @param controllerObj
+     * @throws IOException
+     * @throws AttachNotSupportedException
+     * @throws MalformedObjectNameException
+     * @throws InterruptedException
+     * @throws MonitoringNotStartedException
+     * @throws DataEndpointException
+     */
     public void sendUsageData(String pid, Controller controllerObj) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
@@ -73,23 +98,32 @@ public class Controller implements GarbageCollectionListener {
         usageObj.stratMonitoring();
         usageObj.registerGCNotifications(controllerObj);
 
+        //Create thread pool
         ExecutorService executor = Executors.newFixedThreadPool(3);
-        dasMemoryPublisher.setUsageObj(usageObj);
-        dasCPUPublisher.setUsageObj(usageObj);
 
         Runnable memory = dasMemoryPublisher;
         Runnable cpu = dasCPUPublisher;
 
-        executor.execute(memory);
-        executor.execute(cpu);
+        while (true) {
 
-        executor.shutdown();
-        while (!executor.isTerminated()) {
+            UsageMonitorLog usageLogObj = usageObj.getUsageLog();
+            dasMemoryPublisher.setUsageLogObj(usageLogObj);
+            dasCPUPublisher.setUsageLogObj(usageLogObj);
+
+            executor.execute(memory);
+            executor.execute(cpu);
+
+            Thread.sleep(1000);
+
         }
 
-        dasMemoryPublisher.shutdownDataPublisher();
-        dasCPUPublisher.shutdownDataPublisher();
-        dasGCPublisher.shutdownDataPublisher();
+//        executor.shutdown();
+//        while (!executor.isTerminated()) {
+//        }
+//
+//        dasMemoryPublisher.shutdownDataPublisher();
+//        dasCPUPublisher.shutdownDataPublisher();
+//        dasGCPublisher.shutdownDataPublisher();
 
     }
 
