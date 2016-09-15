@@ -18,8 +18,6 @@
 
 package communicator;
 
-import jvmmonitor.UsageMonitor;
-import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.model.UsageMonitorLog;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.AgentHolder;
@@ -41,11 +39,12 @@ public class DASmemoryPublisher implements Runnable {
     private DataPublisher dataPublisher;
     private String dataStream;
     private EventPublisher eventAgent;
-    private static UsageMonitor usageObj;
+    private UsageMonitorLog usageLogObj;
 
     final static Logger logger = Logger.getLogger(DASmemoryPublisher.class);
 
     /**
+     * Constructor
      * Need to set client-truststore.jks file located path
      *
      * @param defaultThriftPort
@@ -102,12 +101,12 @@ public class DASmemoryPublisher implements Runnable {
     }
 
     /**
-     * Need to set UsageMonitor before publish data to DAS
+     * Need to set UsageMonitorLog before publish data to DAS
      *
-     * @param usageObj
+     * @param usageLogObj
      */
-    public static void setUsageObj(UsageMonitor usageObj) {
-        DASmemoryPublisher.usageObj = usageObj;
+    public void setUsageLogObj(UsageMonitorLog usageLogObj) {
+        this.usageLogObj = usageLogObj;
     }
 
     /**
@@ -143,7 +142,7 @@ public class DASmemoryPublisher implements Runnable {
     /**
      * Need to set resource files located path
      *
-     * @return
+     * @return Data agent config path
      */
     public static String getDataAgentConfigPath() {
         File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
@@ -157,7 +156,7 @@ public class DASmemoryPublisher implements Runnable {
     }
 
     /**
-     * @return
+     * @return LocalAddress
      * @throws SocketException
      * @throws UnknownHostException
      */
@@ -192,33 +191,24 @@ public class DASmemoryPublisher implements Runnable {
 
 
     /**
-     * @Override
+     * @Override method
      */
     public void run() {
-        while (true) {
-            try {
-                UsageMonitorLog usageLogObj = usageObj.getUsageLog();
-                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
-            } catch (MonitoringNotStartedException e) {
-                e.printStackTrace();
-            } catch (DataEndpointConfigurationException e) {
-                e.printStackTrace();
-            } catch (DataEndpointAgentConfigurationException e) {
-                e.printStackTrace();
-            } catch (DataEndpointException e) {
-                e.printStackTrace();
-            } catch (TransportException e) {
-                e.printStackTrace();
-            } catch (DataEndpointAuthenticationException e) {
-                e.printStackTrace();
-            }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getDate(), usageLogObj.getMemoryUsageLog());
+        } catch (DataEndpointConfigurationException e) {
+            e.printStackTrace();
+        } catch (DataEndpointAgentConfigurationException e) {
+            e.printStackTrace();
+        } catch (DataEndpointException e) {
+            e.printStackTrace();
+        } catch (TransportException e) {
+            e.printStackTrace();
+        } catch (DataEndpointAuthenticationException e) {
+            e.printStackTrace();
         }
+
     }
 
 }
