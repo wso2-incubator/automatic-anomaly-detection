@@ -32,7 +32,7 @@ public class UsageMonitorLog {
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
         this.cpuLoadLog = cpuLoadLog;
-        this.timeStamp = new Date().getTime();
+        this.timeStamp = new Date().getTime(); //added the time stamp at object creation
     }
 
     public MemoryUsageLog getMemoryUsageLog() {

@@ -16,8 +16,6 @@ import jvmmonitor.util.GarbageCollectionListener;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -100,6 +98,7 @@ public class UsageMonitor {
      */
     public UsageMonitorLog getUsageLog() throws MonitoringNotStartedException {
 
+        //if all the monitoring metrics are available, return them using UsageMonitorLog model
         if (memoryUsageMonitor != null && garbageCollectionMonitor != null && cpuUsageMonitor != null){
             UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(),garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getCPULoads());
             return usageMonitorLog;
@@ -109,6 +108,12 @@ public class UsageMonitor {
         }
     }
 
+    /**
+     * This method can be used to register GarbageCollectionListener implementations
+     * The listeners will be notified by calling their processGCLogs method
+     * @param listener
+     * @throws MonitoringNotStartedException
+     */
     public void registerGCNotifications(GarbageCollectionListener listener) throws MonitoringNotStartedException {
 
         if (garbageCollectionMonitor != null){

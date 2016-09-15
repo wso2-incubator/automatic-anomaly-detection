@@ -214,6 +214,8 @@ public class GarbageCollectionMonitor {
                 synchronized (gcUsages){
                     gcUsages.add(gclog);
                 }
+
+                //notify the GarbageCollectionListeners that GC logs has arrived
                 if (gcUsages.size() > 0){
                     for ( GarbageCollectionListener l : listeners) {
                         l.processGClogs((LinkedList<GarbageCollectionLog>) gcUsages);
@@ -245,6 +247,12 @@ public class GarbageCollectionMonitor {
         }
     }
 
+
+    /**
+     * Register GarbageCollectionListeners
+     * They can listen to notifications trigger when any GC log arrives
+     * @param listener
+     */
     public void registerListener(GarbageCollectionListener listener){
         this.listeners.add(listener);
     }
