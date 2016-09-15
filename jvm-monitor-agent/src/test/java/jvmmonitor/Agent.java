@@ -64,7 +64,7 @@ public class Agent {
                         System.out.println("Start time : " + formattedDate);
 
                     }
-                Date date1 = new Date(usageMonitor.getUsageLog().getDate());
+                Date date1 = new Date(usageMonitor.getUsageLog().getTimeStamp());
                 SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
                 String formattedDate1 = sdf1.format(date1);
                 System.out.println("Usage Received Time : " + formattedDate1);
