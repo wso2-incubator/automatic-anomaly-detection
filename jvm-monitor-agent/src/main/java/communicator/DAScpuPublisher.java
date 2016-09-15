@@ -40,6 +40,7 @@ public class DAScpuPublisher implements Runnable {
     private String dataStream;
     private EventPublisher eventAgent;
     private UsageMonitorLog usageLogObj;
+    private String appID = "";
 
     final static Logger logger = Logger.getLogger(DAScpuPublisher.class);
 
@@ -110,13 +111,23 @@ public class DAScpuPublisher implements Runnable {
     }
 
     /**
+     * Need to set this to identify particular application
+     *
+     * @param appID
+     */
+    public void setAppID(String appID) {
+        this.appID = appID;
+    }
+
+    /**
      * Generate StreamId for CPU data
      * <p>
      * Data format must be in the following order in given types in "CPUUsageStream":-
      * <p>
-     * double   processCPULoad
-     * double   systemCPULoad
-     * long     Timestamp
+     * long      Timestamp
+     * String    AppID
+     * double    processCPULoad
+     * double    systemCPULoad
      *
      * @param HTTPD_LOG_STREAM
      * @param VERSION
@@ -191,7 +202,7 @@ public class DAScpuPublisher implements Runnable {
     public void run() {
 
         try {
-            eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getDate(), usageLogObj.getCpuLoadLog());
+            eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, usageLogObj.getCpuLoadLog());
         } catch (DataEndpointConfigurationException e) {
             e.printStackTrace();
         } catch (DataEndpointAgentConfigurationException e) {

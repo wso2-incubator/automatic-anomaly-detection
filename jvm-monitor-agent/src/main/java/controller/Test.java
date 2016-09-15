@@ -54,15 +54,14 @@ public class Test {
             DataEndpointConfigurationException {
 
 
-
-         //If you use java code
+        //If you use java code
         //Set java file name & file located path relative to project directory
         String fileName = "Executor";
-        String jarFilePath = "/jvm-monitor-agent/src/samples/applications" + "/GenerateOOM";
+        String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications" + "/GenerateOOM";
         String arg = "1 10000";
 
         String currentDir = System.getProperty("user.dir");
-        jarFilePath = currentDir + jarFilePath + "/";
+        String jarFilePath = currentDir + jarFileRelativePath + "/";
         String error = null, out = "";
         boolean isCompile = true;
         boolean doCompile = true;
@@ -97,7 +96,7 @@ public class Test {
                 }
 
                 Thread.sleep(3000);
-                cmd = "java -classpath " + jarFilePath + " " + fileName + " "+ arg;
+                cmd = "java -classpath " + jarFilePath + " " + fileName + " " + arg;
                 logger.info(cmd);
                 Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
@@ -139,7 +138,7 @@ public class Test {
                 logger.info(vmd.id() + "\t" + vmd.displayName());
                 counter++;
 
-                if (counter > 1){
+                if (counter > 1) {
                     System.out.println(pid + " " + counter);
                     Runtime.getRuntime().exec("kill -9 " + pid);
                     counter--;
@@ -151,8 +150,10 @@ public class Test {
         if (pid == null) {
             logger.error("Given \"" + fileName + "\" file is not running");
         } else if (counter == 1) {
+            String appID = jarFileRelativePath.substring(1).replace('/', '_') + '-' + fileName;
+
             Controller controllerObj = new Controller();
-            controllerObj.sendUsageData(pid, controllerObj);
+            controllerObj.sendUsageData(pid, appID, controllerObj);
             try {
                 Runtime.getRuntime().exec("kill -9 " + pid);
             } catch (Exception e) {
