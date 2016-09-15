@@ -22,7 +22,17 @@ import java.util.LinkedList;
 * under the License.
 */
 
+/**
+ * Can be implemented by any listener of the GarbageCollectionMonitor notifications
+ */
 public interface GarbageCollectionListener {
 
+    /**
+     * Process GC Log queue
+     * Triggered by GarbageCollectionMonitor
+     * Triggered when new garbage collection log arrives
+     * GC Log queue is thread safe
+     * @param gcLogList
+     */
     void processGClogs(LinkedList<GarbageCollectionLog> gcLogList);
 }
