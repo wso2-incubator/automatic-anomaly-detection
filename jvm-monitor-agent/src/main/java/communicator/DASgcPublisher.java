@@ -1,5 +1,3 @@
-package communicator;
-
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -18,9 +16,9 @@ package communicator;
 * under the License.
 */
 
-import jvmmonitor.model.CPULoadLog;
+package communicator;
+
 import jvmmonitor.model.GarbageCollectionLog;
-import jvmmonitor.model.MemoryUsageLog;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
@@ -32,23 +30,19 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.LinkedList;
 
 
-public class DASPublisher {
-
-    private EventPublisher eventAgent;
-    private String memoryStream;
-    private String gcStream;
-    private String cpuStream;
-    private String gcLogStream;
+public class DASgcPublisher {
 
     private DataPublisher dataPublisher;
+    private EventPublisher eventAgent;
+    private String dataStream;
+    private String appID = "";
 
-    final static Logger logger = Logger.getLogger(DASPublisher.class);
+    final static Logger logger = Logger.getLogger(DASgcPublisher.class);
 
     /**
      * Need to set client-truststore.jks file located path
@@ -65,7 +59,7 @@ public class DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException,
+    public DASgcPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
@@ -95,13 +89,22 @@ public class DASPublisher {
 
         dataPublisher = new DataPublisher(type, url, authURL, username, password);
 
-        setMemoryStream();
-        setGcStream();
-        setCpuStream();
-        setGcLogStream();
+        //Set default Garbage collection log Stream
+        String HTTPD_LOG_STREAM = "GarbageCollectionStream";
+        String VERSION = "1.0.0";
+        setDataStream(HTTPD_LOG_STREAM, VERSION);
 
         eventAgent = new EventPublisher();
 
+    }
+
+    /**
+     * Need to set this to identify particular application
+     *
+     * @param appID
+     */
+    public void setAppID(String appID) {
+        this.appID = appID;
     }
 
     /**
@@ -111,26 +114,6 @@ public class DASPublisher {
      */
     public void shutdownDataPublisher() throws DataEndpointException {
         dataPublisher.shutdown();
-    }
-
-    /**
-     * Generate StreamId for Memory data
-     * <p>
-     * Data format must be in the following order in given types in "MemoryUsageStream":-
-     * <p>
-     * long  MAX_HEAP_MEMORY
-     * long  ALLOCATED_HEAP_MEMORY
-     * long  USED_HEAP_MEMORY
-     * long  MAX_NON_HEAP_MEMORY
-     * long  ALLOCATED_NON_HEAP_MEMORY
-     * long  USED_NON_HEAP_MEMORY
-     * long  PENDING_FINALIZATIONS
-     * long  timestamp
-     */
-    private void setMemoryStream() {
-        String HTTPD_LOG_STREAM = "MemoryUsageStream";
-        String VERSION = "1.0.0";
-        memoryStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
     /**
@@ -160,83 +143,12 @@ public class DASPublisher {
      * long 	SURVIVOR_MAX_MEMORY_BEFORE_GC
      * long 	OLD_GEN_MAX_MEMORY_AFTER_GC
      * long 	OLD_GEN_MAX_MEMORY_BEFORE_GC
+     *
+     * @param HTTPD_LOG_STREAM
+     * @param VERSION
      */
-    private void setGcStream() {
-        String HTTPD_LOG_STREAM = "GarbageCollectionStream";
-        String VERSION = "1.0.0";
-        gcStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-    }
-
-    /**
-     * Generate StreamId for CPU data
-     * <p>
-     * Data format must be in the following order in given types in "CPUUsageStream":-
-     * <p>
-     * double   processCPULoad
-     * double   systemCPULoad
-     * long     timestamp
-     */
-    private void setCpuStream() {
-        String HTTPD_LOG_STREAM = "CPUUsageStream";
-        String VERSION = "1.0.0";
-        cpuStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-    }
-
-    /**
-     * Generate StreamId for Garbage Collection data
-     * Garbage Collection data should be in format -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps
-     * <p>
-     * Data format must be in the following order in given types in "gcLogStream":-
-     * <p>
-     * String	Date
-     * String   TimeStarted
-     * double   TimePass
-     * String   GCFlage
-     * String   CaseCollection
-     * String   GCName
-     * long     YoungGenerationBefore
-     * long     YoungGenerationAfter
-     * long     TotalYoungGeneration
-     * long     OldGenerationBefore
-     * long     OldGenerationAfter
-     * long     TotalOldGeneration
-     * long     MetaspaceGenerationBefore
-     * long     MetaspaceGenerationAfter
-     * long     TotalMetaspaceGeneration
-     * long     TotalUsedHeapBefore
-     * long     TotalUsedHeapAfter
-     * long     TotalAvailableHeap
-     * double   GCEventDuration
-     * double   GCEventUserTimes
-     * double   GCEventSysTimes
-     * double   GCEventRealTimes
-     */
-    private void setGcLogStream() {
-        String HTTPD_LOG_STREAM = "gcLogStream";
-        String VERSION = "1.0.0";
-        gcLogStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
-    }
-
-    /**
-     * @param date
-     * @param memoryUsageLog
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointAgentConfigurationException
-     * @throws DataEndpointException
-     * @throws DataEndpointConfigurationException
-     * @throws TransportException
-     */
-    public void publishMemoryData(long date, MemoryUsageLog memoryUsageLog) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
-            TransportException {
-
-        //HTTPD_LOG_STREAM = "MemoryUsageStream"
-        //VERSION = "1.0.0"
-
-        eventAgent.publishLogEvents(dataPublisher, memoryStream, date, memoryUsageLog);
-
+    public void setDataStream(String HTTPD_LOG_STREAM, String VERSION) {
+        dataStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
     }
 
     /**
@@ -257,53 +169,8 @@ public class DASPublisher {
         //VERSION = "1.0.0"
 
         while (!garbageCollectionLog.isEmpty()) {
-            eventAgent.publishLogEvents(dataPublisher, gcStream, garbageCollectionLog.poll());
+            eventAgent.publishLogEvents(dataPublisher, dataStream, appID, garbageCollectionLog.poll());
         }
-
-    }
-
-    /**
-     * @param date
-     * @param cpuLoadLog
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointAgentConfigurationException
-     * @throws DataEndpointException
-     * @throws DataEndpointConfigurationException
-     * @throws TransportException
-     */
-    public void publishCPUData(long date, CPULoadLog cpuLoadLog) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
-            TransportException {
-
-        //HTTPD_LOG_STREAM = "CPUUsageStream"
-        //VERSION = "1.0.0"
-
-        eventAgent.publishLogEvents(dataPublisher, cpuStream, date, cpuLoadLog);
-
-    }
-
-    /**
-     * @param fileName
-     * @throws TransportException
-     * @throws DataEndpointConfigurationException
-     * @throws FileNotFoundException
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointException
-     * @throws DataEndpointAgentConfigurationException
-     */
-    public void publishXXgcLogData(String fileName) throws TransportException,
-            DataEndpointConfigurationException,
-            FileNotFoundException,
-            DataEndpointAuthenticationException,
-            DataEndpointException,
-            DataEndpointAgentConfigurationException {
-
-        //HTTPD_LOG_STREAM = "gcLogStream"
-        //VERSION = "1.0.0"
-
-        eventAgent.publishLogEvents(dataPublisher, gcLogStream, fileName);
 
     }
 
