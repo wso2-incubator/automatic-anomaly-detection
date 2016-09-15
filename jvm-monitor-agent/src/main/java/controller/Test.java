@@ -1,4 +1,3 @@
-package controller;
 /*
 *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -16,6 +15,8 @@ package controller;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package controller;
 
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
@@ -150,10 +151,12 @@ public class Test {
         if (pid == null) {
             logger.error("Given \"" + fileName + "\" file is not running");
         } else if (counter == 1) {
-            String appID = jarFileRelativePath.substring(1).replace('/', '_') + '-' + fileName;
+
+            String appID = (jarFileRelativePath.substring(jarFileRelativePath.lastIndexOf('/') + 1).replace('/', '_') + '-' + fileName).trim();
 
             Controller controllerObj = new Controller();
             controllerObj.sendUsageData(pid, appID, controllerObj);
+
             try {
                 Runtime.getRuntime().exec("kill -9 " + pid);
             } catch (Exception e) {
