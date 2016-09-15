@@ -25,14 +25,14 @@ public class UsageMonitorLog {
     private MemoryUsageLog memoryUsageLog;
     private List<GarbageCollectionLog> garbageCollectionLog;
     private CPULoadLog cpuLoadLog;
-    private Date date;
+    private long timeStamp;
 
 
     public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog, CPULoadLog cpuLoadLog) {
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
         this.cpuLoadLog = cpuLoadLog;
-        this.date = new Date();
+        this.timeStamp = new Date().getTime();
     }
 
     public MemoryUsageLog getMemoryUsageLog() {
@@ -52,11 +52,11 @@ public class UsageMonitorLog {
     }
 
     public long getDate() {
-        return date.getTime();
+        return timeStamp;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDate(long timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public CPULoadLog getCpuLoadLog() {
