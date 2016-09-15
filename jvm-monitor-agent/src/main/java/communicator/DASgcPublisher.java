@@ -30,6 +30,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -40,6 +41,7 @@ public class DASgcPublisher {
     private DataPublisher dataPublisher;
     private EventPublisher eventAgent;
     private String dataStream;
+    private String gcLogStream;
     private String appID = "";
 
     final static Logger logger = Logger.getLogger(DASgcPublisher.class);
@@ -152,6 +154,43 @@ public class DASgcPublisher {
     }
 
     /**
+     * Generate StreamId for Garbage Collection data
+     * Garbage Collection data should be in format -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps
+     * <p>
+     * Data format must be in the following order in given types in "gcLogStream":-
+     * <p>
+     * String   fileID
+     * String	Date
+     * String   TimeStarted
+     * double   TimePass
+     * String   GCFlage
+     * String   CaseCollection
+     * String   GCName
+     * long     YoungGenerationBefore
+     * long     YoungGenerationAfter
+     * long     TotalYoungGeneration
+     * long     OldGenerationBefore
+     * long     OldGenerationAfter
+     * long     TotalOldGeneration
+     * long     MetaspaceGenerationBefore
+     * long     MetaspaceGenerationAfter
+     * long     TotalMetaspaceGeneration
+     * long     TotalUsedHeapBefore
+     * long     TotalUsedHeapAfter
+     * long     TotalAvailableHeap
+     * double   GCEventDuration
+     * double   GCEventUserTimes
+     * double   GCEventSysTimes
+     * double   GCEventRealTimes
+     *
+     * @param HTTPD_LOG_STREAM
+     * @param VERSION
+     */
+    private void setGcLogStream(String HTTPD_LOG_STREAM, String VERSION) {
+        gcLogStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+    }
+
+    /**
      * @param garbageCollectionLog
      * @throws DataEndpointAuthenticationException
      * @throws DataEndpointAgentConfigurationException
@@ -171,6 +210,29 @@ public class DASgcPublisher {
         while (!garbageCollectionLog.isEmpty()) {
             eventAgent.publishLogEvents(dataPublisher, dataStream, appID, garbageCollectionLog.poll());
         }
+
+    }
+
+    /**
+     * @param fileName
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     * @throws FileNotFoundException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointException
+     * @throws DataEndpointAgentConfigurationException
+     */
+    public void publishXXgcLogData(String fileName) throws TransportException,
+            DataEndpointConfigurationException,
+            FileNotFoundException,
+            DataEndpointAuthenticationException,
+            DataEndpointException,
+            DataEndpointAgentConfigurationException {
+
+        //HTTPD_LOG_STREAM = "gcLogStream"
+        //VERSION = "1.0.0"
+
+        eventAgent.publishLogEvents(dataPublisher, gcLogStream, fileName);
 
     }
 
