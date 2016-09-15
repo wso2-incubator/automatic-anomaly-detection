@@ -48,7 +48,8 @@ public class EventPublisher {
      *
      * @param dataPublisher
      * @param streamId
-     * @param date
+     * @param timestamp
+     * @param appID
      * @param cpuLog
      * @throws DataEndpointException
      * @throws DataEndpointAuthenticationException
@@ -56,18 +57,22 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, CPULoadLog cpuLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad(), date});
+                new Object[]{timestamp,
+                        appID,
+                        cpuLog.getProcessCPULoad(),
+                        cpuLog.getSystemCPULoad()
+                });
 
         dataPublisher.publish(event);
 
-        logger.info("publish CPU data : " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad() + " , " + date);
+        logger.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
 
     }
 
@@ -76,6 +81,7 @@ public class EventPublisher {
      *
      * @param dataPublisher
      * @param streamId
+     * @param appID
      * @param gcLog
      * @throws DataEndpointException
      * @throws DataEndpointAuthenticationException
@@ -83,17 +89,18 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, GarbageCollectionLog gcLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionLog gcLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{gcLog.getGcType(),
-                        gcLog.getDuration(),
-                        gcLog.getStartTime(),
+                new Object[]{gcLog.getStartTime(),
+                        appID,
+                        gcLog.getGcType(),
                         gcLog.getGcCause(),
+                        gcLog.getDuration(),
                         gcLog.getEdenUsedMemoryAfterGC(),
                         gcLog.getEdenUsedMemoryBeforeGC(),
                         gcLog.getSurvivorUsedMemoryAfterGC(),
@@ -115,8 +122,8 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        logger.info("publish GC data : " + gcLog.getGcType() + " , " + gcLog.getDuration() + " , " + gcLog.getStartTime()
-                + " , " + gcLog.getGcCause() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
+        logger.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
+                gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
                 + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
                 + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
                 + " , " + gcLog.getEdenCommittedMemoryAfterGC() + " , " + gcLog.getEdenCommittedMemoryBeforeGC()
@@ -133,7 +140,8 @@ public class EventPublisher {
      *
      * @param dataPublisher
      * @param streamId
-     * @param date
+     * @param timestamp
+     * @param appID
      * @param memoryLog
      * @throws DataEndpointException
      * @throws DataEndpointAuthenticationException
@@ -141,27 +149,29 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long date, MemoryUsageLog memoryLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, MemoryUsageLog memoryLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
             DataEndpointConfigurationException {
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{memoryLog.getMaxHeapMemory(),
+                new Object[]{timestamp,
+                        appID,
+                        memoryLog.getMaxHeapMemory(),
                         memoryLog.getAllocatedHeapMemory(),
                         memoryLog.getUsedHeapMemory(),
                         memoryLog.getMaxNonHeapMemory(),
                         memoryLog.getAllocatedNonHeapMemory(),
                         memoryLog.getUsedNonHeapMemory(),
-                        memoryLog.getPendingFinalizations(),
-                        date});
+                        memoryLog.getPendingFinalizations()
+                });
 
         dataPublisher.publish(event);
 
-        logger.info("publish Memory data : " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
+        logger.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
                 + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
-                + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations() + " , " + date);
+                + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations());
 
     }
 
