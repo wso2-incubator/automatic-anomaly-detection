@@ -51,11 +51,11 @@ public class UsageMonitorLog {
         this.garbageCollectionLog = garbageCollectionLog;
     }
 
-    public long getDate() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setDate(long timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 
