@@ -36,16 +36,34 @@ public class Executor {
      * int  Max main list size
      * int  Array size
      * long Threads sleep time
-     *
-     * eg:- 3 5 100000 10 1500
+     * <p>
+     * You can add parameters in two type
+     * 1). Numbers of Threads, Thread Pool size (eg:- 3 5)
+     * 2). Numbers of Threads, Thread Pool size, Max main list size, Array size, Threads sleep time (eg:- 3 5 100000 10 1500)
      */
     public static void main(String[] args) {
 
-        int numbersOfThread = Integer.parseInt(args[0]);
-        ExecutorService executor = Executors.newFixedThreadPool(Integer.parseInt(args[1]));
-        ListSort.maxMainlistSize = Integer.parseInt(args[2]);
-        for (int i = 0; i < numbersOfThread; i++) {
-            Runnable worker = new NumberBuilder(Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+        int numbersOfThreads = 3;
+        int threadPoolSize = 5;
+        int maxMainListSize = 100000;
+        int arraySize = 10;
+        long threadsSleepTime = 1500;
+
+        if (args.length == 2) {
+            numbersOfThreads = Integer.parseInt(args[0]);
+            threadPoolSize = Integer.parseInt(args[1]);
+        } else if (args.length == 5) {
+            numbersOfThreads = Integer.parseInt(args[0]);
+            threadPoolSize = Integer.parseInt(args[1]);
+            maxMainListSize = Integer.parseInt(args[2]);
+            arraySize = Integer.parseInt(args[3]);
+            threadsSleepTime = Integer.parseInt(args[4]);
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
+        ListSort.maxMainlistSize = maxMainListSize;
+        for (int i = 0; i < numbersOfThreads; i++) {
+            Runnable worker = new NumberBuilder(arraySize, threadsSleepTime);
             executor.execute(worker);
         }
         executor.shutdown();
