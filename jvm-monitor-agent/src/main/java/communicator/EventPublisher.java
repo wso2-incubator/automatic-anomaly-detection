@@ -207,12 +207,12 @@ public class EventPublisher {
             }
 
             Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                    new Object[]{gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
+                    new Object[]{fileName, gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
                             gcData.get(5), gcData.get(6), gcData.get(7), gcData.get(8), gcData.get(9), gcData.get(10),
                             gcData.get(11), gcData.get(12), gcData.get(13), gcData.get(14), gcData.get(15), gcData.get(16),
                             gcData.get(17), gcData.get(18), gcData.get(19), gcData.get(20), gcData.get(21)});
 
-            logger.info("publish GC log data from file : " + gcData.get(0) + " , " + gcData.get(1) + " , " + gcData.get(2) + " , " + gcData.get(3)
+            logger.info("publish GC log data from file : " + fileName + " , " + gcData.get(0) + " , " + gcData.get(1) + " , " + gcData.get(2) + " , " + gcData.get(3)
                     + " , " + gcData.get(4) + " , " + gcData.get(5) + " , " + gcData.get(6) + " , " + gcData.get(7) + " , " + gcData.get(8)
                     + " , " + gcData.get(9) + " , " + gcData.get(10) + " , " + gcData.get(11) + " , " + gcData.get(12) + " , " + gcData.get(13)
                     + " , " + gcData.get(14) + " , " + gcData.get(15) + " , " + gcData.get(16) + " , " + gcData.get(17) + " , " + gcData.get(18)
