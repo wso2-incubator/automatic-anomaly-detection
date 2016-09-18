@@ -58,7 +58,7 @@ public class Test {
         //If you use java code
         //Set java file name & file located path relative to project directory
         String fileName = "Executor";
-        String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications" + "/GenerateOOM";
+        String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications" + "/NormalApp3";
         String arg = "1 10000";
 
         String currentDir = System.getProperty("user.dir");
@@ -132,19 +132,20 @@ public class Test {
 
         String pid = null;
         int counter = 0;
+        //Assigning "true" for killMultipleProcess variable is not recommended. This will kill all the processes which have given "fileName".
+        boolean killMultipleProcess = true;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
             if (vmd.displayName().indexOf(fileName) != -1) {
-                pid = vmd.id();
-                logger.info(vmd.id() + "\t" + vmd.displayName());
-                counter++;
-
-                if (counter > 1) {
-                    System.out.println(pid + " " + counter);
-                    Runtime.getRuntime().exec("kill -9 " + pid);
+                if (counter == 0) {
+                    pid = vmd.id();
+                    logger.info("PID found. PID: " + vmd.id() + "\tName: " + vmd.displayName());
+                } else if (killMultipleProcess) {
+                    logger.info("kill PID : " + vmd.id() + " " + vmd.displayName());
+                    Runtime.getRuntime().exec("kill -9 " + vmd.id());
                     counter--;
                 }
-
+                counter++;
             }
         }
 
