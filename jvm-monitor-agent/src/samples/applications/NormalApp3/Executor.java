@@ -19,25 +19,44 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is sample java app for test purpose
+ */
 public class Executor {
+
+    private List<Integer> primes = new ArrayList<Integer>();
 
     public static void main(String[] args) {
 
-        List<Integer> primes = new ArrayList<Integer>();
+        long value = Integer.MAX_VALUE;
 
-        for (int i = 1; i < Integer.MAX_VALUE; i++) {
+        if (args.length == 1) {
+            value = Long.parseLong(args[0]);
+        }
+
+        Executor obj = new Executor();
+        obj.primeNumber(value);
+
+    }
+
+    public void primeNumber(long value) {
+
+        long i = 1;
+        while (i < value) {
             boolean isPrime = true;
-            int limit = (int) Math.sqrt(i);
-            for (int j = 2; j <= i / 2; j++) {
+            long j = 2, limit = (long) Math.sqrt(i);
+            while (j <= limit) {
                 if (i % j == 0) {
                     isPrime = false;
                     break;
                 }
+                j++;
             }
 
             if (isPrime) {
-                primes.add(i);
+                primes.add((int) i);
             }
+            i++;
         }
 
     }
