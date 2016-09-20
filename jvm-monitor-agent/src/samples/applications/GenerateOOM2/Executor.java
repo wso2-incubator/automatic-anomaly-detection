@@ -38,15 +38,27 @@ public class Executor {
         int numberOfThread = 2;
 
         if (args.length == 1) {
-            sleepTime = Integer.parseInt(args[0]);
+
+            try{
+                sleepTime = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         } else if (args.length == 2) {
-            sleepTime = Integer.parseInt(args[0]);
-            numberOfThread = Integer.parseInt(args[1]);
+
+            try{
+                sleepTime = Integer.parseInt(args[0]);
+                numberOfThread = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
 
         for (int x = 0; x < numberOfThread; x++) {
-            Thread t = new Thread(new LargestPalindrome());
-            LargestPalindrome.threadSleepTime = sleepTime;
+            Thread t = new Thread(new GenerateOOME());
+            GenerateOOME.threadSleepTime = sleepTime;
             t.start();
         }
 
@@ -55,7 +67,7 @@ public class Executor {
 
 }
 
-class LargestPalindrome implements Runnable {
+class GenerateOOME implements Runnable {
 
     private List<Integer> numbers = new ArrayList<Integer>();
     public static int threadSleepTime = 0;
@@ -83,5 +95,4 @@ class LargestPalindrome implements Runnable {
     }
 
 }
-
 

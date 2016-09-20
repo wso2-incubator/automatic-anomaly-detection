@@ -54,16 +54,28 @@ public class Executor {
         worker[2] = largestPrimeFactor;
 
         if (args.length == 3) {
-            palindrome.setLimit(Integer.parseInt(args[0]));
-            prime.setPrimeLimit(args[1]);
-            largestPrimeFactor.setNumber(args[2]);
+
+            try {
+                palindrome.setLimit(Integer.parseInt(args[0]));
+                prime.setPrimeLimit(args[1]);
+                largestPrimeFactor.setNumber(args[2]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         } else if (args.length == 6) {
-            palindrome.setLimit(Integer.parseInt(args[0]));
-            palindrome.setThreadSleepTime(Integer.parseInt(args[1]));
-            prime.setPrimeLimit(args[2]);
-            prime.setThreadSleepTime(Integer.parseInt(args[3]));
-            largestPrimeFactor.setNumber(args[4]);
-            largestPrimeFactor.setThreadSleepTime(Integer.parseInt(args[5]));
+
+            try {
+                palindrome.setLimit(Integer.parseInt(args[0]));
+                palindrome.setThreadSleepTime(Integer.parseInt(args[1]));
+                prime.setPrimeLimit(args[2]);
+                prime.setThreadSleepTime(Integer.parseInt(args[3]));
+                largestPrimeFactor.setNumber(args[4]);
+                largestPrimeFactor.setThreadSleepTime(Integer.parseInt(args[5]));
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
 
         for (Runnable work : worker) {

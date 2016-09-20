@@ -31,7 +31,13 @@ public class Executor {
         long value = Integer.MAX_VALUE;
 
         if (args.length == 1) {
-            value = Long.parseLong(args[0]);
+
+            try {
+                value = Long.parseLong(args[0]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
 
         Executor obj = new Executor();

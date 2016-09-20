@@ -50,14 +50,26 @@ public class Executor {
         long threadsSleepTime = 1500;
 
         if (args.length == 2) {
-            numbersOfThreads = Integer.parseInt(args[0]);
-            threadPoolSize = Integer.parseInt(args[1]);
+
+            try {
+                numbersOfThreads = Integer.parseInt(args[0]);
+                threadPoolSize = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         } else if (args.length == 5) {
-            numbersOfThreads = Integer.parseInt(args[0]);
-            threadPoolSize = Integer.parseInt(args[1]);
-            maxMainListSize = Integer.parseInt(args[2]);
-            arraySize = Integer.parseInt(args[3]);
-            threadsSleepTime = Integer.parseInt(args[4]);
+
+            try {
+                numbersOfThreads = Integer.parseInt(args[0]);
+                threadPoolSize = Integer.parseInt(args[1]);
+                maxMainListSize = Integer.parseInt(args[2]);
+                arraySize = Integer.parseInt(args[3]);
+                threadsSleepTime = Integer.parseInt(args[4]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
 
         ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
