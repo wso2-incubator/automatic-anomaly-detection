@@ -5,7 +5,6 @@ import jvmmonitor.model.CPULoadLog;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
-import java.util.Map;
 
 import static java.lang.management.ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME;
 import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
@@ -27,6 +26,10 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Collect the CPU load percentages from any connected JVM process
+ */
 public class CPUUsageMonitor {
 
     private OperatingSystemMXBean osMXBean;
@@ -41,8 +44,8 @@ public class CPUUsageMonitor {
     }
 
     /**
-     * Return CPU load precentages of the System and the process
-     * @return
+     * Return CPU load percentages of the System and the process
+     * @return {CPULoadLog}
      */
     public CPULoadLog getCPULoads(){
 

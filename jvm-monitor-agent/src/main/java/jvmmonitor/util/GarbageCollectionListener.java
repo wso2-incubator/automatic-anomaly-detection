@@ -27,6 +27,7 @@ import java.util.LinkedList;
  */
 public interface GarbageCollectionListener {
 
+
     /**
      * Process GC Log queue
      * Triggered by GarbageCollectionMonitor

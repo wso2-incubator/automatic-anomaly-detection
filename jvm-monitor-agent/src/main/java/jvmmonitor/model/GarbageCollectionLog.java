@@ -17,6 +17,19 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Garbage Collection logs model class
+ *
+ * Stores
+ *  GC Type
+ *  GC Cause
+ *  GC Duration
+ *  GC Start Time
+ *  GC eden space memory parameters
+ *  GC survivor space memory parameters
+ *  GC old space memory parameters
+ */
 public class GarbageCollectionLog {
 
     private long EdenUsedMemoryAfterGC;

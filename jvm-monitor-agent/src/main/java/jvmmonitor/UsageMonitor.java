@@ -12,6 +12,7 @@ import jvmmonitor.management.MemoryUsageMonitor;
 import jvmmonitor.model.UsageMonitorLog;
 import jvmmonitor.server.Connection;
 import jvmmonitor.util.GarbageCollectionListener;
+import org.apache.log4j.Logger;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -36,7 +37,8 @@ import java.io.IOException;
 */
 
 /**
- * Monitor the JVM usage metrics using the Usage Log classes
+ * Monitor the JVM usage metrics using the Usage monitoring classes
+ * Return an Usage Log object
  */
 public class UsageMonitor {
 
@@ -45,10 +47,14 @@ public class UsageMonitor {
     private MemoryUsageMonitor memoryUsageMonitor;
     private CPUUsageMonitor cpuUsageMonitor;
 
-    public final static String MEMORY_USAGE_LOG = "memory.usage";
-    public final static String GARBAGE_COLLECTION_LOG = "gc.usage";
+    final static Logger logger = Logger.getLogger(UsageMonitor.class);
+
     /**
      * Constructor
+     *
+     * At creation the PID of the monitoring JVM should be provided
+     * The JVM will be searched using the PID
+     *
      * @param pid
      * @throws IOException
      * @throws AttachNotSupportedException
@@ -59,6 +65,9 @@ public class UsageMonitor {
 
     /**
      * Start monitoring usage metrics of JVM
+     *
+     * Create a MBean Server Connection to the targeted JVM
+     * Get the required MXBeans from targeted JVM
      *
      * @return
      * @throws MalformedObjectNameException
@@ -83,11 +92,6 @@ public class UsageMonitor {
         } catch (AgentInitializationException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Currently running");
-        for (VirtualMachineDescriptor vmd : VirtualMachine.list())
-            System.out.println(vmd.id() + "\t" + vmd.displayName());
-
         return false;
     }
 
@@ -106,6 +110,7 @@ public class UsageMonitor {
         else{
             throw new MonitoringNotStartedException();
         }
+
     }
 
     /**
@@ -124,7 +129,18 @@ public class UsageMonitor {
 
     }
 
-    // ====================================Getters=======================
+
+    /**
+     * Display currently running JVMs in the same machine
+     */
+    public void displayCurrentlyRunningJVMs() {
+        logger.info("Currently running");
+        for (VirtualMachineDescriptor vmd : VirtualMachine.list())
+            logger.info(vmd.id() + "\t" + vmd.displayName());
+
+    }
+
+        // ====================================Getters=======================
     public GarbageCollectionMonitor getGarbageCollectionMonitor() {
         return garbageCollectionMonitor;
     }

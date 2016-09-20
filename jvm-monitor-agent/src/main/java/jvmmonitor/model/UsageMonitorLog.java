@@ -20,6 +20,16 @@ import java.util.List;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Model for all collected JVM monitoring parameters
+ *
+ * Stores
+ *  MemoryUsageLog model
+ *  CPUUsageLog model
+ *  List of GarbageCollectionLog model
+ *  Time Stamp created at usage collection
+ */
 public class UsageMonitorLog {
 
     private MemoryUsageLog memoryUsageLog;
@@ -28,12 +38,22 @@ public class UsageMonitorLog {
     private long timeStamp;
 
 
+    /**
+     * Constructor
+     *
+     * Forced to add usage models at object creation time
+     *
+     * @param memoryLog
+     * @param garbageCollectionLog
+     * @param cpuLoadLog
+     */
     public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog, CPULoadLog cpuLoadLog) {
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
         this.cpuLoadLog = cpuLoadLog;
         this.timeStamp = new Date().getTime(); //added the time stamp at object creation
     }
+
 
     public MemoryUsageLog getMemoryUsageLog() {
         return memoryUsageLog;

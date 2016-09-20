@@ -17,6 +17,15 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+
+/**
+ * Memory usage model class
+ *
+ * Store
+ *  Heap memory parameters
+ *  Non-Heap memory parameters
+ */
 public class MemoryUsageLog {
 
     private long maxHeapMemory;

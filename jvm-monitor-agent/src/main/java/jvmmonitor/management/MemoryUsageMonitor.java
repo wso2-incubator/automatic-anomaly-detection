@@ -2,6 +2,7 @@ package jvmmonitor.management;
 
 import jvmmonitor.model.MemoryUsageLog;
 import org.apache.log4j.Logger;
+
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
 import java.lang.management.MemoryMXBean;
@@ -31,21 +32,14 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 
 
 /**
- * Manage MemoryMXBeans from given JVM Connections
+ * Collect MemoryMXBeans from given JVM Connections
  */
 public class MemoryUsageMonitor {
 
     private MemoryMXBean memoryMXBean ;
 
-//    public final static String MAX_HEAP_MEMORY = "max_heap";
-//    public final static String ALLOCATED_HEAP_MEMORY = "alloc_heap";
-//    public final static String USED_HEAP_MEMORY = "used_heap";
-//    public final static String MAX_NON_HEAP_MEMORY = "max_non_heap";
-//    public final static String ALLOCATED_NON_HEAP_MEMORY = "alloc_non_heap";
-//    public final static String USED_NON_HEAP_MEMORY = "used_non_heap";
-//    public final static String PENDING_FINALIZATIONS = "pending_final";
-
     final static Logger logger = Logger.getLogger(MemoryUsageMonitor.class);
+
     /**
      * Constructor
      *
@@ -53,21 +47,18 @@ public class MemoryUsageMonitor {
      * Object created can be used to collect the Memory management data
      *
      * @param serverConnection
-     * @throws InterruptedException
      * @throws IOException
      */
     public MemoryUsageMonitor(MBeanServerConnection serverConnection) throws IOException  {
         this.memoryMXBean = newPlatformMXBeanProxy(serverConnection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
     }
 
+
     /**
-     * Calculate the memory management using the MemoryMXBean
-     *
-     * @return {Map<String, Long>} hash map with memory usages
+     * Collect the memory usages using the MemoryMXBean
+     * @return {MemoryUsageLog} Memory usage log model with memory usages
      */
     public MemoryUsageLog getMemoryUsage() {
-
-//        Map<String,Long> memUsageMap = new HashMap<String,Long>();
 
         MemoryUsage mu;
         MemoryUsageLog memoryUsageLog;
@@ -77,9 +68,7 @@ public class MemoryUsageMonitor {
 
             //heap memory management data
             mu = memoryMXBean.getHeapMemoryUsage();
-//            memUsageMap.put(MAX_HEAP_MEMORY, mu.getMax());
-//            memUsageMap.put(ALLOCATED_HEAP_MEMORY, mu.getCommitted());
-//            memUsageMap.put(USED_HEAP_MEMORY, mu.getUsed());
+
             memoryUsageLog.setMaxHeapMemory(mu.getMax());
             memoryUsageLog.setAllocatedHeapMemory(mu.getCommitted());
             memoryUsageLog.setUsedHeapMemory(mu.getUsed());
@@ -87,15 +76,11 @@ public class MemoryUsageMonitor {
 
             //non heap memory management data
             mu = memoryMXBean.getNonHeapMemoryUsage();
-//            memUsageMap.put(MAX_NON_HEAP_MEMORY, mu.getMax());
-//            memUsageMap.put(ALLOCATED_NON_HEAP_MEMORY, mu.getCommitted());
-//            memUsageMap.put(USED_NON_HEAP_MEMORY, mu.getUsed());
+
             memoryUsageLog.setMaxNonHeapMemory(mu.getMax());
             memoryUsageLog.setAllocatedNonHeapMemory(mu.getCommitted());
             memoryUsageLog.setUsedNonHeapMemory(mu.getUsed());
 
-
-//            memUsageMap.put(PENDING_FINALIZATIONS, (long) (memoryMXBean.getObjectPendingFinalizationCount()));
             memoryUsageLog.setPendingFinalizations(memoryMXBean.getObjectPendingFinalizationCount());
 
             return memoryUsageLog;
@@ -103,20 +88,6 @@ public class MemoryUsageMonitor {
         }else{
             throw new NullPointerException();
         }
-    }
-
-    /**
-     *  @Test - Only for test purposes
-     */
-    public void printMemoryUsage(){
-
-        logger.info("Heap:\t");
-        MemoryUsage mu = memoryMXBean.getHeapMemoryUsage();
-        logger.info("allocated " + mu.getCommitted() + ", used " + mu.getUsed() + ", max " + mu.getMax());
-        logger.info("Non-Heap:\t");
-        mu = memoryMXBean.getNonHeapMemoryUsage();
-        logger.info("allocated " + mu.getCommitted() + ", used " + mu.getUsed() + ", max " + mu.getMax());
-        logger.info("Pending Finalizations: " + memoryMXBean.getObjectPendingFinalizationCount());
     }
 
 

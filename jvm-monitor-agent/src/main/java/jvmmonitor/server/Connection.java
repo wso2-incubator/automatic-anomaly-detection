@@ -46,37 +46,40 @@ public class Connection {
 
     private final static Logger logger = Logger.getLogger(Connection.class);
 
-
     /**
      * Constructor to create Connector
+     * @param pid process id of monitoring JVM
      *
-     * @param pid process id of monitoring VM
+     * @param pid
+     * @throws IOException
+     * @throws AttachNotSupportedException
      */
     private Connection(String pid) throws IOException, AttachNotSupportedException {
         this.pid = pid;
         vm = VirtualMachine.attach(pid);
     }
 
-
     /**
      * Connector is singleton
      *
      * Return single Connector obj
      * Make sure that VirtualMachine objs are destroyed before creating a new instance
+     * Forced to maintain only one connection at once
      * @param pid
      *
      * @return Connector obj
      */
     public static Connection getConnection(String pid){
+
         if (pid != null){
-
             try {
-                if (connection != null){
-                    connection.disconnectFromVM();
+                synchronized (Connection.class) {
+                    if (connection != null) {
+                        connection.disconnectFromVM();
+                    }
+                    connection = new Connection(pid);
                 }
-                connection = new Connection(pid);
                 return  connection;
-
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (AttachNotSupportedException e) {
@@ -106,8 +109,7 @@ public class Connection {
         for(Map.Entry<?,?> en:vm.getSystemProperties().entrySet())
             logger.debug("\t"+en.getKey()+" = "+en.getValue());
 
-        logger.debug("==================================================");
-
+        logger.info("==================================================");
 
         String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
 

@@ -45,7 +45,7 @@ import java.util.Set;
 
 
 /**
- * Manage the Garbage Collection logs from any connected JVMs
+ * Collect the Garbage Collection logs from any connected JVMs
  *
  */
 public class GarbageCollectionMonitor {
@@ -76,7 +76,6 @@ public class GarbageCollectionMonitor {
      * Added notifications to trigger when any garbage collection activity happens
      *
      * @param serverConnection
-     * @return {List<GarbageCollectorMXBean>} list of GC MX beans
      * @throws InterruptedException
      * @throws MalformedObjectNameException
      */
@@ -89,6 +88,7 @@ public class GarbageCollectionMonitor {
         this.gcBeans = new ArrayList<GarbageCollectorMXBean>(gcnames.size());
 
         GarbageCollectorMXBean gcbean;
+
         //get all the GarbageCollectorMXBeans - there's one for each heap generation
         //so probably two - the old generation and young generation
         for (ObjectName on : gcnames) {
@@ -107,24 +107,18 @@ public class GarbageCollectionMonitor {
 
 
     /**
-     * Return garbage collection usages reference
-     */
-    public List<GarbageCollectionLog> getGCUsages() {
-        return gcUsages;
-    }
-
-
-
-    /**
      * Implements a notification listener to listen notifications happens after Garbage collection
      *
      */
     protected  class GCNotificationListener implements NotificationListener {
 
-        long totalGcDuration = 0;   //keep a count of the total time spent in GCs
-
         /**
-         *  implement the notifier callback handler
+         * implement the notifier callback handler
+         *  when gc event happens this method will be executed
+         *  collect gc log data and add it to gc log queue
+         *  trigger the GarbageCollectionListeners
+         * @param notification
+         * @param handback
          */
         public void handleNotification(Notification notification, Object handback) {
 
@@ -162,14 +156,11 @@ public class GarbageCollectionMonitor {
                 gclog.setEdenMaxMemoryAfterGC(memoryUsage.getMax());
                 gclog.setEdenUsedMemoryAfterGC(memoryUsage.getUsed());
 
-
-
                 //survivor space memory management
                 memoryUsage = memoryUsageMap.get(SURVIVOR_SPACE);
                 gclog.setSurvivorCommittedMemoryAfterGC(memoryUsage.getCommitted());
                 gclog.setSurvivorMaxMemoryAfterGC(memoryUsage.getMax());
                 gclog.setSurvivorUsedMemoryAfterGC(memoryUsage.getUsed());
-
 
                 //old gen space memory management
                 memoryUsage = memoryUsageMap.get(OLD_GENERATION_SPACE);
@@ -222,27 +213,6 @@ public class GarbageCollectionMonitor {
                     }
                 }
 
-
-//                //Get the information about each memory space
-//                Map<String, MemoryUsage> membefore = info.getGcInfo().getMemoryUsageBeforeGc();
-//                Map<String, MemoryUsage> mem = info.getGcInfo().getMemoryUsageAfterGc();
-//                for (Map.Entry<String, MemoryUsage> entry : mem.entrySet()) {
-//                    String name = entry.getKey();
-//                    MemoryUsage memdetail = entry.getValue();
-//                    long memInit = memdetail.getInit();
-//                    long memCommitted = memdetail.getCommitted();
-//                    long memMax = memdetail.getMax();
-//                    long memUsed = memdetail.getUsed();
-//                    MemoryUsage before = membefore.get(name);
-//                    long beforepercent = ((before.getUsed()*1000L)/before.getCommitted());
-//                    long percent = ((memUsed*1000L)/before.getCommitted()); //>100% when it gets expanded
-//
-//                    System.out.print(name + (memCommitted==memMax?"(fully expanded)":"(still expandable)") +"used: "+(beforepercent/10)+"."+(beforepercent%10)+"%->"+(percent/10)+"."+(percent%10)+"%("+((memUsed/1048576)+1)+"MB) / ");
-//                }
-//                System.out.println();
-//                totalGcDuration += info.getGcInfo().getDuration();
-//                long percent = totalGcDuration*1000L/info.getGcInfo().getEndTime();
-//                System.out.println("monitor.GC cumulated overhead "+(percent/10)+"."+(percent%10)+"%");
             }
         }
     }
@@ -250,12 +220,21 @@ public class GarbageCollectionMonitor {
 
     /**
      * Register GarbageCollectionListeners
-     * They can listen to notifications trigger when any GC log arrives
+     * Notification listeners can listen to notifications trigger when any GC log arrives
      * @param listener
      */
     public void registerListener(GarbageCollectionListener listener){
         this.listeners.add(listener);
     }
+
+    /**
+     * Return garbage collection usages reference
+     */
+    public List<GarbageCollectionLog> getGCUsages() {
+        return gcUsages;
+    }
+
+
     //====================setters and getters=============================
     public List<GarbageCollectorMXBean> getGcBeans() {
         return gcBeans;
