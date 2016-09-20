@@ -28,22 +28,33 @@ public class Executor {
         int len = 5;
         int size = 10000000;
 
-        if (args.length == 1){
-            len = Integer.parseInt(args[0]);
+        if (args.length == 1) {
+
+            try {
+                len = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
 
         }
-        if (args.length > 2){
-            len = Integer.parseInt(args[0]);
-            size = Integer.parseInt(args[1]);
+        if (args.length > 2) {
+
+            try {
+                len = Integer.parseInt(args[0]);
+                size = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
 
         executor.execute(len, size);
     }
 
-    public void execute(int len, int size){
+    public void execute(int len, int size) {
 
-        for(int i=0; i< len; i++){
-            Thread program = new Thread(new Program(i+1, size));
+        for (int i = 0; i < len; i++) {
+            Thread program = new Thread(new Program(i + 1, size));
             program.start();
         }
 
@@ -68,7 +79,7 @@ public class Executor {
 
             while (true) {
 
-                int limit = random.nextInt(size - size/2) + size/2;
+                int limit = random.nextInt(size - size / 2) + size / 2;
 
                 for (int i = 0; i < limit; i++) {
 
@@ -90,7 +101,7 @@ public class Executor {
                 }
 
                 int j = 0;
-                while (j < limit){
+                while (j < limit) {
 
                     j++;
                     System.out.println("Thread" + index + "- count =" + j);

@@ -24,29 +24,41 @@ public class Executor {
         double x = 1;
         int y = 10000;
 
-        if (args.length == 1){
-            x = Double.parseDouble(args[0]);
+        if (args.length == 1) {
+
+            try {
+                x = Double.parseDouble(args[0]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
         if (args.length > 1) {
-            x = Double.parseDouble(args[0]);
-            y = Integer.parseInt(args[1]);
+
+            try {
+                x = Double.parseDouble(args[0]);
+                y = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                System.err.println(e);
+            }
+
         }
 
 
-        generateOOM(x,y);
+        generateOOM(x, y);
     }
 
 
     /**
      * This method generate Out of memory exception eventually
-     *
+     * <p>
      * Generate int arrays with growing length
      *
      * @param multiplier
      * @param addition
      * @throws Exception
      */
-    static void generateOOM(double multiplier , int addition) throws Exception {
+    static void generateOOM(double multiplier, int addition) throws Exception {
 
         int iteratorValue = 10;
 
@@ -62,7 +74,7 @@ public class Executor {
             } while (loop1 > 0);
 
             //increase the length of next array
-            iteratorValue = (int)(iteratorValue * multiplier) + addition;
+            iteratorValue = (int) (iteratorValue * multiplier) + addition;
 
             Thread.sleep(500);
         }

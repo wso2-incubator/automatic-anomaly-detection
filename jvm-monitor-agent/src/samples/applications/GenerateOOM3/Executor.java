@@ -42,6 +42,7 @@ public class Executor {
         int sleepTime = 0;
 
         if (args.length == 3) {
+
             try {
                 numberOfIteration = Integer.parseInt(args[0]);
                 memoryGrowthTime = Integer.parseInt(args[1]);
@@ -49,7 +50,9 @@ public class Executor {
             } catch (NumberFormatException e) {
                 System.err.println(e);
             }
+
         } else if (args.length == 4) {
+
             try {
                 numberOfIteration = Integer.parseInt(args[0]);
                 memoryGrowthTime = Integer.parseInt(args[1]);
@@ -58,6 +61,7 @@ public class Executor {
             } catch (NumberFormatException e) {
                 System.err.println(e);
             }
+
         }
 
         //Start delay
