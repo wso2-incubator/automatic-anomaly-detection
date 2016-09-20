@@ -1,0 +1,16 @@
+{
+  "name": "PredictionResultsStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "state",
+      "type": "STRING"
+    }
+  ]
+}

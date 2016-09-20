@@ -1,0 +1,92 @@
+{
+  "name": "ProcessedUsageEventsStream",
+  "version": "1.0.0",
+  "nickName": "ProcessedUsageEventsStream",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "process_cpu_load",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "system_cpu_load",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "minor_gc_freq",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_freq",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_committed",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_committed",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_committed",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "gc_duration",
+      "type": "DOUBLE"
+    }
+  ]
+}
