@@ -50,7 +50,7 @@ public class NormalApp3 {
 
         }
 
-        Executor obj = new Executor();
+        NormalApp3 obj = new NormalApp3();
         obj.primeNumber(value);
 
     }
