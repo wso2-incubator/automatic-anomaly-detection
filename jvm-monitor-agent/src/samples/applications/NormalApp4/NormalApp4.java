@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 /**
  * This is sample java app for test purpose
  */
-public class Executor {
+public class NormalApp4 {
 
     /**
      * Parameters:-
