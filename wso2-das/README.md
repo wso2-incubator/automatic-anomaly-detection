@@ -29,7 +29,9 @@ This package contains the resources that are required to setup [WSO2 Data Analyt
 
 4. Go to Execution Plans in main tab and select **'UsagePredictionExecutionPlan'** execution plan in edit mode
 
-5. Replace the ML predict() function model path(\<DAS_HOME>/models/\<Model_Name>) with the generated model path
+5. Replace the ML predict() function model path with the generated model path
+
+         from PredictionDataStream#ml:predict('<DAS_HOME>/models/<Model_Name>' , 'string', 99.0, ....
 
 6. [Run JVM Monitoring Agent](https://github.com/wso2-incubator/automatic-anomaly-detection/tree/master/jvm-monitor-agent)
 
