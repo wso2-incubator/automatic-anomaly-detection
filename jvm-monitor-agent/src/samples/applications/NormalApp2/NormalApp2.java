@@ -28,13 +28,17 @@ public class NormalApp2 {
         int len = 5;
         int size = 10000000;
 
-        if (args.length == 1){
-            len = Integer.parseInt(args[0]);
-        }
+        try {
+            if (args.length == 1) {
+                len = Integer.parseInt(args[0]);
+            }
 
-        if (args.length > 1){
-            len = Integer.parseInt(args[0]);
-            size = Integer.parseInt(args[1]);
+            if (args.length > 1) {
+                len = Integer.parseInt(args[0]);
+                size = Integer.parseInt(args[1]);
+            }
+        }catch(NumberFormatException e){
+
         }
 
 

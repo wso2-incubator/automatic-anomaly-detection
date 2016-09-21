@@ -27,18 +27,26 @@ public class GenerateOOM{
         int y = 10000;
         long z = 10000000L;
 
-        if (args.length == 1){
-            x = Double.parseDouble(args[0]);
-        }
-        if (args.length == 2) {
-            x = Double.parseDouble(args[0]);
-            y = Integer.parseInt(args[1]);
-        }
+        try{
+            if (args.length == 1){
+                    x = Double.parseDouble(args[0]);
 
-        if (args.length > 2) {
-            x = Double.parseDouble(args[0]);
-            y = Integer.parseInt(args[1]);
-            z = Long.parseLong(args[2]);
+            }
+            if (args.length == 2) {
+
+                    x = Double.parseDouble(args[0]);
+                    y = Integer.parseInt(args[1]);
+
+            }
+
+            if (args.length > 2) {
+
+                    x = Double.parseDouble(args[0]);
+                    y = Integer.parseInt(args[1]);
+                    z = Long.parseLong(args[2]);
+            }
+        }catch (NumberFormatException e){
+
         }
 
         generateOOM(x,y,z);
