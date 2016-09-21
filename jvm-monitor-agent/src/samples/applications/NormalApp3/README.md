@@ -1,6 +1,6 @@
 #Normal App 3
 
-Sample application to generate Out of memory error. 
+Sample application to simulate normal conditions of application.
 
 ##Compile
 
@@ -11,14 +11,10 @@ Sample application to generate Out of memory error.
         java NormalApp3
 or
 
-        java NormalApp3 <int> sleepTime
-or
-
-        java NormalApp3 <int> sleepTime <int> numberOfThread
+        java NormalApp3 <long> upperBound
 
 
 
 | Options  |  Description  | Default |
 | --------|---------|-------|
-|***\<int> sleepTime*** | Thread sleep time (ms) | 0 |
-| ***\<int> numberOfThread*** | Number of Threads | 2 |
+|***\<int> upperBound*** | Upper Bound of prime| Integer.MAX_VALUE |
