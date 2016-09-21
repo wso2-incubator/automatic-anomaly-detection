@@ -1,0 +1,44 @@
+{
+  "name": "MemoryUsageStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "Memory usage events",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "max_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "allocated_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "used_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "max_non_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "allocated_non_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "used_non_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "pending_finalizations",
+      "type": "LONG"
+    }
+  ]
+}
