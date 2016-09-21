@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * This is a sample Java app for testing "OOM scenario".
  */
-public class Executor {
+public class GenerateOOM2 {
 
     /**
      * Parameters:-

@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 /**
  * This class provides normal application scenarios
  */
-public class Executor {
+public class NormalApp {
 
     /**
      * Parameters:-

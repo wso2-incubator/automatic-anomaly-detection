@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * This is sample java app for test purpose
  */
-public class Executor {
+public class NormalApp3 {
 
     private List<Integer> primes = new ArrayList<Integer>();
 
