@@ -249,7 +249,7 @@ select
 insert into PredictionDataStream; 
 
 
-from PredictionDataStream#ml:predict('/home/nadheesh/install/wso2_products/wso2das-3.1.0/test/JVM.Model.2016-09-19_09-17-20' , 'string', 99.0,
+from PredictionDataStream#ml:predict('<DAS_HOME>/models/<Model_Name>' , 'string', 99.0,
 										  	heap_used_1,
 											heap_used_2,
 											heap_used_3,
