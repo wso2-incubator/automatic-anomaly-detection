@@ -79,7 +79,8 @@ public class GarbageCollectionMonitor {
      * @throws InterruptedException
      * @throws MalformedObjectNameException
      */
-    public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
+    public GarbageCollectionMonitor(MBeanServerConnection serverConnection) throws MalformedObjectNameException,
+            IOException {
 
         this.gcUsages = new LinkedList<GarbageCollectionLog>();
         this.listeners = new ArrayList<GarbageCollectionListener>();

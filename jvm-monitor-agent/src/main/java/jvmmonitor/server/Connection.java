@@ -54,7 +54,8 @@ public class Connection {
      * @throws IOException
      * @throws AttachNotSupportedException
      */
-    private Connection(String pid) throws IOException, AttachNotSupportedException {
+    private Connection(String pid) throws IOException,
+            AttachNotSupportedException {
         this.pid = pid;
         vm = VirtualMachine.attach(pid);
     }
@@ -99,7 +100,9 @@ public class Connection {
      * @throws AgentInitializationException
      * @throws IOException
      */
-    public MBeanServerConnection getServerConnection() throws IOException, AgentLoadException, AgentInitializationException {
+    public MBeanServerConnection getServerConnection() throws IOException,
+            AgentLoadException,
+            AgentInitializationException {
 
 
         //print properties of connected VM

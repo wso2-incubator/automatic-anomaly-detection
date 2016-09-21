@@ -59,7 +59,9 @@ public class UsageMonitor {
      * @throws IOException
      * @throws AttachNotSupportedException
      */
-    public UsageMonitor(String pid) throws IOException, AttachNotSupportedException {
+    public UsageMonitor(String pid) throws IOException,
+            AttachNotSupportedException {
+
         this.connection = Connection.getConnection(pid);
     }
 
@@ -73,7 +75,8 @@ public class UsageMonitor {
      * @throws MalformedObjectNameException
      * @throws InterruptedException
      */
-    public boolean stratMonitoring() throws MalformedObjectNameException, InterruptedException {
+    public boolean stratMonitoring() throws MalformedObjectNameException,
+            InterruptedException {
 
         MBeanServerConnection serverConnection;
         try {
