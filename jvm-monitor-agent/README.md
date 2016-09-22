@@ -1,15 +1,15 @@
 # JVM Monitor Agent(JMA)
 
-## Introdution
+## Introduction
 The JVM Monitoring Agent(JMA) is a WSO2 DAS based JVM system metric usage monitoring tool which is capable of publishing those data into WSO2 DAS.
 
 The types of usage data collected are;
 
-1. Memory Usage Data ( Heap and Non Heap)
+1. Memory Usage Data (Heap and Non Heap)
 
 2. CPU Load Percentages (JVM process and System)
 
-3. Garbage Collection Logs ( GC Type, Memory parameters before and after GC)
+3. Garbage Collection Logs (GC Type, Memory parameters before and after GC)
 
 ## Prerequisites
 
@@ -31,31 +31,34 @@ The types of usage data collected are;
 2. Open the terminal and run:
 
     ```sh
-        $ mvn exec:java
+      $ mvn exec:java
     ```
 
 3. Or Use following command:
     ```sh
-        $ mvn compile
-        $ mvn package
-        $ java -cp target/jvm-monitor-agent-1.0-SNAPSHOT.jar controller.Test <Input argument>
+      $ mvn compile
+      $ mvn package
+      $ java -cp target/jvm-monitor-agent-1.0-SNAPSHOT.jar controller.JVMMonitorAgent <Input arguments>
     ```
 
-    **Input argument should be in following order:**
+    ***Input arguments should be in following order:***
 
-    **[** monitored application name **]** **[** file path **]** **[** string arguments **]** **[** options **]**
+    ```
+    [app_name] [app_path] [app_args] [options]
+    ```
 
-    ***---Description---***
+   
+    | Arguments | Description|
+    |------------|------------|
+    |***[app_name]***| Monitored application name without file extension |
+    |***[app_path]***| Monitored application path relative to \<JMA_HOME> |
+    |***[app_args]***| Monitored application arguements. For sample applications please refere [README.md](https://github.com/wso2-incubator/automatic-anomaly-detection/tree/master/jvm-monitor-agent/src/samples/applications)|
+    |***[options]*** | Use to control the JMA (Please refer options table for more details) |
+    
+    | Options | Description |
+    |---------|-------------|
+    | ***-j***| If a jar file is used as application |
+    | ***-a***| If absolute file path is given instead of relative path |
+    | ***-f***| If .class file is to be run from the given file path. (does not compile monitoring application) (if “-f” is not given, particular .java file will first compile then run) |
+    | ***-r***| If respected monitoring application process is terminated, then it would run again automatically and continue monitoring |
 
-    **[** monitored application name **]:** Monitored application name. Do not put file extension.
-
-    **[** file path **]:**				            Need to give relative file path according to <JMA_HOME>
-
-    **[** string arguments **]:**	 		        This depends on monitored application. If you run < JMA_HOME>/samples/applications/< APP_NAME> , please use “README.md” inside the particular directory.
-
-    **[** options **]:**
-
-	    -j 	     If a jar file is used.
-	    -a	     If absolute file path is used.
-	    -f 	     If .class file is to be run from the given file path. (does not compile monitoring application) (if “-f” is not given, particular .java file will first compile then run)
-	    -r       If respected monitoring application process is terminated, then it would run again automatically and continue monitoring

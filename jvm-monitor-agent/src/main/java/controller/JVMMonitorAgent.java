@@ -42,9 +42,9 @@ import java.util.List;
  * This class runs "BadCode.jar" file to get jvm usage data
  * Need to set .java or .jar file path
  */
-public class JvmMonitorAgent {
+public class JVMMonitorAgent {
 
-    final static Logger logger = Logger.getLogger(JvmMonitorAgent.class);
+    final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
     //If you want to change Default values; please set java file name , file located path relative to project directory & input arguments.
     private String fileName = "NormalApp3";
@@ -253,9 +253,7 @@ public class JvmMonitorAgent {
 
         String pid = null;
 
-        System.err.println("A:" + appName + ":");
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
-            System.err.println("JVM:" + vmd.displayName());
             if (vmd.displayName().indexOf(appName) != -1) {
                 pid = vmd.id();
                 logger.info("PID found. PID: " + vmd.id() + "\tName: " + vmd.displayName());
@@ -283,7 +281,7 @@ public class JvmMonitorAgent {
             logger.error("Given \"" + fileName + "\" file is not running");
         } else {
 
-            String appID = (jarFilePath.substring(jarFilePath.lastIndexOf('/') + 1).replace('/', '_') + '-' + fileName).trim();
+            String appID = (fileName).trim();
 
             Controller controllerObj = new Controller();
             controllerObj.sendUsageData(pid, appID, controllerObj);
@@ -340,7 +338,7 @@ public class JvmMonitorAgent {
 
     public static void main(String[] args) {
 
-        JvmMonitorAgent testObj = new JvmMonitorAgent();
+        JVMMonitorAgent testObj = new JVMMonitorAgent();
 
         try {
             if (args.length >= 2) {
