@@ -20,12 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is sample java app for test purpose
+ * This is sample java app for test purpose.
  */
-public class Executor {
+public class NormalApp3 {
 
     private List<Integer> primes = new ArrayList<Integer>();
 
+    /**
+     * This is calculates primes up to user input.
+     * Parameters:-
+     * <p>
+     * Upper bound of primes
+     * <p>
+     * Eg:- (10000000)
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         long value = Integer.MAX_VALUE;
@@ -40,7 +50,7 @@ public class Executor {
 
         }
 
-        Executor obj = new Executor();
+        NormalApp3 obj = new NormalApp3();
         obj.primeNumber(value);
 
     }
