@@ -42,9 +42,9 @@ import java.util.List;
  * This class runs "BadCode.jar" file to get jvm usage data
  * Need to set .java or .jar file path
  */
-public class Test {
+public class JvmMonitorAgent {
 
-    final static Logger logger = Logger.getLogger(Test.class);
+    final static Logger logger = Logger.getLogger(JvmMonitorAgent.class);
 
     //If you want to change Default values; please set java file name , file located path relative to project directory & input arguments.
     private String fileName = "NormalApp3";
@@ -340,7 +340,7 @@ public class Test {
 
     public static void main(String[] args) {
 
-        Test testObj = new Test();
+        JvmMonitorAgent testObj = new JvmMonitorAgent();
 
         try {
             if (args.length >= 2) {
