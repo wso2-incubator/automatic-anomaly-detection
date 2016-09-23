@@ -1,6 +1,6 @@
 #Normal App 3
 
-Sample application to simulate normal conditions of application.
+Sample application to simulate normal conditions of application. This class calculates primes up to user input.
 
 ##Compile
 
@@ -17,4 +17,4 @@ or
 
 | Options  |  Description  | Default |
 | --------|---------|-------|
-|***\<int> upperBound*** | Upper Bound of prime| Integer.MAX_VALUE |
+|***\<int> upperBound*** | Upper bound of primes | Integer.MAX_VALUE |
