@@ -23,7 +23,7 @@ public class GenerateOOM{
     public static void main(String[] args) throws Exception {
         Thread.sleep(5000);
 
-        double x = 1;
+        double x = 1.2;
         int y = 10000;
         long z = 10000000L;
 
@@ -80,7 +80,7 @@ public class GenerateOOM{
             //increase the length of next array
             iteratorValue = (int)(iteratorValue * multiplier) + addition;
 
-            if (iteratorValue >= limit ){
+            if (limititeratorValue >= limit ){
                 iteratorValue = 10;
                 System.gc();
 
