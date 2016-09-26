@@ -24,4 +24,11 @@ or
 | ***\<int> threadPoolSize*** | Thread Pool size, | 5 |
 | ***\<int> maxMainListSize*** | Max main list size | 100000 |
 | ***\<int> arraySize*** | Array size | 10 |
-| ***\<int> threadsSleepTime*** | Threads sleep time | 1500 |
+| ***\<int> threadsSleepTime*** | Threads sleep time | 100 |
+
+---
+
+**CPU and Memory behaviour of this App**
+
+![Normal App 1]
+(https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/jvm-monitor-agent/src/samples/applications/NormalApp/NormalApp.jpg)*Draw a graph using [VisualVM](https://visualvm.java.net)*

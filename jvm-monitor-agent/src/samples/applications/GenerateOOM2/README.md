@@ -22,3 +22,10 @@ or
 | --------|---------|-------|
 |***\<int> sleepTime*** | Thread sleep time (ms) | 0 |
 | ***\<int> numberOfThread*** | Number of Threads | 2 |
+
+---
+
+**CPU and Memory behaviour of this App**
+
+![Generate OOM 2]
+(https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/jvm-monitor-agent/src/samples/applications/GenerateOOM2/GenerateOOM2.jpg)*Draw a graph using [VisualVM](https://visualvm.java.net)*

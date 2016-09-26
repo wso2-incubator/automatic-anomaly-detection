@@ -24,9 +24,9 @@ or
 | ***\<int> numberOfThread*** | Large Prime number | 600851475143 |
 | ***\<int> numberOfThread*** | Thread 3 sleep time (ms) | 4000 |
 
+---
 
+**CPU and Memory behaviour of this App**
 
-
-
-
-
+![Normal App 4]
+(https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/jvm-monitor-agent/src/samples/applications/NormalApp4/NormalApp4.jpg)*Draw a graph using [VisualVM](https://visualvm.java.net)*

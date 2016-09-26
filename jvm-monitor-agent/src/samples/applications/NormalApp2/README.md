@@ -22,3 +22,9 @@ or
 |***\<int> count*** | Defines the number of threads running | 5 |
 | ***\<int> limit*** | Defines maximum number of array operations and mathematical operations per each iteration | 10000000|
 
+---
+
+**CPU and Memory behaviour of this App**
+
+![Normal App 2]
+(https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/jvm-monitor-agent/src/samples/applications/NormalApp2/NormalApp2.jpg)*Draw a graph using [VisualVM](https://visualvm.java.net)*

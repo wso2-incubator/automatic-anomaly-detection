@@ -39,7 +39,7 @@ public class NormalApp {
      * <p>
      * You can add parameters in two type
      * 1). Numbers of Threads, Thread Pool size (eg:- 3 5)
-     * 2). Numbers of Threads, Thread Pool size, Max main list size, Array size, Threads sleep time (eg:- 3 5 100000 10 1500)
+     * 2). Numbers of Threads, Thread Pool size, Max main list size, Array size, Threads sleep time (eg:- 3 5 100000 10 100)
      */
     public static void main(String[] args) {
 
@@ -47,7 +47,7 @@ public class NormalApp {
         int threadPoolSize = 5;
         int maxMainListSize = 100000;
         int arraySize = 10;
-        long threadsSleepTime = 1500;
+        long threadsSleepTime = 100;
 
         if (args.length == 2) {
 
@@ -113,7 +113,7 @@ class NumberBuilder implements Runnable {
             numbList.clear();
 
             try {
-                Thread.sleep(sleepTime + randomGenerator.nextInt(50));
+                Thread.sleep(sleepTime + randomGenerator.nextInt(500));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -124,7 +124,7 @@ class NumberBuilder implements Runnable {
 
 class ListSort {
 
-    public static CopyOnWriteArrayList<Integer> mainNumberList = new CopyOnWriteArrayList<Integer>();
+    public ArrayList<Integer> mainNumberList = new ArrayList<Integer>(maxMainlistSize*2);
     public static int maxMainlistSize;
 
     public synchronized void addtoMainList(List<Integer> numbers) {

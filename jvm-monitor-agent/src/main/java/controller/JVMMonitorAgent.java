@@ -147,7 +147,7 @@ public class JVMMonitorAgent {
         if (killMultipleProcess) {
 
             for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
-                if (vmd.displayName().indexOf(appName) != -1) {
+                if (appName.equals(vmd.displayName())) {
 
                     try {
                         killProcess(vmd.id());
@@ -167,7 +167,7 @@ public class JVMMonitorAgent {
     }
 
     private void setAppName() {
-
+        arg = arg.trim();
         appName = fileName;
         if (!"".equals(arg)) {
             appName += " " + arg;
@@ -222,7 +222,7 @@ public class JVMMonitorAgent {
                 }
 
             } else {
-                logger.error("Could not find \"" + fileName + "\" java file in given directory: " + jarFilePath);
+                logger.error("Could not find \"" + fileName + fileExtension + "\" java file in given directory: " + jarFilePath);
                 System.exit(0);
             }
 
@@ -254,7 +254,7 @@ public class JVMMonitorAgent {
         String pid = null;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
-            if (vmd.displayName().indexOf(appName) != -1) {
+            if (appName.equals(vmd.displayName())) {
                 pid = vmd.id();
                 logger.info("PID found. PID: " + vmd.id() + "\tName: " + vmd.displayName());
             }
