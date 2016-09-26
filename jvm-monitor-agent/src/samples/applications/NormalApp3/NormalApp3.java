@@ -32,13 +32,13 @@ public class NormalApp3 {
      * <p>
      * Upper bound of primes
      * <p>
-     * Eg:- (10000000)
+     * Eg:- (1000000)
      *
      * @param args
      */
     public static void main(String[] args) {
 
-        long value = Integer.MAX_VALUE;
+        long value = 1000000;
 
         if (args.length == 1) {
 
@@ -50,17 +50,22 @@ public class NormalApp3 {
 
         }
 
-        NormalApp3 obj = new NormalApp3();
-        obj.primeNumber(value);
+        while (true) {
+            NormalApp3 obj = new NormalApp3();
+            obj.primeNumber(value);
+        }
 
     }
 
     public void primeNumber(long value) {
 
         long i = 1;
+        boolean isPrime;
+        long j, limit;
         while (i < value) {
-            boolean isPrime = true;
-            long j = 2, limit = (long) Math.sqrt(i);
+            isPrime = true;
+            j = 2;
+            limit = (long) Math.sqrt(i);
             while (j <= limit) {
                 if (i % j == 0) {
                     isPrime = false;
@@ -74,6 +79,8 @@ public class NormalApp3 {
             }
             i++;
         }
+
+        primes.clear();
 
     }
 }
