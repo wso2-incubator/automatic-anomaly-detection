@@ -25,8 +25,8 @@ public class NormalApp2 {
     public static void main(String[] args) throws InterruptedException {
         NormalApp2 executor = new NormalApp2();
 
-        int len = 5;
-        int size = 10000000;
+        int len = 10;
+        int size = 100000000;
 
         try {
             if (args.length == 1) {
@@ -69,21 +69,24 @@ public class NormalApp2 {
 
         @Override
         public void run() {
-            ArrayList<Long> arrayList = new ArrayList<Long>(10);
 
             while (true) {
 
                 int limit = random.nextInt(size - size/2) + size/2;
 
                 for (int i = 0; i < limit; i++) {
+                    int len = random.nextInt(size/2);
 
-                    Long number = random.nextLong();
-                    arrayList.add(number);
-                    System.out.println("Thread" + index + "- Number added to the list : " + number);
+                    if (len > 500000){
+                        len = 500000;
+                    }
+                    ArrayList<Long> arrayList = new ArrayList<Long>(len);
 
-                    if (i > 0) {
-                        arrayList.remove(0);
-                        System.out.println("Thread" + index + "- Removed number from arraylist :" + (i - 1));
+                    for(int k = 0 ; k < arrayList.size(); k++){
+                        Long number = random.nextLong();
+                        arrayList.add(number);
+                        System.out.println("Thread" + index + "- Number added to the list : " + number);
+
                     }
 
                     try {
@@ -100,13 +103,12 @@ public class NormalApp2 {
                     j++;
                     System.out.println("Thread" + index + "- count =" + j);
 
-                    if (arrayList.size() > 0) {
-                        arrayList.clear();
-                    }
-
                     double x = Math.random();
                     double y = Math.random();
                     double z = Math.random();
+
+                    double ans = x + y / z;
+                    double ans2 = Math.exp(Math.sin(x * Math.PI) + 12);
 
                     System.out.println("Thread" + index + "- ANSWER = " + x + "-" + y + "/" + z);
                 }
