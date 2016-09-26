@@ -24,7 +24,7 @@ or
 | ***\<int> threadPoolSize*** | Thread Pool size, | 5 |
 | ***\<int> maxMainListSize*** | Max main list size | 100000 |
 | ***\<int> arraySize*** | Array size | 10 |
-| ***\<int> threadsSleepTime*** | Threads sleep time | 1500 |
+| ***\<int> threadsSleepTime*** | Threads sleep time | 100 |
 
 ---
 
