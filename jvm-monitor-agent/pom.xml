@@ -39,20 +39,37 @@
     </profiles>
 
     <dependencies>
+
+        <!-- carbon.analytics-common dependency -->
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.agent</artifactId>
             <version>${carbon.commons.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
             <version>${carbon.commons.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons.thrift</artifactId>
             <version>${carbon.commons.version}</version>
+        </dependency>
+
+        <!--Other dependency-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
 
         <dependency>
@@ -63,22 +80,12 @@
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>slf4j-log4j12</artifactId>-->
-        <!--<version>1.5.10</version>-->
-        <!--</dependency>-->
-
     </dependencies>
 
     <properties>
         <carbon.commons.version>5.1.4-SNAPSHOT</carbon.commons.version>
+        <slf4j.version>1.5.10</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
     </properties>
 
 
