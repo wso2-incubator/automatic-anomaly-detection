@@ -39,20 +39,37 @@
     </profiles>
 
     <dependencies>
+
+        <!-- carbon.analytics-common dependency -->
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.agent</artifactId>
             <version>${carbon.commons.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
             <version>${carbon.commons.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.databridge.commons.thrift</artifactId>
             <version>${carbon.commons.version}</version>
+        </dependency>
+
+        <!--Other dependency-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
 
         <dependency>
@@ -63,22 +80,53 @@
             <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <!--<dependency>-->
-        <!--<groupId>org.slf4j</groupId>-->
-        <!--<artifactId>slf4j-log4j12</artifactId>-->
-        <!--<version>1.5.10</version>-->
-        <!--</dependency>-->
-
     </dependencies>
+
+    <build>
+        <plugins>
+
+            <!--maven assembly plugin. To create .jar file with all dependencies.-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>controller.JVMMonitorAgent</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
     <properties>
         <carbon.commons.version>5.1.4-SNAPSHOT</carbon.commons.version>
+        <slf4j.version>1.5.10</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
     </properties>
 
 
