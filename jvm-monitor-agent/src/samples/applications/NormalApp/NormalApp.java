@@ -43,11 +43,12 @@ public class NormalApp {
      */
     public static void main(String[] args) {
 
-        int numbersOfThreads = 3;
-        int threadPoolSize = 5;
-        int maxMainListSize = 100000;
+        int numbersOfThreads = 5;
+        int threadPoolSize = 12;
+        int maxMainListSize = 10000000;
         int arraySize = 10;
         long threadsSleepTime = 100;
+        Random randomGenerator = new Random();
 
         if (args.length == 2) {
 
@@ -75,7 +76,7 @@ public class NormalApp {
         ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
         ListSort.maxMainlistSize = maxMainListSize;
         for (int i = 0; i < numbersOfThreads; i++) {
-            Runnable worker = new NumberBuilder(arraySize, threadsSleepTime);
+            Runnable worker = new NumberBuilder(arraySize + randomGenerator.nextInt(500), threadsSleepTime);
             executor.execute(worker);
         }
         executor.shutdown();
@@ -124,7 +125,7 @@ class NumberBuilder implements Runnable {
 
 class ListSort {
 
-    public ArrayList<Integer> mainNumberList = new ArrayList<Integer>(maxMainlistSize*2);
+    public ArrayList<Integer> mainNumberList = new ArrayList<Integer>(maxMainlistSize * 2 + (new Random()).nextInt(1000));
     public static int maxMainlistSize;
 
     public synchronized void addtoMainList(List<Integer> numbers) {
