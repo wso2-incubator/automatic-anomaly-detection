@@ -80,7 +80,7 @@ public class GenerateOOM{
             //increase the length of next array
             iteratorValue = (int)(iteratorValue * multiplier) + addition;
 
-            if (limititeratorValue >= limit ){
+            if (limit!=-1 && iteratorValue >= limit ){
                 iteratorValue = 10;
                 System.gc();
 
