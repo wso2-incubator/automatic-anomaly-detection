@@ -18,54 +18,65 @@
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This is sample java app for test purpose.
  */
 public class NormalApp3 {
 
-    private List<Integer> primes = new ArrayList<Integer>();
 
     /**
      * This is calculates primes up to user input.
      * Parameters:-
      * <p>
      * Upper bound of primes
+     * GC force integer
      * <p>
-     * Eg:- (1000000)
+     * Eg:- (1000000) or (1000000, 12)
      *
      * @param args
      */
     public static void main(String[] args) {
 
-        long value = 1000000;
+        int value = 10000000;
+        int gcForceInt = 12;
 
-        if (args.length == 1) {
+        try {
 
-            try {
-                value = Long.parseLong(args[0]);
-            } catch (NumberFormatException e) {
-                System.err.println(e);
+            if (args.length == 1) {
+                value = Integer.parseInt(args[0]);
+            } else if (args.length == 2) {
+                value = Integer.parseInt(args[0]);
+                gcForceInt = Integer.parseInt(args[1]);
             }
 
+        } catch (NumberFormatException e) {
+            System.err.println(e);
         }
 
+        Random randomGenerator = new Random();
+
         while (true) {
-            NormalApp3 obj = new NormalApp3();
-            obj.primeNumber(value);
+            (new Prime()).find(randomGenerator.nextInt(value), gcForceInt);
         }
 
     }
 
-    public void primeNumber(long value) {
+
+}
+
+class Prime {
+
+    private List<Integer> nonPrimes = new ArrayList<Integer>();
+
+    public void find(int value, int gcForceInt) {
 
         long i = 1;
-        boolean isPrime;
-        long j, limit;
+
         while (i < value) {
-            isPrime = true;
-            j = 2;
-            limit = (long) Math.sqrt(i);
+            boolean isPrime = true;
+            long j = 2, limit = (long) Math.sqrt(i);
             while (j <= limit) {
                 if (i % j == 0) {
                     isPrime = false;
@@ -74,13 +85,19 @@ public class NormalApp3 {
                 j++;
             }
 
-            if (isPrime) {
-                primes.add((int) i);
+            if (!isPrime) {
+                nonPrimes.add((int) i);
             }
             i++;
         }
 
-        primes.clear();
+        nonPrimes.clear();
+        nonPrimes = new ArrayList<Integer>(3);
+
+        //Forced to collect GC
+        if (value % gcForceInt == 0) {
+            System.gc();
+        }
 
     }
 }
