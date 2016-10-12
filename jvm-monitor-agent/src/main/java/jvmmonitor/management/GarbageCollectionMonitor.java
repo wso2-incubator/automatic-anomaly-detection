@@ -199,7 +199,7 @@ public class GarbageCollectionMonitor {
                 //=====================general info===========================
                 gclog.setDuration(gcInfo.getDuration());
                 gclog.setGcCause(info.getGcCause());
-                gclog.setStartTime(gcInfo.getStartTime() + jvmStartTime );
+                gclog.setStartTime(gcInfo.getEndTime() + jvmStartTime );
                 gclog.setGcType(gctype);
                 //============================================================
 
