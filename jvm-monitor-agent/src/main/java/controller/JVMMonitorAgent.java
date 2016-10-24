@@ -46,20 +46,29 @@ public class JVMMonitorAgent {
 
     final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
-    //If you want to change Default values; please set java file name , file located path relative to project directory & input arguments.
+    /**
+     * If you want to change the default values; please set,
+     * "fileName" as java file name needed to monitor
+     * "jarFileRelativePath" as file location relative to the project directory
+     * "arg" as input arguments valid only for monitoring App
+     * Input Options
+     */
     private String fileName = "NormalApp3";
     private String fileExtension = ".java";
     private String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications/NormalApp3";
     private String arg = "";
 
-    private String currentDir = System.getProperty("user.dir");
-    private String jarFilePath = currentDir + jarFileRelativePath + "/";
+    //Main program Input Options
     private String appName;
     private boolean isAbsolutePath = false;
     private boolean isJarFile = false;
     private boolean doCompile = true;
     private boolean doRecursion = false;
     private boolean killMultipleProcess = true;
+
+
+    private String currentDir = System.getProperty("user.dir");
+    private String jarFilePath = currentDir + jarFileRelativePath + "/";
 
     /**
      * set user argument
@@ -338,18 +347,18 @@ public class JVMMonitorAgent {
 
     public static void main(String[] args) {
 
-        JVMMonitorAgent testObj = new JVMMonitorAgent();
+        JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
 
         try {
             if (args.length >= 2) {
-                testObj.setAegument(args);
+                jvmMonitor.setAegument(args);
             }
         } catch (Exception e) {
             logger.error(e);
         }
 
-        testObj.setAppName();
-        testObj.runMonitor();
+        jvmMonitor.setAppName();
+        jvmMonitor.runMonitor();
 
     }
 

@@ -19,6 +19,8 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This is sample java app for test purpose.
@@ -27,77 +29,103 @@ public class NormalApp3 {
 
 
     /**
-     * This is calculates primes up to user input.
+     * This app generates 4 random size arrays with random values.
      * Parameters:-
      * <p>
-     * Upper bound of primes
-     * GC force integer
+     * Array Size
+     * Max Integer
+     * Fixed Value
+     * Calculation Limit
      * <p>
-     * Eg:- (1000000) or (1000000, 12)
+     * Eg:- (1000000 1000000) or (1000000 1000000 1000000 10000000)
      *
      * @param args
      */
     public static void main(String[] args) {
 
-        int value = 10000000;
-        int gcForceInt = 12;
+        int arraySize = 1000000;
+        int maxInteger = 1000000;
+        int fixedValue = 1000000;
+        int calLimit = 10000000;
 
         try {
 
-            if (args.length == 1) {
-                value = Integer.parseInt(args[0]);
-            } else if (args.length == 2) {
-                value = Integer.parseInt(args[0]);
-                gcForceInt = Integer.parseInt(args[1]);
+            if (args.length == 2) {
+                arraySize = Integer.parseInt(args[0]);
+                maxInteger = Integer.parseInt(args[1]);
+            } else if (args.length == 4) {
+                arraySize = Integer.parseInt(args[0]);
+                maxInteger = Integer.parseInt(args[1]);
+                fixedValue = Integer.parseInt(args[2]);
+                calLimit = Integer.parseInt(args[3]);
             }
 
         } catch (NumberFormatException e) {
             System.err.println(e);
         }
 
-        Random randomGenerator = new Random();
-
-        while (true) {
-            (new Prime()).find(randomGenerator.nextInt(value), gcForceInt);
-        }
+        NumberGenerator builder = new NumberGenerator(arraySize, maxInteger, fixedValue, calLimit);
+        builder.run();
 
     }
 
 
 }
 
-class Prime {
 
-    private List<Integer> nonPrimes = new ArrayList<Integer>();
+class NumberGenerator {
 
-    public void find(int value, int gcForceInt) {
+    Random randomGenerator = new Random();
+    private int arraySize;
+    private int maxInteger;
+    private int calLimit;
+    private int fixedValue;
 
-        long i = 1;
+    public NumberGenerator(int arraySize, int maxInteger, int fixedValue, int calLimit) {
+        this.arraySize = arraySize;
+        this.maxInteger = maxInteger;
+        this.fixedValue = fixedValue;
+        this.calLimit = calLimit;
+    }
 
-        while (i < value) {
-            boolean isPrime = true;
-            long j = 2, limit = (long) Math.sqrt(i);
-            while (j <= limit) {
-                if (i % j == 0) {
-                    isPrime = false;
-                    break;
-                }
-                j++;
+    public void run() {
+
+        while (true) {
+
+            List<Integer> numbers = new ArrayList<Integer>(randomGenerator.nextInt(arraySize) + fixedValue);
+            List<Integer> numbers2 = new ArrayList<Integer>(randomGenerator.nextInt(arraySize) + fixedValue);
+            List<Integer> numbers3 = new ArrayList<Integer>(randomGenerator.nextInt(arraySize) + fixedValue);
+            List<Integer> numbers4 = new ArrayList<Integer>(randomGenerator.nextInt(arraySize) + fixedValue);
+            List<Integer> numbers5 = new ArrayList<Integer>(randomGenerator.nextInt(arraySize) + fixedValue);
+            List<Integer> numbers6 = new ArrayList<Integer>(randomGenerator.nextInt(arraySize) + fixedValue);
+
+            for (int x = 0; x < numbers.size(); x++) {
+                numbers.add(randomGenerator.nextInt(maxInteger));
+                numbers2.add(randomGenerator.nextInt(maxInteger));
+                numbers3.add(randomGenerator.nextInt(maxInteger));
+                numbers4.add(randomGenerator.nextInt(maxInteger));
+                numbers5.add(randomGenerator.nextInt(maxInteger));
+                numbers6.add(randomGenerator.nextInt(maxInteger));
+            }
+            numbers.clear();
+
+            int i = 0;
+            int cal = randomGenerator.nextInt(calLimit);
+            double limit = 0;
+            while (i < cal) {
+                limit += Math.atan(Math.sqrt(i));
+                i++;
             }
 
-            if (!isPrime) {
-                nonPrimes.add((int) i);
+            try {
+                Thread.sleep(randomGenerator.nextInt(300));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            i++;
-        }
 
-        nonPrimes.clear();
-        nonPrimes = new ArrayList<Integer>(3);
-
-        //Forced to collect GC
-        if (value % gcForceInt == 0) {
-            System.gc();
         }
 
     }
+
+
 }

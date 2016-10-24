@@ -134,7 +134,7 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
-
+    @Override
     public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
 
         try {

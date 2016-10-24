@@ -72,7 +72,7 @@ insert into UsageStream;
 
 
 /*convert events attibute gc_type(major or minor) into to two attributes as major and minor*/
-from GarbageCollectionStream[gc_type == "major"] 
+from GarbageCollectionStream
 select 
 	app_id,
 	time_stamp,
