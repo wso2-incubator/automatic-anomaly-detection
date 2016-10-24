@@ -27,6 +27,7 @@ import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.UsageMonitorLog;
 import jvmmonitor.util.GarbageCollectionListener;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -35,6 +36,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
+import java.lang.management.GarbageCollectorMXBean;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -44,6 +46,8 @@ import java.util.concurrent.Executors;
 
 
 public class Controller implements GarbageCollectionListener {
+
+    final static Logger logger = Logger.getLogger(Controller.class);
 
     private final DASgcPublisher dasGCPublisher;
     private final DASmemoryPublisher dasMemoryPublisher;
@@ -100,7 +104,11 @@ public class Controller implements GarbageCollectionListener {
             usageObj.setCredential(credential);
         }
 
-        usageObj.stratMonitoring();
+        while (!usageObj.stratMonitoring()){
+            Thread.sleep(1000);
+            logger.info("Start Monitoring Failed. Trying again...");
+        }
+
         usageObj.registerGCNotifications(controllerObj);
 
         //Create thread pool
