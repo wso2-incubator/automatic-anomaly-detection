@@ -34,7 +34,8 @@ The types of usage data collected are;
         java -cp $JAVA_HOME/lib/tools.jar:jvm-monitor-agent-1.0-SNAPSHOT-jar-with-dependencies.jar controller.JVMMonitorAgent <Input arguments>
 
     ***\<Input arguments> should be in following order:***
-    **Monitoring application in remote server using JMX URL**
+    
+    1.**Monitoring application in remote server using JMX URL**
     ```
     -u [jmx_url] [username]<optional> [password]<optional>
     ```
@@ -46,7 +47,7 @@ The types of usage data collected are;
     
     \* service:jmx:rmi://\<TARGET_MACHINE>:\<JMX_RMI_SERVER_PORT>/jndi/rmi://\<TARGET_MACHINE>:\<RMI_REGISTRY_PORT>/jmxrmi
         
-    **Monitoring application in same machine**
+    2.**Monitoring application in same machine**
     ```
     [app_name] [app_path] [app_args] [options]
     ```
