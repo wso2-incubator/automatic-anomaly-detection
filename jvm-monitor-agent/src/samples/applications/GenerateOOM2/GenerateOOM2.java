@@ -35,7 +35,7 @@ public class GenerateOOM2 {
     public static void main(String[] args) {
 
         int sleepTime = 0;
-        int numberOfThread = 2;
+        int numberOfThread = 1;
 
         if (args.length == 1) {
 
