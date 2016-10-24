@@ -175,7 +175,7 @@ public class Connection {
                 return con.getMBeanServerConnection();
 
             } catch (Exception ex) {
-                logger.info(ex.getMessage());
+                ex.printStackTrace();
             }
         }
         return null;
