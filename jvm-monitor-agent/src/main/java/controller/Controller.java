@@ -37,6 +37,7 @@ import javax.management.MalformedObjectNameException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -87,7 +88,7 @@ public class Controller implements GarbageCollectionListener {
      * @throws MonitoringNotStartedException
      * @throws DataEndpointException
      */
-    public void sendUsageData(String pid, String appID, Controller controllerObj) throws IOException,
+    public void sendUsageData(String pid, String appID, Controller controllerObj, String[] credential) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
             InterruptedException,
@@ -95,6 +96,10 @@ public class Controller implements GarbageCollectionListener {
             DataEndpointException {
 
         UsageMonitor usageObj = new UsageMonitor(pid);
+        if (credential != null){
+            usageObj.setCredential(credential);
+        }
+
         usageObj.stratMonitoring();
         usageObj.registerGCNotifications(controllerObj);
 
@@ -134,7 +139,6 @@ public class Controller implements GarbageCollectionListener {
 
     }
 
-    @Override
     public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
 
         try {

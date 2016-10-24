@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -148,6 +149,9 @@ public class UsageMonitor {
         return garbageCollectionMonitor;
     }
 
+    public void setCredential(String[] credential){
+        connection.setCredential(credential);
+    }
     public MemoryUsageMonitor getMemoryUsageMonitor() {
         return memoryUsageMonitor;
     }

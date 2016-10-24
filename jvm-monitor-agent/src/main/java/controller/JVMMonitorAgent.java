@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class runs "BadCode.jar" file to get jvm usage data
@@ -65,10 +66,13 @@ public class JVMMonitorAgent {
     private boolean doCompile = true;
     private boolean doRecursion = false;
     private boolean killMultipleProcess = true;
+    private boolean isURL = false;
 
 
     private String currentDir = System.getProperty("user.dir");
     private String jarFilePath = currentDir + jarFileRelativePath + "/";
+    private String jmxURL;
+    private String[] credential;
 
     /**
      * set user argument
@@ -79,38 +83,46 @@ public class JVMMonitorAgent {
 
         List<String> val = setOptions(args);
 
-        if (val.size() >= 2) {
+        if (!isURL) {
+            if (val.size() >= 2) {
 
-            fileName = val.get(0);
+                fileName = val.get(0);
 
-            if (isJarFile) {
-                fileExtension = ".jar";
-            }
-
-            String temPath = val.get(1);
-            if ('/' != temPath.charAt(temPath.length() - 1)) {
-                temPath = temPath + "/";
-            }
-            if ('/' != temPath.charAt(0)) {
-                temPath = "/" + temPath;
-            }
-
-
-            if (isAbsolutePath) {
-                jarFilePath = temPath;
-            } else {
-                jarFilePath = currentDir + temPath;
-            }
-
-            if (val.size() > 2) {
-                for (int x = 2; x < val.size(); x++) {
-                    arg += val.get(x) + " ";
+                if (isJarFile) {
+                    fileExtension = ".jar";
                 }
-                arg = arg.trim();
+
+                String temPath = val.get(1);
+                if ('/' != temPath.charAt(temPath.length() - 1)) {
+                    temPath = temPath + "/";
+                }
+                if ('/' != temPath.charAt(0)) {
+                    temPath = "/" + temPath;
+                }
+
+
+                if (isAbsolutePath) {
+                    jarFilePath = temPath;
+                } else {
+                    jarFilePath = currentDir + temPath;
+                }
+
+                if (val.size() > 2) {
+                    for (int x = 2; x < val.size(); x++) {
+                        arg += val.get(x) + " ";
+                    }
+                    arg = arg.trim();
+                }
             }
-
+        } else {
+            if (val.size() == 3) {
+                credential = new String[2];
+                credential[0] = val.get(1);
+                credential[1] = val.get(2);
+            }
+            jmxURL = val.get(0);
+            fileName = "DAS";
         }
-
     }
 
     /**
@@ -136,6 +148,8 @@ public class JVMMonitorAgent {
                 doRecursion = true;
             } else if ("-x".equals(s)) {
                 killMultipleProcess = false;
+            } else if ("-u".equals(s)) {
+                isURL = true;
             } else {
                 args.add(s);
             }
@@ -164,10 +178,8 @@ public class JVMMonitorAgent {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
             }
-
         }
     }
 
@@ -283,8 +295,14 @@ public class JVMMonitorAgent {
             TransportException,
             DataEndpointConfigurationException {
 
-        runMonitoredApp();
-        String pid = getPID();
+        String pid;
+
+        if (!isURL) {
+            runMonitoredApp();
+            pid = getPID();
+        } else {
+            pid = jmxURL;
+        }
 
         if (pid == null) {
             logger.error("Given \"" + fileName + "\" file is not running");
@@ -293,7 +311,7 @@ public class JVMMonitorAgent {
             String appID = (fileName).trim();
 
             Controller controllerObj = new Controller();
-            controllerObj.sendUsageData(pid, appID, controllerObj);
+            controllerObj.sendUsageData(pid, appID, controllerObj, credential);
 
             try {
                 killProcess(pid);
