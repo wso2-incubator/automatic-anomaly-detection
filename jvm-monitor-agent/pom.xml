@@ -121,6 +121,22 @@
             </plugin>
 
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>client-truststore.jks</include>
+                    <include>data-agent-conf.xml</include>
+                </includes>
+                <targetPath>../resources/</targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>log4j.properties</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <properties>
