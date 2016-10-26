@@ -18,7 +18,7 @@ package communicator;
 * under the License.
 */
 
-import jvmmonitor.io.ExtractGCData;
+
 import jvmmonitor.model.CPULoadLog;
 import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.MemoryUsageLog;
@@ -172,56 +172,6 @@ public class EventPublisher {
         logger.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
                 + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
                 + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations());
-
-    }
-
-    /**
-     * This method publish Garbage Collection Log data from file to DAS
-     *
-     * @param dataPublisher
-     * @param streamId
-     * @param fileName
-     * @throws DataEndpointException
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointAgentConfigurationException
-     * @throws TransportException
-     * @throws DataEndpointConfigurationException
-     * @throws FileNotFoundException
-     */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, String fileName) throws DataEndpointException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointConfigurationException,
-            FileNotFoundException {
-
-        Scanner scanner = new Scanner(new FileInputStream(fileName));
-        while (scanner.hasNextLine()) {
-            String stringLog = scanner.nextLine();
-
-            ExtractGCData eObj = new ExtractGCData();
-            ArrayList gcData = eObj.getGCData(stringLog);
-
-            if (gcData == null) {
-                continue;
-            }
-
-            Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                    new Object[]{fileName, gcData.get(0), gcData.get(1), gcData.get(2), gcData.get(3), gcData.get(4),
-                            gcData.get(5), gcData.get(6), gcData.get(7), gcData.get(8), gcData.get(9), gcData.get(10),
-                            gcData.get(11), gcData.get(12), gcData.get(13), gcData.get(14), gcData.get(15), gcData.get(16),
-                            gcData.get(17), gcData.get(18), gcData.get(19), gcData.get(20), gcData.get(21)});
-
-            logger.info("publish GC log data from file : " + fileName + " , " + gcData.get(0) + " , " + gcData.get(1) + " , " + gcData.get(2) + " , " + gcData.get(3)
-                    + " , " + gcData.get(4) + " , " + gcData.get(5) + " , " + gcData.get(6) + " , " + gcData.get(7) + " , " + gcData.get(8)
-                    + " , " + gcData.get(9) + " , " + gcData.get(10) + " , " + gcData.get(11) + " , " + gcData.get(12) + " , " + gcData.get(13)
-                    + " , " + gcData.get(14) + " , " + gcData.get(15) + " , " + gcData.get(16) + " , " + gcData.get(17) + " , " + gcData.get(18)
-                    + " , " + gcData.get(19) + " , " + gcData.get(20) + " , " + gcData.get(21));
-
-            dataPublisher.publish(event);
-
-        }
-        scanner.close();
 
     }
 

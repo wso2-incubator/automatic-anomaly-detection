@@ -54,25 +54,47 @@ public class JVMMonitorAgent {
      * "arg" as input arguments valid only for monitoring App
      * Input Options
      */
-    private String fileName = "NormalApp3";
-    private String fileExtension = ".java";
-    private String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications/NormalApp3";
-    private String arg = "";
+    private String fileName;
+    private String fileExtension;
+    private String jarFileRelativePath;
+    private String arg;
 
     //Main program Input Options
     private String appName;
-    private boolean isAbsolutePath = false;
-    private boolean isJarFile = false;
-    private boolean doCompile = true;
-    private boolean doRecursion = false;
-    private boolean killMultipleProcess = true;
-    private boolean isURL = false;
+    private boolean isAbsolutePath;
+    private boolean isJarFile;
+    private boolean doCompile;
+    private boolean doRecursion;
+    private boolean killMultipleProcess;
+    private boolean isURL;
 
 
-    private String currentDir = System.getProperty("user.dir");
-    private String jarFilePath = currentDir + jarFileRelativePath + "/";
+    private String currentDir;
+    private String jarFilePath;
+    private String hostname;
     private String jmxURL;
     private String[] credential;
+    private String[] dasCredentials;
+
+
+    public JVMMonitorAgent(){
+        fileName = "NormalApp3";
+        fileExtension = ".java";
+        jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications/NormalApp3";
+        arg = "";
+
+        isAbsolutePath = false;
+        isJarFile = false;
+        doCompile = true;
+        doRecursion = false;
+        killMultipleProcess = true;
+        isURL = false;
+
+        currentDir = System.getProperty("user.dir");
+        jarFilePath = currentDir + jarFileRelativePath + "/";
+        hostname = "127.0.0.1";
+        dasCredentials = new String[]{"admin", "admin"};
+    }
 
     /**
      * set user argument
@@ -310,7 +332,7 @@ public class JVMMonitorAgent {
 
             String appID = (fileName).trim();
 
-            Controller controllerObj = new Controller();
+            Controller controllerObj = new Controller(hostname,dasCredentials);
             controllerObj.sendUsageData(pid, appID, controllerObj, credential);
 
             try {

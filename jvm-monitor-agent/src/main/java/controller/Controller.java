@@ -66,7 +66,7 @@ public class Controller implements GarbageCollectionListener {
      * @throws DataEndpointAgentConfigurationException
      * @throws TransportException
      */
-    public Controller() throws DataEndpointException,
+    public Controller(String hostname, String[] dasCredentials) throws DataEndpointException,
             SocketException,
             UnknownHostException,
             DataEndpointConfigurationException,
@@ -74,9 +74,9 @@ public class Controller implements GarbageCollectionListener {
             DataEndpointAgentConfigurationException,
             TransportException {
 
-        dasMemoryPublisher = new DASmemoryPublisher(7611, 9611, "admin", "admin");
-        dasCPUPublisher = new DAScpuPublisher(7611, 9611, "admin", "admin");
-        dasGCPublisher = new DASgcPublisher(7611, 9611, "admin", "admin");
+        dasMemoryPublisher = new DASmemoryPublisher(hostname,7611, 9611,dasCredentials[0] , dasCredentials[1]);
+        dasCPUPublisher = new DAScpuPublisher(hostname,7611, 9611,dasCredentials[0], dasCredentials[1]);
+        dasGCPublisher = new DASgcPublisher(hostname,7611, 9611, dasCredentials[0], dasCredentials[1]);
 
     }
 

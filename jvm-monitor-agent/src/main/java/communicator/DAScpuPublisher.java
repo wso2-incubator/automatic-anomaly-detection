@@ -52,7 +52,7 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DAScpuPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
+    public DAScpuPublisher(String hostname, int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -61,7 +61,7 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(defaultThriftPort, defaultBinaryPort, username, password);
+        super(hostname, defaultThriftPort, defaultBinaryPort, username, password);
 
         /**
          * Set default CPU usage stream

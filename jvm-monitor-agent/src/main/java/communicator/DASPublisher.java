@@ -58,7 +58,7 @@ public class DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
+    public DASPublisher(String host, int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -75,7 +75,6 @@ public class DASPublisher {
         System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
 
         AgentHolder.setConfigPath(getDataAgentConfigPath());
-        String host = getLocalAddress().getHostAddress();
 
         String type = getProperty("type", "Thrift");
         int receiverPort = defaultThriftPort;

@@ -51,7 +51,7 @@ public class DASgcPublisher extends DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASgcPublisher(int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
+    public DASgcPublisher(String hostname, int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -60,7 +60,7 @@ public class DASgcPublisher extends DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(defaultThriftPort, defaultBinaryPort, username, password);
+        super(hostname, defaultThriftPort, defaultBinaryPort, username, password);
 
         /**
          * Set default Garbage collection log Stream
@@ -125,7 +125,8 @@ public class DASgcPublisher extends DASPublisher {
          * double   GCEventRealTimes
          */
 //        String HTTPD_LOG_STREAM = "GCLogStream";
-//        String VERSION = "1.0.0";
+//        String V
+// ERSION = "1.0.0";
 //        setDataStream(HTTPD_LOG_STREAM, VERSION);
 
     }
@@ -155,29 +156,6 @@ public class DASgcPublisher extends DASPublisher {
 
     }
 
-    /**
-     * Send data to EventPublisher
-     *
-     * @param fileName
-     * @throws TransportException
-     * @throws DataEndpointConfigurationException
-     * @throws FileNotFoundException
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointException
-     * @throws DataEndpointAgentConfigurationException
-     */
-    public void publishXXgcLogData(String fileName) throws TransportException,
-            DataEndpointConfigurationException,
-            FileNotFoundException,
-            DataEndpointAuthenticationException,
-            DataEndpointException,
-            DataEndpointAgentConfigurationException {
 
-        //HTTPD_LOG_STREAM = "gcLogStream"
-        //VERSION = "1.0.0"
-
-        eventAgent.publishLogEvents(dataPublisher, dataStream, fileName);
-
-    }
 
 }
