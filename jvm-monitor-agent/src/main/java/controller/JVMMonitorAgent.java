@@ -18,6 +18,8 @@
 
 package controller;
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
@@ -28,6 +30,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+import util.PropertyLoader;
 
 import javax.management.MalformedObjectNameException;
 import java.io.BufferedReader;
@@ -37,7 +40,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class runs "BadCode.jar" file to get jvm usage data
@@ -49,51 +51,48 @@ public class JVMMonitorAgent {
 
     /**
      * If you want to change the default values; please set,
-     * "fileName" as java file name needed to monitor
+     * "appName" as java file name needed to monitor
      * "jarFileRelativePath" as file location relative to the project directory
-     * "arg" as input arguments valid only for monitoring App
+     * "monitoredAppArgs" as input arguments valid only for monitoring App
      * Input Options
      */
-    private String fileName;
+
     private String fileExtension;
-    private String jarFileRelativePath;
-    private String arg;
+    private String monitoredAppArgs;
 
     //Main program Input Options
     private String appName;
+    private String pid;
     private boolean isAbsolutePath;
     private boolean isJarFile;
     private boolean doCompile;
     private boolean doRecursion;
     private boolean killMultipleProcess;
-    private boolean isURL;
+    private boolean remoteMonitoring;
+    private boolean monitorWithPID;
+    private boolean monitorWithAppName;
 
 
     private String currentDir;
     private String jarFilePath;
-    private String hostname;
-    private String jmxURL;
-    private String[] credential;
-    private String[] dasCredentials;
 
+    public JVMMonitorAgent() {
 
-    public JVMMonitorAgent(){
-        fileName = "NormalApp3";
         fileExtension = ".java";
-        jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications/NormalApp3";
-        arg = "";
+        monitoredAppArgs = "";
 
         isAbsolutePath = false;
         isJarFile = false;
         doCompile = true;
         doRecursion = false;
         killMultipleProcess = true;
-        isURL = false;
+        remoteMonitoring = false;
+        monitorWithPID = false;
+        monitorWithAppName = false;
 
+        String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications/NormalApp3";
         currentDir = System.getProperty("user.dir");
         jarFilePath = currentDir + jarFileRelativePath + "/";
-        hostname = "127.0.0.1";
-        dasCredentials = new String[]{"admin", "admin"};
     }
 
     /**
@@ -101,14 +100,21 @@ public class JVMMonitorAgent {
      *
      * @param args
      */
-    private void setAegument(String args[]) {
+    private void setArgument(String args[]) {
 
         List<String> val = setOptions(args);
 
-        if (!isURL) {
-            if (val.size() >= 2) {
+        if (val != null) {
 
-                fileName = val.get(0);
+            if (monitorWithPID && val.size() > 0) {
+                this.pid = val.get(0).trim();
+
+            } else if (monitorWithAppName && val.size() > 0) {
+                this.appName = val.get(0).trim();
+
+            } else if (val.size() >= 2) {
+
+                appName = val.get(0);
 
                 if (isJarFile) {
                     fileExtension = ".jar";
@@ -122,7 +128,6 @@ public class JVMMonitorAgent {
                     temPath = "/" + temPath;
                 }
 
-
                 if (isAbsolutePath) {
                     jarFilePath = temPath;
                 } else {
@@ -131,21 +136,14 @@ public class JVMMonitorAgent {
 
                 if (val.size() > 2) {
                     for (int x = 2; x < val.size(); x++) {
-                        arg += val.get(x) + " ";
+                        monitoredAppArgs += val.get(x) + " ";
                     }
-                    arg = arg.trim();
+                    monitoredAppArgs = monitoredAppArgs.trim();
                 }
             }
-        } else {
-            if (val.size() == 3) {
-                credential = new String[2];
-                credential[0] = val.get(1);
-                credential[1] = val.get(2);
-            }
-            jmxURL = val.get(0);
-            fileName = "DAS";
         }
     }
+
 
     /**
      * set Options argument
@@ -171,13 +169,15 @@ public class JVMMonitorAgent {
             } else if ("-x".equals(s)) {
                 killMultipleProcess = false;
             } else if ("-u".equals(s)) {
-                isURL = true;
+                remoteMonitoring = true;
+            } else if ("-n".equals(s)) {
+                monitorWithAppName = true;
+            } else if ("-p".equals(s)) {
+                monitorWithPID = true;
             } else {
                 args.add(s);
             }
-
         }
-
         return args;
 
     }
@@ -210,10 +210,10 @@ public class JVMMonitorAgent {
     }
 
     private void setAppName() {
-        arg = arg.trim();
-        appName = fileName;
-        if (!"".equals(arg)) {
-            appName += " " + arg;
+        monitoredAppArgs = monitoredAppArgs.trim();
+        appName = appName;
+        if (!"".equals(monitoredAppArgs)) {
+            appName += " " + monitoredAppArgs;
         }
     }
 
@@ -228,9 +228,9 @@ public class JVMMonitorAgent {
         boolean isCompile = true;
 
         if (!isJarFile) {
-            if ((new File(jarFilePath + fileName + ".class").isFile()) && !doCompile) {
+            if ((new File(jarFilePath + appName + ".class").isFile()) && !doCompile) {
 
-                String cmd = "java -classpath " + jarFilePath + " " + fileName + " " + arg;
+                String cmd = "java -classpath " + jarFilePath + " " + appName + " " + monitoredAppArgs;
                 logger.info(cmd);
                 try {
                     Runtime.getRuntime().exec(cmd);
@@ -238,9 +238,9 @@ public class JVMMonitorAgent {
                     logger.error(e);
                 }
 
-            } else if ((new File(jarFilePath + fileName + fileExtension).isFile())) {
+            } else if ((new File(jarFilePath + appName + fileExtension).isFile())) {
 
-                String cmd = "javac " + jarFilePath + fileName + fileExtension;
+                String cmd = "javac " + jarFilePath + appName + fileExtension;
                 logger.info(cmd);
 
                 try {
@@ -257,7 +257,7 @@ public class JVMMonitorAgent {
                     }
 
                     Thread.sleep(3000);
-                    cmd = "java -classpath " + jarFilePath + " " + fileName + " " + arg;
+                    cmd = "java -classpath " + jarFilePath + " " + appName + " " + monitoredAppArgs;
                     logger.info(cmd);
                     Runtime.getRuntime().exec(cmd);
                 } catch (Exception e) {
@@ -265,19 +265,19 @@ public class JVMMonitorAgent {
                 }
 
             } else {
-                logger.error("Could not find \"" + fileName + fileExtension + "\" java file in given directory: " + jarFilePath);
+                logger.error("Could not find \"" + appName + fileExtension + "\" java file in given directory: " + jarFilePath);
                 System.exit(0);
             }
 
         } else {
 
-            if (!(new File(jarFilePath + fileName + fileExtension).isFile())) {
-                System.err.println("Could not find .jar file in given directory: " + jarFilePath + fileName + fileExtension);
+            if (!(new File(jarFilePath + appName + fileExtension).isFile())) {
+                System.err.println("Could not find .jar file in given directory: " + jarFilePath + appName + fileExtension);
                 System.exit(0);
             }
 
             try {
-                Runtime.getRuntime().exec("java -jar " + jarFilePath + fileName + fileExtension);
+                Runtime.getRuntime().exec("java -jar " + jarFilePath + appName + fileExtension);
             } catch (Exception e) {
                 logger.error(e);
             }
@@ -292,21 +292,35 @@ public class JVMMonitorAgent {
 
     }
 
-    private String getPID() {
+    private String getPID(String appName) {
 
         String pid = null;
 
         for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
-            if (appName.equals(vmd.displayName())) {
+            if (appName != null && appName.equals(vmd.displayName())) {
                 pid = vmd.id();
                 logger.info("PID found. PID: " + vmd.id() + "\tName: " + vmd.displayName());
+                break;
             }
         }
-
         return pid;
     }
 
-    private void startSendMonitoredData() throws MalformedObjectNameException,
+    private String getAppName(String pid) {
+
+        String appName = null;
+
+        for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
+            if (pid != null && pid.equals(vmd.id())) {
+                appName = vmd.displayName();
+                logger.info("AppName found. PID: " + vmd.id() + "\tName: " + vmd.displayName());
+                break;
+            }
+        }
+        return appName;
+    }
+
+    private void startSendingMonitoredData() throws MalformedObjectNameException,
             InterruptedException,
             IOException,
             AttachNotSupportedException,
@@ -315,42 +329,54 @@ public class JVMMonitorAgent {
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
-            DataEndpointConfigurationException {
+            DataEndpointConfigurationException,
+            AgentLoadException,
+            AgentInitializationException {
 
-        String pid;
+        Controller controller = new Controller();
 
-        if (!isURL) {
-            runMonitoredApp();
-            pid = getPID();
-        } else {
-            pid = jmxURL;
-        }
+        if (remoteMonitoring) { //if remote monitoring is enabled use JMX URL to connect
+            controller.activateRemoteMonitoring();
 
-        if (pid == null) {
-            logger.error("Given \"" + fileName + "\" file is not running");
-        } else {
+        } else if (monitorWithPID) { //monitoring using PID is enabled start monitoring using the PID
+            if (pid == null) {
+                logger.error("No pid is given");
+                System.exit(0);
 
-            String appID = (fileName).trim();
-
-            Controller controllerObj = new Controller(hostname,dasCredentials);
-            controllerObj.sendUsageData(pid, appID, controllerObj, credential);
-
-            try {
-                killProcess(pid);
-            } catch (Exception e) {
-                logger.error(e);
+            } else {
+                appName = null;
+                appName = getAppName(pid);
+                if (appName == null) {
+                    logger.error("No running application found with given PID : " + pid);
+                } else {
+                    controller.activateLocalMonitoring(pid, appName);
+                }
             }
-        }
+        } else { // start monitoring using the PID obtained by the Application name
+            if (!monitorWithAppName) { //check if running app name is provided
+                //run the application if the jar or java file is provided
+                runMonitoredApp();
+            }
 
+            pid = null;
+            pid = getPID(appName);
+            if (pid == null) {
+                logger.error("No running application found with given Application Display name : " + appName);
+            } else {
+                controller.activateLocalMonitoring(pid, appName);
+            }
+
+        }
     }
 
     /**
      * This function will be recursion if user give "-r" as a option.
      */
-    private void runMonitor() {
+    private void runMonitor() throws AgentLoadException,
+            AgentInitializationException {
 
         try {
-            startSendMonitoredData();
+            startSendingMonitoredData();
         } catch (UndeclaredThrowableException e) {
 
             if (doRecursion) {
@@ -385,13 +411,18 @@ public class JVMMonitorAgent {
 
     }
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws AgentLoadException,
+            AgentInitializationException {
+
+        PropertyLoader.loadProperties();
+        logger.info("Properties loaded...");
 
         JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
 
         try {
-            if (args.length >= 2) {
-                jvmMonitor.setAegument(args);
+            if (args.length >= 1) {
+                jvmMonitor.setArgument(args);
             }
         } catch (Exception e) {
             logger.error(e);

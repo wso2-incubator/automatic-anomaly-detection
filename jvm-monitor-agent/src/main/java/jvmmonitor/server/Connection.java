@@ -12,6 +12,7 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,143 +41,134 @@ import java.util.Properties;
  */
 public class Connection {
 
-    private String address;
-    private String[] credential;
-    private VirtualMachine vm;
+    private final static Logger logger = Logger.getLogger(Connection.class);
 
+    private VirtualMachine vm;
     private static Connection connection;
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
 
-    private final static Logger logger = Logger.getLogger(Connection.class);
 
     /**
-     * Constructor to create Connector
-     *
-     * @param address process id or the MBean URL of monitoring JVM
-     * @throws IOException
-     * @throws AttachNotSupportedException
-     */
-    private Connection(String address) throws IOException,
-            AttachNotSupportedException {
-        this.address = address;
-    }
-
-    /**
-     * Constructor to create Connector
-     *
-     * @param address process id or the MBean URL of monitoring JVM
-     * @param credential
-     * @throws IOException
-     * @throws AttachNotSupportedException
-     */
-    private Connection(String address, String[] credential) throws IOException,
-            AttachNotSupportedException {
-        this.address = address;
-        this.credential= credential;
-    }
-
-    /**
-     * Connector is singleton
+     * Connection is singleton
      * <p>
-     * Return single Connector obj
+     * Return single Connection obj
      * Make sure that VirtualMachine objs are destroyed before creating a new instance
      * Forced to maintain only one connection at once
      *
-     * @param address
      * @return Connector obj
      */
-    public static Connection getConnection(String address) {
-
-        if (address != null) {
-            try {
-                synchronized (Connection.class) {
-                    if (connection != null) {
-                        connection.disconnectFromVM();
-                    }
-                    connection = new Connection(address);
+    public static Connection getConnection() {
+        try {
+            synchronized (Connection.class) {
+                if (connection != null) {
+                    connection.disconnectFromVM();
                 }
-                return connection;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (AttachNotSupportedException e) {
-                e.printStackTrace();
+                connection = new Connection();
             }
+            return connection;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
 
     /**
-     * Create the MBeanServerConnection
+     * Create the MBeanServerConnection to a remote server using the JMX URL
      * This server connection can be used to get the UsageBean objects from the monitoring VM
      *
-     * @return {MBeanServerConnection} Server Connection
-     * @throws AgentLoadException
-     * @throws AgentInitializationException
+     * @param hostname
+     * @param RMI_Server_Port
+     * @param RMI_Registry_Port
+     * @param username
+     * @param password
+     * @return
      * @throws IOException
      */
-    public MBeanServerConnection getServerConnection() throws IOException,
-            AgentLoadException,
-            AgentInitializationException {
+    public MBeanServerConnection getRemoteMBeanServerConnection(String hostname, String RMI_Server_Port, String RMI_Registry_Port, String username, String password) throws IOException {
 
-        if (address != null) {
-            try {
+        if (hostname != null) {
 
-                String connectorAddress;
-                JMXConnector con;
+            String connectorAddress, RMI_Server_Address, RMI_Registry_Address;
+            JMXConnector con;
 
-                if (address.startsWith("service")) {
-                    connectorAddress = address;
-                    if (credential != null && credential.length == 2){
-                        Map<String,String[]> cred= new HashMap<String, String[]>();
-                        cred.put(JMXConnector.CREDENTIALS, credential);
-                        con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress), cred);
-                    }else{
-                        con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
-                    }
+            //create JMX URL
+            RMI_Server_Address = hostname.concat(":").concat(RMI_Server_Port);
+            RMI_Registry_Address = hostname.concat(":").concat(RMI_Registry_Port);
 
+            connectorAddress = "service:jmx:rmi://"
+                    .concat(RMI_Server_Address)
+                    .concat("/jndi/rmi://")
+                    .concat(RMI_Registry_Address)
+                    .concat("/jmxrmi");
+            logger.info(connectorAddress);
 
-                } else {
-
-                    vm = VirtualMachine.attach(address);
-                    //print properties of connected VM
-                    logger.info("Connected to " + vm.id());
-                    logger.debug("System Properties:");
-
-                    for (Map.Entry<?, ?> en : vm.getSystemProperties().entrySet())
-                        logger.debug("\t" + en.getKey() + " = " + en.getValue());
-
-                    logger.info("==================================================");
-
-                    connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
-                    if (connectorAddress == null) {
-                        logger.info("loading agent");
-
-                        Properties props = vm.getSystemProperties();
-                        String home = props.getProperty("java.home");
-                        String agent = home + File.separator + "lib" + File.separator + "management-agent.jar";
-                        vm.loadAgent(agent);
-
-                        connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
-                        while (connectorAddress == null) {
-                            try {
-                                Thread.sleep(1000);
-                                connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
-
-                }
-
-                logger.info(connectorAddress);
-                return con.getMBeanServerConnection();
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            if (username != null && password != null) {
+                Map<String, String[]> cred = new HashMap<String, String[]>();
+                cred.put(JMXConnector.CREDENTIALS, new String[]{username, password});
+                con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress), cred);
+            } else {
+                con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
             }
+
+            return con.getMBeanServerConnection();
+        }
+        return null;
+    }
+
+    /**
+     * Create the MBeanServerConnection to a local server using PID
+     * This server connection can be used to get the UsageBean objects from the monitoring VM
+     *
+     * @param pid
+     * @return
+     */
+    public MBeanServerConnection getLocalMBeanServerConnection(String pid) throws IOException,
+            AttachNotSupportedException,
+            AgentInitializationException,
+            AgentLoadException {
+
+        if (pid != null) {
+
+            String connectorAddress;
+            JMXConnector con;
+
+            //attach VM using the pid given
+            vm = VirtualMachine.attach(pid);
+
+            //print properties of connected VM
+            logger.info("Connected to " + vm.id());
+            logger.debug("System Properties:");
+
+            for (Map.Entry<?, ?> en : vm.getSystemProperties().entrySet())
+                logger.debug("\t" + en.getKey() + " = " + en.getValue());
+
+            logger.info("==================================================");
+
+            //getting the connector address to the local JVM
+            connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+            if (connectorAddress == null) {
+                logger.info("loading agent");
+
+                Properties props = vm.getSystemProperties();
+                String home = props.getProperty("java.home");
+                String agent = home + File.separator + "lib" + File.separator + "management-agent.jar";
+                vm.loadAgent(agent);
+
+                connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+                while (connectorAddress == null) {
+                    try {
+                        Thread.sleep(1000);
+                        connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            logger.info("Connecting Address for given PID :" + pid + " is :" + connectorAddress);
+            con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
+            return con.getMBeanServerConnection();
         }
         return null;
     }
@@ -187,9 +179,5 @@ public class Connection {
      */
     private void disconnectFromVM() throws IOException {
         vm.detach();
-    }
-
-    public void setCredential(String[] credential){
-        this.credential = credential;
     }
 }

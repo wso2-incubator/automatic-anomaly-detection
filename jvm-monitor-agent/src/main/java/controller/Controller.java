@@ -18,6 +18,8 @@
 
 package controller;
 
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import communicator.DAScpuPublisher;
 import communicator.DASmemoryPublisher;
@@ -33,21 +35,20 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+import util.PropertyLoader;
 
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
-import java.lang.management.GarbageCollectorMXBean;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class Controller implements GarbageCollectionListener {
+public class Controller{
 
-    final static Logger logger = Logger.getLogger(Controller.class);
+    private final static Logger logger = Logger.getLogger(Controller.class);
 
     private final DASgcPublisher dasGCPublisher;
     private final DASmemoryPublisher dasMemoryPublisher;
@@ -66,7 +67,7 @@ public class Controller implements GarbageCollectionListener {
      * @throws DataEndpointAgentConfigurationException
      * @throws TransportException
      */
-    public Controller(String hostname, String[] dasCredentials) throws DataEndpointException,
+    public Controller() throws DataEndpointException,
             SocketException,
             UnknownHostException,
             DataEndpointConfigurationException,
@@ -74,17 +75,25 @@ public class Controller implements GarbageCollectionListener {
             DataEndpointAgentConfigurationException,
             TransportException {
 
-        dasMemoryPublisher = new DASmemoryPublisher(hostname,7611, 9611,dasCredentials[0] , dasCredentials[1]);
-        dasCPUPublisher = new DAScpuPublisher(hostname,7611, 9611,dasCredentials[0], dasCredentials[1]);
-        dasGCPublisher = new DASgcPublisher(hostname,7611, 9611, dasCredentials[0], dasCredentials[1]);
+
+        String hostname, username , password;
+        int thrift_port, binary_port;
+
+        hostname = PropertyLoader.DAS_ADDRESS;
+        username = PropertyLoader.DAS_USERNAME;
+        password = PropertyLoader.DAS_PASSWORD;
+        thrift_port = PropertyLoader.DAS_THRIFT_PORT;
+        binary_port = PropertyLoader.DAS_BINARY_PORT;
+
+        dasMemoryPublisher = new DASmemoryPublisher(hostname,thrift_port, binary_port,username , password);
+        dasCPUPublisher = new DAScpuPublisher(hostname,thrift_port, binary_port,username, password);
+        dasGCPublisher = new DASgcPublisher(hostname,thrift_port, binary_port, username, password);
 
     }
 
     /**
-     * This method sends CPU and Memory usage data per second
-     *
-     * @param pid
-     * @param controllerObj
+     * Method start remote monitoring target application and publishing the usage data
+
      * @throws IOException
      * @throws AttachNotSupportedException
      * @throws MalformedObjectNameException
@@ -92,77 +101,123 @@ public class Controller implements GarbageCollectionListener {
      * @throws MonitoringNotStartedException
      * @throws DataEndpointException
      */
-    public void sendUsageData(String pid, String appID, Controller controllerObj, String[] credential) throws IOException,
+    public void activateRemoteMonitoring() throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
             InterruptedException,
             MonitoringNotStartedException,
-            DataEndpointException {
+            DataEndpointException,
+            AgentLoadException,
+            AgentInitializationException {
 
-        UsageMonitor usageObj = new UsageMonitor(pid);
-        if (credential != null){
-            usageObj.setCredential(credential);
-        }
 
-        while (!usageObj.stratMonitoring()){
+        UsageMonitor usageObj = new UsageMonitor();
+
+        while (!usageObj.stratMonitoring(PropertyLoader.TARGET_ADDRESS,
+                PropertyLoader.TARGET_RMI_SERVER_PORT,
+                PropertyLoader.TARGET_RMI_REGISTRY_PORT,
+                PropertyLoader.TARGET_USERNAME,
+                PropertyLoader.TARGET_PASSWORD)) {
+
             Thread.sleep(1000);
             logger.info("Start Monitoring Failed. Trying again...");
         }
 
-        usageObj.registerGCNotifications(controllerObj);
+        usageObj.registerGCNotifications(new GarbageCollectionLogHandler());
+
+        executePublishing(usageObj,PropertyLoader.TARGET_ADDRESS);
+    }
+
+
+    /**
+     * This method sends CPU and Memory usage data per second
+     *
+     * @param pid
+     * @param appId
+     * @throws IOException
+     * @throws AttachNotSupportedException
+     * @throws MalformedObjectNameException
+     * @throws InterruptedException
+     * @throws MonitoringNotStartedException
+     * @throws DataEndpointException
+     */
+    public void activateLocalMonitoring(String pid,String appId) throws IOException,
+            AttachNotSupportedException,
+            MalformedObjectNameException,
+            InterruptedException,
+            MonitoringNotStartedException,
+            DataEndpointException,
+            AgentLoadException,
+            AgentInitializationException {
+
+        UsageMonitor usageObj = new UsageMonitor();
+
+        while (!usageObj.stratMonitoring(pid)){
+            Thread.sleep(1000);
+            logger.info("Start Monitoring Failed. Trying again...");
+        }
+
+        usageObj.registerGCNotifications(new GarbageCollectionLogHandler());
+
+        executePublishing(usageObj,appId);
+    }
+
+    /**
+     * Perform continues monitoring and publishing to the DAS
+     * @param usageMonitor - UsageMonitor obj to access JVM monitor
+     * @param appId - app id to be send to DAS
+     * @throws MonitoringNotStartedException
+     * @throws InterruptedException
+     */
+    private void executePublishing(UsageMonitor usageMonitor, String appId) throws MonitoringNotStartedException,
+            InterruptedException {
 
         //Create thread pool
         ExecutorService executor = Executors.newFixedThreadPool(3);
 
-        Runnable memory = dasMemoryPublisher;
-        Runnable cpu = dasCPUPublisher;
-
         //Set AppId
-        dasMemoryPublisher.setAppID(appID);
-        dasCPUPublisher.setAppID(appID);
-        dasGCPublisher.setAppID(appID);
+        dasMemoryPublisher.setAppID(appId);
+        dasCPUPublisher.setAppID(appId);
+        dasGCPublisher.setAppID(appId);
 
-        while (true) {
+        while(true) {
 
-            UsageMonitorLog usageLogObj = usageObj.getUsageLog();
+            UsageMonitorLog usageLogObj = usageMonitor.getUsageLog();
 
             //Set UsageMonitorLog
             dasMemoryPublisher.setUsageLogObj(usageLogObj);
             dasCPUPublisher.setUsageLogObj(usageLogObj);
 
-            executor.execute(memory);
-            executor.execute(cpu);
+            executor.execute(dasMemoryPublisher);
+            executor.execute(dasCPUPublisher);
 
             Thread.sleep(1000);
-
         }
-
-//        executor.shutdown();
-//        while (!executor.isTerminated()) {
-//        }
-//
-//        dasMemoryPublisher.shutdownDataPublisher();
-//        dasCPUPublisher.shutdownDataPublisher();
-//        dasGCPublisher.shutdownDataPublisher();
-
     }
 
-    public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
 
-        try {
-            dasGCPublisher.publishGCData(gcLogList);
-        } catch (DataEndpointAuthenticationException e) {
-            e.printStackTrace();
-        } catch (DataEndpointAgentConfigurationException e) {
-            e.printStackTrace();
-        } catch (DataEndpointException e) {
-            e.printStackTrace();
-        } catch (DataEndpointConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransportException e) {
-            e.printStackTrace();
+    /**
+     * Inner class to implement a GC log event listener in order to process GC log data
+     */
+    private class GarbageCollectionLogHandler implements GarbageCollectionListener{
+
+        public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
+            try {
+                dasGCPublisher.publishGCData(gcLogList);
+            } catch (DataEndpointAuthenticationException e) {
+                e.printStackTrace();
+            } catch (DataEndpointAgentConfigurationException e) {
+                e.printStackTrace();
+            } catch (DataEndpointException e) {
+                e.printStackTrace();
+            } catch (DataEndpointConfigurationException e) {
+                e.printStackTrace();
+            } catch (TransportException e) {
+                e.printStackTrace();
+            }
+
         }
-
     }
+
 
 }

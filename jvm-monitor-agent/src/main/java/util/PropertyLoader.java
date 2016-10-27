@@ -26,8 +26,8 @@ public class PropertyLoader {
     private final static String propertyFile = "jma.properties";
 
     public static String DAS_ADDRESS;
-    public static String DAS_THRIFT_PORT;
-    public static String DAS_BINARY_PORT;
+    public static int DAS_THRIFT_PORT;
+    public static int DAS_BINARY_PORT;
     public static String DAS_USERNAME;
     public static String DAS_PASSWORD;
 
@@ -36,7 +36,6 @@ public class PropertyLoader {
     public static String TARGET_RMI_REGISTRY_PORT;
     public static String TARGET_USERNAME;
     public static String TARGET_PASSWORD;
-
 
     public static void loadProperties(){
 
@@ -52,8 +51,8 @@ public class PropertyLoader {
             }
 
             DAS_ADDRESS = prop.getProperty("jma.das.address");
-            DAS_THRIFT_PORT= prop.getProperty("jma.das.thriftport");
-            DAS_BINARY_PORT = prop.getProperty("jma.das.binaryport");
+            DAS_THRIFT_PORT= Integer.parseInt(prop.getProperty("jma.das.thriftport"));
+            DAS_BINARY_PORT = Integer.parseInt(prop.getProperty("jma.das.binaryport"));
             DAS_USERNAME = prop.getProperty("jma.das.username");
             DAS_PASSWORD =prop.getProperty("jma.das.password");
 
@@ -64,9 +63,10 @@ public class PropertyLoader {
             TARGET_PASSWORD = prop.getProperty("jma.target.password");
 
 
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
+
         } finally {
             try {
                 if (input != null) {

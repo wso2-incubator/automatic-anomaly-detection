@@ -43,46 +43,88 @@ import java.util.ArrayList;
  */
 public class UsageMonitor {
 
+    private final static Logger logger = Logger.getLogger(UsageMonitor.class);
+
     private Connection connection;
     private GarbageCollectionMonitor garbageCollectionMonitor;
     private MemoryUsageMonitor memoryUsageMonitor;
     private CPUUsageMonitor cpuUsageMonitor;
 
-    final static Logger logger = Logger.getLogger(UsageMonitor.class);
 
     /**
      * Constructor
-     *
-     * At creation the PID of the monitoring JVM should be provided
-     * The JVM will be searched using the PID
-     *
-     * @param pid
-     * @throws IOException
-     * @throws AttachNotSupportedException
      */
-    public UsageMonitor(String pid) throws IOException,
-            AttachNotSupportedException {
-
-        this.connection = Connection.getConnection(pid);
+    public UsageMonitor() {
+        this.connection = Connection.getConnection();
     }
 
     /**
-     * Start monitoring usage metrics of JVM
      *
-     * Create a MBean Server Connection to the targeted JVM
+     * Start monitoring usage metrics of JVM
+     * <p>
+     * Create a Local MBean Server Connection to the targeted JVM
      * Get the required MXBeans from targeted JVM
      *
-     * @return
+     * @param pid - process id of targeted JVM
+     * @return - boolean to express if the startMonitoring was successful
      * @throws MalformedObjectNameException
      * @throws InterruptedException
+     * @throws AgentInitializationException
+     * @throws AgentLoadException
+     * @throws AttachNotSupportedException
+     * @throws IOException
      */
-    public boolean stratMonitoring() throws MalformedObjectNameException,
-            InterruptedException {
+    public boolean stratMonitoring(String pid) throws MalformedObjectNameException,
+            InterruptedException,
+            AgentInitializationException,
+            AgentLoadException,
+            AttachNotSupportedException,
+            IOException {
 
-        MBeanServerConnection serverConnection;
+        MBeanServerConnection serverConnection = connection.getLocalMBeanServerConnection(pid);
+        return getMXBeans(serverConnection);
+    }
+
+    /**
+     *
+     * Start monitoring usage metrics of JVM
+     * <p>
+     * Create a Remote MBean Server Connection to the targeted JVM
+     * Get the required MXBeans from targeted JVM
+     *
+     * @param hostname - hostname(ip) of targeted JVM
+     * @param RMI_Server_Port -Java RMI connection server port
+     * @param RMI_Registry_Port -Java RMI connection registry port
+     * @param username - access role of the JMX service for authorization
+     * @param password - password of the access role for authentication
+     * @return - boolean to express if the startMonitoring was successful
+     * @throws MalformedObjectNameException
+     * @throws InterruptedException
+     * @throws AgentInitializationException
+     * @throws AgentLoadException
+     * @throws AttachNotSupportedException
+     * @throws IOException
+     */
+    public boolean stratMonitoring(String hostname,String RMI_Server_Port, String RMI_Registry_Port, String username, String password) throws MalformedObjectNameException,
+            InterruptedException,
+            AgentInitializationException,
+            AgentLoadException,
+            AttachNotSupportedException,
+            IOException {
+
+        MBeanServerConnection serverConnection = connection.getRemoteMBeanServerConnection(hostname,RMI_Server_Port,RMI_Registry_Port,username,password);
+        return getMXBeans(serverConnection);
+    }
+
+    /**
+     * Create and assign Monitor objs with MXBeans to monitor the targeted JVM
+     * @param serverConnection - connection to get MXBeans from the targeted machine
+     * @return - return true if method executed successfully
+     * @throws MalformedObjectNameException
+     */
+    private boolean getMXBeans(MBeanServerConnection serverConnection) throws MalformedObjectNameException {
         try {
 
-            serverConnection = this.connection.getServerConnection();
             if (serverConnection != null) {
                 this.garbageCollectionMonitor = new GarbageCollectionMonitor(serverConnection);
                 this.memoryUsageMonitor = new MemoryUsageMonitor(serverConnection);
@@ -90,10 +132,7 @@ public class UsageMonitor {
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AgentLoadException e) {
-            e.printStackTrace();
-        } catch (AgentInitializationException e) {
+            logger.error("Failed to get MXBeans using the MBeanServerConnection");
             e.printStackTrace();
         }
         return false;
@@ -101,17 +140,17 @@ public class UsageMonitor {
 
     /**
      * get usage data of JVMd
-     * @return
+     *
+     * @return - return usage data bundle at the requested time
      * @throws MonitoringNotStartedException
      */
     public UsageMonitorLog getUsageLog() throws MonitoringNotStartedException {
 
         //if all the monitoring metrics are available, return them using UsageMonitorLog model
-        if (memoryUsageMonitor != null && garbageCollectionMonitor != null && cpuUsageMonitor != null){
-            UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(),garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getCPULoads());
+        if (memoryUsageMonitor != null && garbageCollectionMonitor != null && cpuUsageMonitor != null) {
+            UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(), garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getCPULoads());
             return usageMonitorLog;
-        }
-        else{
+        } else {
             throw new MonitoringNotStartedException();
         }
 
@@ -120,14 +159,15 @@ public class UsageMonitor {
     /**
      * This method can be used to register GarbageCollectionListener implementations
      * The listeners will be notified by calling their processGCLogs method
-     * @param listener
+     *
+     * @param listener - listener obj which can listen to garbage collection log events( must implement {@link GarbageCollectionListener} )
      * @throws MonitoringNotStartedException
      */
     public void registerGCNotifications(GarbageCollectionListener listener) throws MonitoringNotStartedException {
 
-        if (garbageCollectionMonitor != null){
+        if (garbageCollectionMonitor != null) {
             this.garbageCollectionMonitor.registerListener(listener);
-        }else{
+        } else {
             throw new MonitoringNotStartedException();
         }
 
@@ -144,14 +184,12 @@ public class UsageMonitor {
 
     }
 
-        // ====================================Getters=======================
+
+    // ===================Getters=======================
     public GarbageCollectionMonitor getGarbageCollectionMonitor() {
         return garbageCollectionMonitor;
     }
 
-    public void setCredential(String[] credential){
-        connection.setCredential(credential);
-    }
     public MemoryUsageMonitor getMemoryUsageMonitor() {
         return memoryUsageMonitor;
     }
