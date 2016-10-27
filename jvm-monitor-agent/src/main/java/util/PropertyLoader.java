@@ -1,7 +1,5 @@
 package util;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -23,7 +21,7 @@ import java.util.Properties;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class PropertyReader {
+public class PropertyLoader {
 
     private final static String propertyFile = "jma.properties";
 
@@ -47,7 +45,7 @@ public class PropertyReader {
 
         try {
 
-            input = PropertyReader.class.getClassLoader().getResourceAsStream(propertyFile);
+            input = PropertyLoader.class.getClassLoader().getResourceAsStream(propertyFile);
 
             if (input != null){
                 prop.load(input);
