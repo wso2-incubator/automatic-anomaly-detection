@@ -25,7 +25,7 @@ import java.util.Properties;
 */
 public class PropertyReader {
 
-    private final String properties = "jma.properties";
+    private final static String propertyFile = "jma.properties";
 
     public static String DAS_ADDRESS;
     public static String DAS_THRIFT_PORT;
@@ -47,8 +47,11 @@ public class PropertyReader {
 
         try {
 
-            input = new FileInputStream("jma.properties");
-            prop.load(input);
+            input = PropertyReader.class.getClassLoader().getResourceAsStream(propertyFile);
+
+            if (input != null){
+                prop.load(input);
+            }
 
             DAS_ADDRESS = prop.getProperty("jma.das.address");
             DAS_THRIFT_PORT= prop.getProperty("jma.das.thriftport");
