@@ -110,6 +110,26 @@
                 </executions>
             </plugin>
 
+            <!--maven assembly plugin. To create zip file with .jar with all dependencies.-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/bin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -134,6 +154,7 @@
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>log4j.properties</include>
+                    <include>jma.properties</include>
                 </includes>
             </resource>
         </resources>
