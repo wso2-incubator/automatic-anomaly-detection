@@ -3,6 +3,7 @@ package jvmmonitor.management;
 import com.sun.management.OperatingSystemMXBean;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.server.Connection;
@@ -34,17 +35,17 @@ public class CPUUsageLog {
 
 
     static String pid = "7565";
-    public static void main(String[] args) throws InterruptedException, AgentLoadException, IOException, AgentInitializationException {
+    public static void main(String[] args) throws InterruptedException, AgentLoadException, IOException, AgentInitializationException, AttachNotSupportedException {
 
         System.out.println("Currently running");
         for (VirtualMachineDescriptor vmd : VirtualMachine.list())
             System.out.println(vmd.id() + "\t" + vmd.displayName());
 
 
-        Connection connection = Connection.getConnection(pid);
+        Connection connection = Connection.getConnection();
 
         OperatingSystemMXBean bean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        bean = newPlatformMXBeanProxy(connection.getServerConnection(), OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+        bean = newPlatformMXBeanProxy(connection.getLocalMBeanServerConnection(pid), OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
         while (true) {
             System.out.println( "Process CPU load : " +bean.getProcessCpuLoad()*100 + "%");
             System.out.println( "System CPU load : " + bean.getSystemCpuLoad()*100 + "%");

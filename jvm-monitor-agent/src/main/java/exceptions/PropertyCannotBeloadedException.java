@@ -18,4 +18,9 @@ package exceptions;
 * under the License.
 */
 public class PropertyCannotBeloadedException extends Exception {
+
+    @Override
+    public String getMessage() {
+        return super.getMessage()+" JMA property file cannot be loaded";
+    }
 }

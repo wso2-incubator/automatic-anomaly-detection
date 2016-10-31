@@ -23,6 +23,7 @@ import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
+import exceptions.PropertyCannotBeloadedException;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -78,109 +79,13 @@ public class JVMMonitorAgent {
 
     public JVMMonitorAgent() {
 
-        fileExtension = ".java";
-        monitoredAppArgs = "";
-
-        isAbsolutePath = false;
-        isJarFile = false;
-        doCompile = true;
-        doRecursion = false;
-        killMultipleProcess = true;
-        remoteMonitoring = false;
-        monitorWithPID = false;
-        monitorWithAppName = false;
-
-        String jarFileRelativePath = "/jvm-monitor-agent/src/samples/applications/NormalApp3";
         currentDir = System.getProperty("user.dir");
-        jarFilePath = currentDir + jarFileRelativePath + "/";
-    }
+        jarFilePath = currentDir + "/";
 
-    /**
-     * set user argument
-     *
-     * @param args
-     */
-    private void setArgument(String args[]) {
-
-        List<String> val = setOptions(args);
-
-        if (val != null) {
-
-            if (monitorWithPID && val.size() > 0) {
-                this.pid = val.get(0).trim();
-
-            } else if (monitorWithAppName && val.size() > 0) {
-                this.appName = val.get(0).trim();
-
-            } else if (val.size() >= 2) {
-
-                appName = val.get(0);
-
-                if (isJarFile) {
-                    fileExtension = ".jar";
-                }
-
-                String temPath = val.get(1);
-                if ('/' != temPath.charAt(temPath.length() - 1)) {
-                    temPath = temPath + "/";
-                }
-                if ('/' != temPath.charAt(0)) {
-                    temPath = "/" + temPath;
-                }
-
-                if (isAbsolutePath) {
-                    jarFilePath = temPath;
-                } else {
-                    jarFilePath = currentDir + temPath;
-                }
-
-                if (val.size() > 2) {
-                    for (int x = 2; x < val.size(); x++) {
-                        monitoredAppArgs += val.get(x) + " ";
-                    }
-                    monitoredAppArgs = monitoredAppArgs.trim();
-                }
-            }
-        }
-    }
-
-
-    /**
-     * set Options argument
-     *
-     * @param OptionsArgs
-     * @return
-     */
-    private List setOptions(String OptionsArgs[]) {
-
-        List<String> args = new ArrayList<String>();
-
-        for (int x = 0; x < OptionsArgs.length; x++) {
-
-            String s = OptionsArgs[x];
-            if ("-j".equals(s)) {
-                isJarFile = true;
-            } else if ("-a".equals(s)) {
-                isAbsolutePath = true;
-            } else if ("-f".equals(s)) {
-                doCompile = false;
-            } else if ("-r".equals(s)) {
-                doRecursion = true;
-            } else if ("-x".equals(s)) {
-                killMultipleProcess = false;
-            } else if ("-u".equals(s)) {
-                remoteMonitoring = true;
-            } else if ("-n".equals(s)) {
-                monitorWithAppName = true;
-            } else if ("-p".equals(s)) {
-                monitorWithPID = true;
-            } else {
-                args.add(s);
-            }
-        }
-        return args;
+        loadConfigs();
 
     }
+
 
     /**
      * This will kill multiple process if user give "-k" as a options
@@ -209,13 +114,6 @@ public class JVMMonitorAgent {
         Runtime.getRuntime().exec("kill -9 " + pid);
     }
 
-    private void setAppName() {
-        monitoredAppArgs = monitoredAppArgs.trim();
-        appName = appName;
-        if (!"".equals(monitoredAppArgs)) {
-            appName += " " + monitoredAppArgs;
-        }
-    }
 
     /**
      * Start monitored application
@@ -230,7 +128,7 @@ public class JVMMonitorAgent {
         if (!isJarFile) {
             if ((new File(jarFilePath + appName + ".class").isFile()) && !doCompile) {
 
-                String cmd = "java -classpath " + jarFilePath + " " + appName + " " + monitoredAppArgs;
+                String cmd = "java -classpath " + jarFilePath + appName + " " + monitoredAppArgs;
                 logger.info(cmd);
                 try {
                     Runtime.getRuntime().exec(cmd);
@@ -281,15 +179,12 @@ public class JVMMonitorAgent {
             } catch (Exception e) {
                 logger.error(e);
             }
-
         }
-
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     private String getPID(String appName) {
@@ -370,6 +265,62 @@ public class JVMMonitorAgent {
     }
 
     /**
+     * load configurations accordingly
+     * Amount of configurations loaded is decided by the deciding parameters of the jma.properties
+     */
+    private void loadConfigs() {
+
+        remoteMonitoring = PropertyLoader.REMOTE_MONITORING;
+        monitorWithPID = PropertyLoader.IS_PID;
+        monitorWithAppName = PropertyLoader.IS_APP_NAME;
+
+        if (monitorWithPID) {
+            this.pid = PropertyLoader.PID;
+
+        } else if (monitorWithAppName) {
+            this.appName = PropertyLoader.APP_NAME;
+
+        } else {
+
+            isAbsolutePath = PropertyLoader.IS_ABSOLUTE;
+            isJarFile = PropertyLoader.IS_JAR;
+            doCompile = PropertyLoader.DO_COMPILE;
+            doRecursion = PropertyLoader.RE_RUN;
+            killMultipleProcess = PropertyLoader.KILL_MULTIPLE;
+
+            appName = PropertyLoader.FILE_NAME;
+
+
+            if (isJarFile) {
+                fileExtension = ".jar";
+            } else {
+                fileExtension = ".java";
+            }
+
+            String temPath = PropertyLoader.FILE_PATH;
+            if ('/' != temPath.charAt(temPath.length() - 1)) {
+                temPath = temPath + "/";
+            }
+            if ('/' != temPath.charAt(0)) {
+                temPath = "/" + temPath;
+            }
+
+            if (isAbsolutePath) {
+                jarFilePath = temPath;
+            } else {
+                jarFilePath = currentDir + temPath;
+            }
+
+            monitoredAppArgs = PropertyLoader.FILE_ARGS;
+            if (monitoredAppArgs != null && monitoredAppArgs.trim().toLowerCase().equals("null")) {
+                monitoredAppArgs = "";
+            }
+
+        }
+    }
+
+
+    /**
      * This function will be recursion if user give "-r" as a option.
      */
     private void runMonitor() throws AgentLoadException,
@@ -415,21 +366,17 @@ public class JVMMonitorAgent {
     public static void main(String[] args) throws AgentLoadException,
             AgentInitializationException {
 
-        PropertyLoader.loadProperties();
-        logger.info("Properties loaded...");
-
-        JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
-
         try {
-            if (args.length >= 1) {
-                jvmMonitor.setArgument(args);
-            }
-        } catch (Exception e) {
-            logger.error(e);
+            PropertyLoader.loadProperties();
+            logger.info("Properties loaded...");
+            JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
+            jvmMonitor.runMonitor();
+
+        } catch (PropertyCannotBeloadedException e) {
+            e.printStackTrace();
         }
 
-        jvmMonitor.setAppName();
-        jvmMonitor.runMonitor();
+
 
     }
 

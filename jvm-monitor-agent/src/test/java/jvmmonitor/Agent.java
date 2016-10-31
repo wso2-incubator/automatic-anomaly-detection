@@ -35,60 +35,60 @@ import java.util.Map;
 
 public class Agent {
 
-    final static Logger logger = Logger.getLogger(Agent.class);
-
-    static String pid = "19949";
-
-    //private static MemoryMonitor memoryMonitor = new MemoryMonitor();
-
-    public static void main(String[] args) throws InterruptedException, MonitoringNotStartedException {
-
-
-        logger.info("Currently running");
-        for (VirtualMachineDescriptor vmd : VirtualMachine.list())
-            logger.info(vmd.id() + "\t" + vmd.displayName());
-
-        try {
-            UsageMonitor usageMonitor = new UsageMonitor(pid);
-            usageMonitor.stratMonitoring();
-
-            LinkedList<GarbageCollectionLog> gm = (LinkedList<GarbageCollectionLog>) usageMonitor.getGarbageCollectionMonitor().getGCUsages();
-
-
-            while (true) {
-
-                    if (gm.size() > 0 ){
-                        Date date = new Date(gm.poll().getStartTime());
-                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-                        String formattedDate = sdf.format(date);
-                        System.out.println("Start time : " + formattedDate);
-
-                    }
-                Date date1 = new Date(usageMonitor.getUsageLog().getTimeStamp());
-                SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-                String formattedDate1 = sdf1.format(date1);
-                System.out.println("Usage Received Time : " + formattedDate1);
-
-//                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitor.MEMORY_USAGE_LOG);
-//                logger.info(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY))));
-//                logger.info(MemoryUsageMonitor.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.USED_HEAP_MEMORY))));
-//                logger.info(MemoryUsageMonitor.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.MAX_HEAP_MEMORY))));
-//                logger.info(MemoryUsageMonitor.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.PENDING_FINALIZATIONS))));
+//    final static Logger logger = Logger.getLogger(Agent.class);
 //
-                Thread.sleep(1000);
+//    static String pid = "19949";
 //
-//                logger.info("");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (AttachNotSupportedException e) {
-            e.printStackTrace();
-        } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
-//        } catch (MonitoringNotStartedException e) {
+//    //private static MemoryMonitor memoryMonitor = new MemoryMonitor();
+//
+//    public static void main(String[] args) throws InterruptedException, MonitoringNotStartedException {
+//
+//
+//        logger.info("Currently running");
+//        for (VirtualMachineDescriptor vmd : VirtualMachine.list())
+//            logger.info(vmd.id() + "\t" + vmd.displayName());
+//
+//        try {
+//            UsageMonitor usageMonitor = new UsageMonitor(pid);
+//            usageMonitor.stratMonitoring();
+//
+//            LinkedList<GarbageCollectionLog> gm = (LinkedList<GarbageCollectionLog>) usageMonitor.getGarbageCollectionMonitor().getGCUsages();
+//
+//
+//            while (true) {
+//
+//                    if (gm.size() > 0 ){
+//                        Date date = new Date(gm.poll().getStartTime());
+//                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+//                        String formattedDate = sdf.format(date);
+//                        System.out.println("Start time : " + formattedDate);
+//
+//                    }
+//                Date date1 = new Date(usageMonitor.getUsageLog().getTimeStamp());
+//                SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+//                String formattedDate1 = sdf1.format(date1);
+//                System.out.println("Usage Received Time : " + formattedDate1);
+//
+////                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitor.MEMORY_USAGE_LOG);
+////                logger.info(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY))));
+////                logger.info(MemoryUsageMonitor.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.USED_HEAP_MEMORY))));
+////                logger.info(MemoryUsageMonitor.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.MAX_HEAP_MEMORY))));
+////                logger.info(MemoryUsageMonitor.PENDING_FINALIZATIONS.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.PENDING_FINALIZATIONS))));
+////
+//                Thread.sleep(1000);
+////
+////                logger.info("");
+//            }
+//        } catch (IOException e) {
 //            e.printStackTrace();
-        }
-
-    }
+//        } catch (AttachNotSupportedException e) {
+//            e.printStackTrace();
+//        } catch (MalformedObjectNameException e) {
+//            e.printStackTrace();
+////        } catch (MonitoringNotStartedException e) {
+////            e.printStackTrace();
+//        }
+//
+//    }
 
 }
