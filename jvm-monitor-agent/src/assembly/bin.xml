@@ -28,7 +28,6 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>README.md</include>
-                <include>../LICENSE</include>
             </includes>
         </fileSet>
 
@@ -58,6 +57,17 @@
                 <include>log4j.properties</include>
             </includes>
         </fileSet>
+
+        <fileSet>
+            <directory>${project.basedir}/src/samples</directory>
+            <outputDirectory>samples</outputDirectory>
+            <includes>
+                <include>*/*/*.java</include>
+                <include>*/*/README.md</include>
+                <include>*/*/*.jpg</include>
+            </includes>
+        </fileSet>
+
 
         <fileSet>
             <directory>${project.build.directory}</directory>
