@@ -33,7 +33,7 @@ The types of usage data collected are;
   
   2. **Configure DAS publisher**
     
-    Change the following DAS publisher cofigurations in ```jma.properties``` to publishe monitoring data into the DAS
+    Change the following DAS publisher cofigurations in ```jma.properties``` in order to publish JVM monitoring data into the DAS
   
       ```
       jma.das.address = --Enter DAS IP adress--
@@ -56,7 +56,7 @@ The types of usage data collected are;
      
       1. **Monitoring remote JVM using JMX URL**
     
-           Change the following parameters of ```jma.properties``` to configure remote monitoring using JMX URL
+           Change the following parameters of ```jma.properties``` in order to configure remote monitoring using JMX URL
            
             jma.target.remote_monitoring = --Set this true to enable remote monitoring--
             jma.target.address = --Monitoring jmx server ip--
@@ -76,7 +76,7 @@ The types of usage data collected are;
             
       2. **Monitoring local JVM using Process ID(PID)**
       
-           Change the following parameters of ```jma.properties``` to configure local monitoring using PID
+           Change the following parameters of ```jma.properties``` in order to configure local monitoring using PID
             
             jma.target.remote_monitoring = --Set remote monitoring false to disable remote monitoring--
             
