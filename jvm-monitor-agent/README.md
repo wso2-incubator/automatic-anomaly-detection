@@ -52,7 +52,7 @@ The types of usage data collected are;
       jma.das.thriftport = 7611
       jma.das.binaryport = 9611
     ```
-  3. **Cofigure JVM Monitor Agent**
+  3. **Configure JVM Monitor Agent**
      
       1. **Monitoring remote JVM using JMX URL**
     
