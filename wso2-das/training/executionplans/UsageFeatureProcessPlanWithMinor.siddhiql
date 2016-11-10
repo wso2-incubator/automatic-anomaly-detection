@@ -137,7 +137,7 @@ select
 insert into GCProcessedStream;
 
 /*add a delay to wait UsageStreamEvents until the GC streams is processed*/
-from UsageStream#window.timeBatch(1 sec)
+from UsageStream#window.time(1 sec)
 select *
 insert expired events into UsageStreamNew;
 
