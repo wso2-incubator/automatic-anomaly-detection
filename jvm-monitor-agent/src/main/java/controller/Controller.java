@@ -46,7 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class Controller{
+public class Controller {
 
     private final static Logger logger = Logger.getLogger(Controller.class);
 
@@ -76,24 +76,23 @@ public class Controller{
             TransportException {
 
 
-        String hostname, username , password;
-        int thrift_port, binary_port;
+        String hostname, username, password;
+        int thrift_port;
 
         hostname = PropertyLoader.DAS_ADDRESS;
         username = PropertyLoader.DAS_USERNAME;
         password = PropertyLoader.DAS_PASSWORD;
         thrift_port = PropertyLoader.DAS_THRIFT_PORT;
-        binary_port = PropertyLoader.DAS_BINARY_PORT;
 
-        dasMemoryPublisher = new DASmemoryPublisher(hostname,thrift_port, binary_port,username , password);
-        dasCPUPublisher = new DAScpuPublisher(hostname,thrift_port, binary_port,username, password);
-        dasGCPublisher = new DASgcPublisher(hostname,thrift_port, binary_port, username, password);
+        dasMemoryPublisher = new DASmemoryPublisher(hostname, thrift_port, username, password);
+        dasCPUPublisher = new DAScpuPublisher(hostname, thrift_port, username, password);
+        dasGCPublisher = new DASgcPublisher(hostname, thrift_port, username, password);
 
     }
 
     /**
      * Method start remote monitoring target application and publishing the usage data
-
+     *
      * @throws IOException
      * @throws AttachNotSupportedException
      * @throws MalformedObjectNameException
@@ -125,7 +124,7 @@ public class Controller{
 
         usageObj.registerGCNotifications(new GarbageCollectionLogHandler());
 
-        executePublishing(usageObj,PropertyLoader.TARGET_ADDRESS);
+        executePublishing(usageObj, PropertyLoader.TARGET_ADDRESS);
     }
 
 
@@ -141,7 +140,7 @@ public class Controller{
      * @throws MonitoringNotStartedException
      * @throws DataEndpointException
      */
-    public void activateLocalMonitoring(String pid,String appId) throws IOException,
+    public void activateLocalMonitoring(String pid, String appId) throws IOException,
             AttachNotSupportedException,
             MalformedObjectNameException,
             InterruptedException,
@@ -152,20 +151,21 @@ public class Controller{
 
         UsageMonitor usageObj = new UsageMonitor();
 
-        while (!usageObj.stratMonitoring(pid)){
+        while (!usageObj.stratMonitoring(pid)) {
             Thread.sleep(1000);
             logger.info("Start Monitoring Failed. Trying again...");
         }
 
         usageObj.registerGCNotifications(new GarbageCollectionLogHandler());
 
-        executePublishing(usageObj,appId);
+        executePublishing(usageObj, appId);
     }
 
     /**
      * Perform continues monitoring and publishing to the DAS
+     *
      * @param usageMonitor - UsageMonitor obj to access JVM monitor
-     * @param appId - app id to be send to DAS
+     * @param appId        - app id to be send to DAS
      * @throws MonitoringNotStartedException
      * @throws InterruptedException
      */
@@ -180,7 +180,7 @@ public class Controller{
         dasCPUPublisher.setAppID(appId);
         dasGCPublisher.setAppID(appId);
 
-        while(true) {
+        while (true) {
 
             UsageMonitorLog usageLogObj = usageMonitor.getUsageLog();
 
@@ -199,7 +199,7 @@ public class Controller{
     /**
      * Inner class to implement a GC log event listener in order to process GC log data
      */
-    private class GarbageCollectionLogHandler implements GarbageCollectionListener{
+    private class GarbageCollectionLogHandler implements GarbageCollectionListener {
 
         public void processGClogs(LinkedList<GarbageCollectionLog> gcLogList) {
             try {
