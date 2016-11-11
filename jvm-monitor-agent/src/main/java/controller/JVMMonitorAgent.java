@@ -42,150 +42,14 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This class runs "BadCode.jar" file to get jvm usage data
- * Need to set .java or .jar file path
- */
+
 public class JVMMonitorAgent {
 
     final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
-    /**
-     * If you want to change the default values; please set,
-     * "appName" as java file name needed to monitor
-     * "jarFileRelativePath" as file location relative to the project directory
-     * "monitoredAppArgs" as input arguments valid only for monitoring App
-     * Input Options
-     */
-
-    private String fileExtension;
-    private String monitoredAppArgs;
-
     //Main program Input Options
     private String appName;
     private String pid;
-    private boolean isAbsolutePath;
-    private boolean isJarFile;
-    private boolean doCompile;
-    private boolean doRecursion;
-    private boolean killMultipleProcess;
-    private boolean remoteMonitoring;
-    private boolean monitorWithPID;
-    private boolean monitorWithAppName;
-
-
-    private String currentDir;
-    private String jarFilePath;
-
-    public JVMMonitorAgent() {
-
-        currentDir = System.getProperty("user.dir");
-        jarFilePath = currentDir + "/";
-
-        loadConfigs();
-
-    }
-
-
-    /**
-     * This will kill multiple process if user give "-k" as a options
-     *
-     * @param appName
-     */
-    private void killMultipleProcess(String appName) {
-
-        if (killMultipleProcess) {
-
-            for (VirtualMachineDescriptor vmd : VirtualMachine.list()) {
-                if (appName.equals(vmd.displayName())) {
-
-                    try {
-                        killProcess(vmd.id());
-                        logger.info("kill PID : " + vmd.id() + " " + vmd.displayName());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-    private void killProcess(String pid) throws IOException {
-        Runtime.getRuntime().exec("kill -9 " + pid);
-    }
-
-
-    /**
-     * Start monitored application
-     */
-    private void runMonitoredApp() {
-
-        killMultipleProcess(appName);
-
-        String error, out = "";
-        boolean isCompile = true;
-
-        if (!isJarFile) {
-            if ((new File(jarFilePath + appName + ".class").isFile()) && !doCompile) {
-
-                String cmd = "java -classpath " + jarFilePath + appName + " " + monitoredAppArgs;
-                logger.info(cmd);
-                try {
-                    Runtime.getRuntime().exec(cmd);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-
-            } else if ((new File(jarFilePath + appName + fileExtension).isFile())) {
-
-                String cmd = "javac " + jarFilePath + appName + fileExtension;
-                logger.info(cmd);
-
-                try {
-                    Process prc = Runtime.getRuntime().exec(cmd);
-                    BufferedReader stdError = new BufferedReader(new InputStreamReader(prc.getErrorStream()));
-                    while ((error = stdError.readLine()) != null) {
-                        out += error + '\n';
-                        isCompile = false;
-                    }
-
-                    if (!isCompile) {
-                        logger.error(out);
-                        System.exit(0);
-                    }
-
-                    Thread.sleep(3000);
-                    cmd = "java -classpath " + jarFilePath + " " + appName + " " + monitoredAppArgs;
-                    logger.info(cmd);
-                    Runtime.getRuntime().exec(cmd);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-
-            } else {
-                logger.error("Could not find \"" + appName + fileExtension + "\" java file in given directory: " + jarFilePath);
-                System.exit(0);
-            }
-
-        } else {
-
-            if (!(new File(jarFilePath + appName + fileExtension).isFile())) {
-                System.err.println("Could not find .jar file in given directory: " + jarFilePath + appName + fileExtension);
-                System.exit(0);
-            }
-
-            try {
-                Runtime.getRuntime().exec("java -jar " + jarFilePath + appName + fileExtension);
-            } catch (Exception e) {
-                logger.error(e);
-            }
-        }
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
     private String getPID(String appName) {
 
@@ -264,61 +128,6 @@ public class JVMMonitorAgent {
         }
     }
 
-    /**
-     * load configurations accordingly
-     * Amount of configurations loaded is decided by the deciding parameters of the jma.properties
-     */
-    private void loadConfigs() {
-
-        remoteMonitoring = PropertyLoader.REMOTE_MONITORING;
-        monitorWithPID = PropertyLoader.IS_PID;
-        monitorWithAppName = PropertyLoader.IS_APP_NAME;
-
-        if (monitorWithPID) {
-            this.pid = PropertyLoader.PID;
-
-        } else if (monitorWithAppName) {
-            this.appName = PropertyLoader.APP_NAME;
-
-        } else {
-
-            isAbsolutePath = PropertyLoader.IS_ABSOLUTE;
-            isJarFile = PropertyLoader.IS_JAR;
-            doCompile = PropertyLoader.DO_COMPILE;
-            doRecursion = PropertyLoader.RE_RUN;
-            killMultipleProcess = PropertyLoader.KILL_MULTIPLE;
-
-            appName = PropertyLoader.FILE_NAME;
-
-
-            if (isJarFile) {
-                fileExtension = ".jar";
-            } else {
-                fileExtension = ".java";
-            }
-
-            String temPath = PropertyLoader.FILE_PATH;
-            if ('/' != temPath.charAt(temPath.length() - 1)) {
-                temPath = temPath + "/";
-            }
-            if ('/' != temPath.charAt(0)) {
-                temPath = "/" + temPath;
-            }
-
-            if (isAbsolutePath) {
-                jarFilePath = temPath;
-            } else {
-                jarFilePath = currentDir + temPath;
-            }
-
-            monitoredAppArgs = PropertyLoader.FILE_ARGS;
-            if (monitoredAppArgs != null && monitoredAppArgs.trim().toLowerCase().equals("null")) {
-                monitoredAppArgs = "";
-            }
-
-        }
-    }
-
 
     /**
      * This function will be recursion if user give "-r" as a option.
@@ -330,13 +139,6 @@ public class JVMMonitorAgent {
             startSendingMonitoredData();
         } catch (UndeclaredThrowableException e) {
 
-            if (doRecursion) {
-                System.err.println("Monitored process stopped. monitoring app is now restarted");
-                runMonitor();
-            } else {
-                System.err.println("Monitored process stopped. monitoring application is terminated");
-                System.exit(0);
-            }
 
         } catch (TransportException e) {
             e.printStackTrace();
