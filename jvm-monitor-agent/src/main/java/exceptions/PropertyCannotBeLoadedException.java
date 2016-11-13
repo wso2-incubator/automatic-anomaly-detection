@@ -17,10 +17,13 @@ package exceptions;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class PropertyCannotBeloadedException extends Exception {
+public class PropertyCannotBeLoadedException extends Exception {
 
-    @Override
-    public String getMessage() {
-        return super.getMessage()+" JMA property file cannot be loaded";
+    public PropertyCannotBeLoadedException(String message) {
+        super(message);
+    }
+
+    public PropertyCannotBeLoadedException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
