@@ -41,7 +41,6 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
      * Need to set client-truststore.jks file located path
      *
      * @param defaultThriftPort
-     * @param defaultBinaryPort
      * @param username
      * @param password
      * @throws SocketException
@@ -52,7 +51,7 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DAScpuPublisher(String hostname, int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
+    public DAScpuPublisher(String hostname, int defaultThriftPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -61,7 +60,7 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, defaultBinaryPort, username, password);
+        super(hostname, defaultThriftPort, username, password);
 
         /**
          * Set default CPU usage stream

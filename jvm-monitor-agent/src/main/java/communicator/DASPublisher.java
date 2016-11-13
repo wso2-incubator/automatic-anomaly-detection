@@ -47,7 +47,6 @@ public class DASPublisher {
      * Need to set client-truststore.jks file located path
      *
      * @param defaultThriftPort
-     * @param defaultBinaryPort
      * @param username
      * @param password
      * @throws SocketException
@@ -58,7 +57,7 @@ public class DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(String host, int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
+    public DASPublisher(String host, int defaultThriftPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -78,9 +77,7 @@ public class DASPublisher {
 
         String type = getProperty("type", "Thrift");
         int receiverPort = defaultThriftPort;
-        if (type.equals("Binary")) {
-            receiverPort = defaultBinaryPort;
-        }
+
         int securePort = receiverPort + 100;
 
         String url = getProperty("url", "tcp://" + host + ":" + receiverPort);

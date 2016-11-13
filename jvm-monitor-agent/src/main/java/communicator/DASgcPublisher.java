@@ -40,7 +40,6 @@ public class DASgcPublisher extends DASPublisher {
      * Need to set client-truststore.jks file located path
      *
      * @param defaultThriftPort
-     * @param defaultBinaryPort
      * @param username
      * @param password
      * @throws SocketException
@@ -51,7 +50,7 @@ public class DASgcPublisher extends DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASgcPublisher(String hostname, int defaultThriftPort, int defaultBinaryPort, String username, String password) throws
+    public DASgcPublisher(String hostname, int defaultThriftPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -60,7 +59,7 @@ public class DASgcPublisher extends DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, defaultBinaryPort, username, password);
+        super(hostname, defaultThriftPort, username, password);
 
         /**
          * Set default Garbage collection log Stream
@@ -155,7 +154,6 @@ public class DASgcPublisher extends DASPublisher {
         }
 
     }
-
 
 
 }
