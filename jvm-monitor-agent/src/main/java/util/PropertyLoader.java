@@ -1,7 +1,7 @@
 package util;
 
 
-import exceptions.PropertyCannotBeloadedException;
+import exceptions.PropertyCannotBeLoadedException;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -29,98 +29,71 @@ import java.util.Properties;
 */
 public class PropertyLoader {
 
-    private final static String propertyFile = "jma.properties";
+    private final static String PROPERTY_FILE = "jma.properties";
     private final static Logger logger = Logger.getLogger(PropertyLoader.class);
 
     //das publisher configurations
-    public static String DAS_ADDRESS;
-    public static int DAS_THRIFT_PORT;
-    public static int DAS_BINARY_PORT;
-    public static String DAS_USERNAME;
-    public static String DAS_PASSWORD;
+    public static String dasAddress;
+    public static int dasThriftPort;
+    public static String dasUsername;
+    public static String dasPassword;
+
+    //targeted monitoring mode
+    public static String mode;
 
     //targeted remote server configuration
-    public static boolean REMOTE_MONITORING;
-    public static String TARGET_ADDRESS;
-    public static String TARGET_RMI_SERVER_PORT;
-    public static String TARGET_RMI_REGISTRY_PORT;
-    public static String TARGET_USERNAME;
-    public static String TARGET_PASSWORD;
+    public static String targetAddress;
+    public static String targetRmiServerPort;
+    public static String targetRmiRegistryPort;
+    public static String targetUsername;
+    public static String targetPassword;
 
     //monitor running app using PID configurations
-    public static boolean IS_PID;
-    public static String PID;
-
-    //monitor running app using app name(display name) configurations
-    public static boolean IS_APP_NAME;
-    public static String APP_NAME;
-
-    //file execution configurations
-    public static String FILE_NAME;
-    public static String FILE_PATH;
-    public static String FILE_ARGS;
-    public static boolean IS_JAR;
-    public static boolean IS_ABSOLUTE;
-    public static boolean DO_COMPILE;
-    public static boolean RE_RUN;
-    public static boolean KILL_MULTIPLE;
+    public static String pid;
 
 
-    public static void loadProperties() throws PropertyCannotBeloadedException {
+    public static void loadProperties() throws PropertyCannotBeLoadedException {
 
 
         Properties prop = new Properties();
-        InputStream input = null;
+        InputStream input;
 
         try {
-            input = new FileInputStream("bin/"+propertyFile);
+            input = new FileInputStream("bin/" + PROPERTY_FILE);
         } catch (FileNotFoundException e1) {
+            input = PropertyLoader.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
+        }
 
-            input = PropertyLoader.class.getClassLoader().getResourceAsStream(propertyFile);
+        try {
+            if (input != null) {
 
-        } finally {
+                prop.load(input);
 
-            try {
-                if (input != null) {
+                dasAddress = prop.getProperty("jma.das.address");
+                dasThriftPort = Integer.parseInt(prop.getProperty("jma.das.thriftport"));
+                dasUsername = prop.getProperty("jma.das.username");
+                dasPassword = prop.getProperty("jma.das.password");
 
-                    prop.load(input);
+                mode = prop.getProperty("jma.target.mode");
 
-                    DAS_ADDRESS = prop.getProperty("jma.das.address");
-                    DAS_THRIFT_PORT = Integer.parseInt(prop.getProperty("jma.das.thriftport"));
-                    DAS_BINARY_PORT = Integer.parseInt(prop.getProperty("jma.das.binaryport"));
-                    DAS_USERNAME = prop.getProperty("jma.das.username");
-                    DAS_PASSWORD = prop.getProperty("jma.das.password");
+                targetAddress = prop.getProperty("jma.target.address");
+                targetRmiServerPort = prop.getProperty("jma.target.rmi_server_port");
+                targetRmiRegistryPort = prop.getProperty("jma.target.rmi_registry_port");
+                targetUsername = prop.getProperty("jma.target.username");
+                targetPassword = prop.getProperty("jma.target.password");
 
-                    REMOTE_MONITORING = Boolean.parseBoolean(prop.getProperty("jma.target.remote_monitoring"));
-                    TARGET_ADDRESS = prop.getProperty("jma.target.address");
-                    TARGET_RMI_SERVER_PORT = prop.getProperty("jma.target.rmi_server_port");
-                    TARGET_RMI_REGISTRY_PORT = prop.getProperty("jma.target.rmi_registry_port");
-                    TARGET_USERNAME = prop.getProperty("jma.target.username");
-                    TARGET_PASSWORD = prop.getProperty("jma.target.password");
+                pid = prop.getProperty("jma.target.pid");
 
-                    IS_PID = Boolean.parseBoolean(prop.getProperty("jma.target.is_pid"));
-                    PID = prop.getProperty("jma.target.pid");
+                input.close();
 
-                    IS_APP_NAME = Boolean.parseBoolean(prop.getProperty("jma.target.is_app_name"));
-                    APP_NAME = prop.getProperty("jma.target.app_name");
-
-                    FILE_NAME = prop.getProperty("jma.target.file.name");
-                    FILE_PATH = prop.getProperty("jma.target.file.path");
-                    FILE_ARGS = prop.getProperty("jma.target.file.args");
-                    IS_JAR = Boolean.parseBoolean(prop.getProperty("jma.target.file.is_jar"));
-                    IS_ABSOLUTE = Boolean.parseBoolean(prop.getProperty("jma.target.file.is_absolute"));
-                    DO_COMPILE = Boolean.parseBoolean(prop.getProperty("jma.target.file.do_compile"));
-                    RE_RUN = Boolean.parseBoolean(prop.getProperty("jma.target.file.re_run"));
-                    KILL_MULTIPLE = Boolean.parseBoolean(prop.getProperty("jma.target.file.kill_multi_processes"));
-                    input.close();
-
-                }else{
-                    logger.error("Loading Properties failed : The property file can not be loaded");
-                    throw new PropertyCannotBeloadedException();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                String msg = "The property file can not be loaded";
+                logger.error(msg);
+                throw new PropertyCannotBeLoadedException(msg);
             }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            throw new PropertyCannotBeLoadedException(e.getMessage(), e);
+        }
     }
-}
 }
