@@ -12,8 +12,6 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -42,53 +40,23 @@ import java.util.Properties;
 public class Connection {
 
     private final static Logger logger = Logger.getLogger(Connection.class);
-
-    private VirtualMachine vm;
-    private static Connection connection;
-    private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
-
-
-    /**
-     * Connection is singleton
-     * <p>
-     * Return single Connection obj
-     * Make sure that VirtualMachine objs are destroyed before creating a new instance
-     * Forced to maintain only one connection at once
-     *
-     * @return Connector obj
-     */
-    public static Connection getConnection() {
-        try {
-            synchronized (Connection.class) {
-                if (connection != null) {
-                    connection.disconnectFromVM();
-                }
-                connection = new Connection();
-            }
-            return connection;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
+    private final static String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
 
     /**
      * Create the MBeanServerConnection to a remote server using the JMX URL
      * This server connection can be used to get the UsageBean objects from the monitoring VM
      *
-     * @param hostname
-     * @param RMI_Server_Port
-     * @param RMI_Registry_Port
-     * @param username
-     * @param password
+     * @param hostname          - Host address of targeted JMX service
+     * @param RMI_Server_Port   - RMI server port of targeted JMX service
+     * @param RMI_Registry_Port - RMI registry port of of targeted JMX service
+     * @param username          - Username of of targeted JMX service
+     * @param password          - Password of targeted JMX service
      * @return
      * @throws IOException
      */
-    public MBeanServerConnection getRemoteMBeanServerConnection(String hostname, String RMI_Server_Port, String RMI_Registry_Port, String username, String password) throws IOException {
+    public static MBeanServerConnection getRemoteMBeanServerConnection(String hostname, String RMI_Server_Port, String RMI_Registry_Port, String username, String password) throws IOException {
 
         if (hostname != null) {
-
             String connectorAddress, RMI_Server_Address, RMI_Registry_Address;
             JMXConnector con;
 
@@ -110,7 +78,6 @@ public class Connection {
             } else {
                 con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
             }
-
             return con.getMBeanServerConnection();
         }
         return null;
@@ -120,21 +87,20 @@ public class Connection {
      * Create the MBeanServerConnection to a local server using PID
      * This server connection can be used to get the UsageBean objects from the monitoring VM
      *
-     * @param pid
+     * @param pid - process id of targeted machine
      * @return
      */
-    public MBeanServerConnection getLocalMBeanServerConnection(String pid) throws IOException,
+    public static MBeanServerConnection getLocalMBeanServerConnection(String pid) throws IOException,
             AttachNotSupportedException,
             AgentInitializationException,
             AgentLoadException {
 
         if (pid != null) {
-
             String connectorAddress;
             JMXConnector con;
 
             //attach VM using the pid given
-            vm = VirtualMachine.attach(pid);
+            VirtualMachine vm = VirtualMachine.attach(pid);
 
             //print properties of connected VM
             logger.info("Connected to " + vm.id());
@@ -143,12 +109,9 @@ public class Connection {
             for (Map.Entry<?, ?> en : vm.getSystemProperties().entrySet())
                 logger.debug("\t" + en.getKey() + " = " + en.getValue());
 
-            logger.info("==================================================");
-
             //getting the connector address to the local JVM
             connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
             if (connectorAddress == null) {
-                logger.info("loading agent");
 
                 Properties props = vm.getSystemProperties();
                 String home = props.getProperty("java.home");
@@ -165,19 +128,12 @@ public class Connection {
                     }
                 }
             }
+            vm.detach();//detach vm
 
-            logger.info("Connecting Address for given PID :" + pid + " is :" + connectorAddress);
+            logger.info("JMX Address for given PID :" + pid + " is :" + connectorAddress);
             con = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress));
             return con.getMBeanServerConnection();
         }
         return null;
-    }
-
-
-    /**
-     * Properly dispose the Connector object
-     */
-    private void disconnectFromVM() throws IOException {
-        vm.detach();
     }
 }
