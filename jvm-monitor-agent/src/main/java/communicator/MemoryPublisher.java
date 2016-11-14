@@ -19,7 +19,6 @@
 package communicator;
 
 import jvmmonitor.model.UsageMonitorLog;
-import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -30,15 +29,30 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 
-public class DASmemoryPublisher extends DASPublisher implements Runnable {
+public class MemoryPublisher extends DASPublisher implements Runnable {
 
     private UsageMonitorLog usageLogObj;
 
-    final static Logger logger = Logger.getLogger(DASmemoryPublisher.class);
+    /**
+     * Set default Memory usage stream
+     * <p>
+     * Data format must be in the following order in given types in "MemoryUsageStream":-
+     * <p>
+     * long    Timestamp
+     * String  AppID
+     * long    MAX_HEAP_MEMORY
+     * long    ALLOCATED_HEAP_MEMORY
+     * long    USED_HEAP_MEMORY
+     * long    MAX_NON_HEAP_MEMORY
+     * long    ALLOCATED_NON_HEAP_MEMORY
+     * long    USED_NON_HEAP_MEMORY
+     * long    PENDING_FINALIZATIONS
+     */
+    private static final String STREAM_NAME = "MemoryUsageStream";
+    private static final String STREAM_VERSION = "1.0.0";
 
     /**
      * Constructor
-     * Need to set client-truststore.jks file located path
      *
      * @param defaultThriftPort
      * @param username
@@ -51,7 +65,7 @@ public class DASmemoryPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASmemoryPublisher(String hostname, int defaultThriftPort, String username, String password) throws
+    public MemoryPublisher(String hostname, int defaultThriftPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -60,26 +74,7 @@ public class DASmemoryPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password);
-
-        /**
-         * Set default Memory usage stream
-         * <p>
-         * Data format must be in the following order in given types in "MemoryUsageStream":-
-         * <p>
-         * long    Timestamp
-         * String  AppID
-         * long    MAX_HEAP_MEMORY
-         * long    ALLOCATED_HEAP_MEMORY
-         * long    USED_HEAP_MEMORY
-         * long    MAX_NON_HEAP_MEMORY
-         * long    ALLOCATED_NON_HEAP_MEMORY
-         * long    USED_NON_HEAP_MEMORY
-         * long    PENDING_FINALIZATIONS
-         */
-        String HTTPD_LOG_STREAM = "MemoryUsageStream";
-        String VERSION = "1.0.0";
-        setDataStream(HTTPD_LOG_STREAM, VERSION);
+        super(hostname, defaultThriftPort, username, password, STREAM_NAME, STREAM_VERSION);
 
     }
 

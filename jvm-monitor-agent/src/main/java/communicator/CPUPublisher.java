@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -30,15 +30,25 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 
-public class DAScpuPublisher extends DASPublisher implements Runnable {
+public class CPUPublisher extends DASPublisher implements Runnable {
 
     private UsageMonitorLog usageLogObj;
 
-    final static Logger logger = Logger.getLogger(DAScpuPublisher.class);
+    /**
+     * Set default CPU usage stream
+     * <p>
+     * Data format must be in the following order in given types in "CPUUsageStream":-
+     * <p>
+     * long      Timestamp
+     * String    AppID
+     * double    processCPULoad
+     * double    systemCPULoad
+     */
+    private static final String STREAM_NAME = "CPUUsageStream";
+    private static final String STREAM_VERSION = "1.0.0";
 
     /**
      * Constructor
-     * Need to set client-truststore.jks file located path
      *
      * @param defaultThriftPort
      * @param username
@@ -51,7 +61,7 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DAScpuPublisher(String hostname, int defaultThriftPort, String username, String password) throws
+    public CPUPublisher(String hostname, int defaultThriftPort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -60,21 +70,7 @@ public class DAScpuPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password);
-
-        /**
-         * Set default CPU usage stream
-         * <p>
-         * Data format must be in the following order in given types in "CPUUsageStream":-
-         * <p>
-         * long      Timestamp
-         * String    AppID
-         * double    processCPULoad
-         * double    systemCPULoad
-         */
-        String HTTPD_LOG_STREAM = "CPUUsageStream";
-        String VERSION = "1.0.0";
-        setDataStream(HTTPD_LOG_STREAM, VERSION);
+        super(hostname, defaultThriftPort, username, password, STREAM_NAME, STREAM_VERSION);
 
     }
 
