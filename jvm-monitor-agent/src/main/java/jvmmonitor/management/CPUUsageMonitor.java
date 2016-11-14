@@ -30,36 +30,32 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 /**
  * Collect the CPU load percentages from any connected JVM process
  */
-public class CPUUsageMonitor {
-
-    private OperatingSystemMXBean osMXBean;
-
+public class CPUUsageMonitor extends UsageMonitor<OperatingSystemMXBean> {
 
     /**
      * Constructor
-     * @param serverConnection
+     * @param serverConnection - JMX connection to the targeted JVM
      */
     public CPUUsageMonitor(MBeanServerConnection serverConnection) throws IOException {
-        this.osMXBean = newPlatformMXBeanProxy(serverConnection, OPERATING_SYSTEM_MXBEAN_NAME , OperatingSystemMXBean.class);
+        mxBean = newPlatformMXBeanProxy(serverConnection, OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
     }
 
     /**
-     * Return CPU load percentages of the System and the process
+     * Return CPU load percentages
+     * which was taken from  the OperatingSystemMXBean
      * @return {CPULoadLog}
      */
-    public CPULoadLog getCPULoads(){
+    @Override
+    protected CPULoadLog getUsageDataFromMXBean() {
+        CPULoadLog cpuLoadLog = new CPULoadLog();
+        cpuLoadLog.setProcessCPULoad(mxBean.getProcessCpuLoad());
+        cpuLoadLog.setSystemCPULoad(mxBean.getSystemCpuLoad());
 
-        if (osMXBean != null){
-            CPULoadLog cpuLoadLog = new CPULoadLog();
-            cpuLoadLog.setProcessCPULoad(osMXBean.getProcessCpuLoad());
-            cpuLoadLog.setSystemCPULoad(osMXBean.getSystemCpuLoad());
-
-            return cpuLoadLog;
-        }else {
-            throw new NullPointerException();
-        }
-
-
+        return cpuLoadLog;
     }
 
+    @Override
+    public CPULoadLog getUsageLog() {
+        return (CPULoadLog) super.getUsageLog();
+    }
 }

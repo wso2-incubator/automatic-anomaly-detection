@@ -23,12 +23,12 @@ import java.util.List;
 
 /**
  * Model for all collected JVM monitoring parameters
- *
+ * <p>
  * Stores
- *  MemoryUsageLog model
- *  CPUUsageLog model
- *  List of GarbageCollectionLog model
- *  Time Stamp created at usage collection
+ * MemoryUsageLog model
+ * CPUUsageLog model
+ * List of GarbageCollectionLog model
+ * Time Stamp created at usage collection
  */
 public class UsageMonitorLog {
 
@@ -37,21 +37,19 @@ public class UsageMonitorLog {
     private CPULoadLog cpuLoadLog;
     private long timeStamp;
 
-
     /**
      * Constructor
+     * Add usage models at object creation time
      *
-     * Forced to add usage models at object creation time
-     *
-     * @param memoryLog
-     * @param garbageCollectionLog
-     * @param cpuLoadLog
+     * @param memoryLog            - Memory Usage model obj
+     * @param garbageCollectionLog - Garbage Collection log model obj
+     * @param cpuLoadLog           - CPU load model obj
      */
     public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog, CPULoadLog cpuLoadLog) {
+        this.timeStamp = new Date().getTime(); //added the time stamp at object creation
         this.memoryUsageLog = memoryLog;
         this.garbageCollectionLog = garbageCollectionLog;
         this.cpuLoadLog = cpuLoadLog;
-        this.timeStamp = new Date().getTime(); //added the time stamp at object creation
     }
 
 
@@ -59,31 +57,16 @@ public class UsageMonitorLog {
         return memoryUsageLog;
     }
 
-    public void setMemoryUsageLog(MemoryUsageLog memoryUsageLog) {
-        this.memoryUsageLog = memoryUsageLog;
-    }
-
     public List<GarbageCollectionLog> getGarbageCollectionLog() {
         return garbageCollectionLog;
-    }
-
-    public void setGarbageCollectionLog(List<GarbageCollectionLog> garbageCollectionLog) {
-        this.garbageCollectionLog = garbageCollectionLog;
     }
 
     public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
     public CPULoadLog getCpuLoadLog() {
         return cpuLoadLog;
     }
 
-    public void setCpuLoadLog(CPULoadLog cpuLoadLog) {
-        this.cpuLoadLog = cpuLoadLog;
-    }
 }

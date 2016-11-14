@@ -43,36 +43,32 @@ import java.util.Set;
 */
 
 
-
 /**
  * Collect the Garbage Collection logs from any connected JVMs
- *
  */
 public class GarbageCollectionMonitor {
 
-    private List<GarbageCollectorMXBean> gcBeans;
-    private List<GarbageCollectionLog> gcUsages;
-    private List<GarbageCollectionListener> listeners;
-
-    private long jvmStartTime;
+    private final static Logger logger = Logger.getLogger(GarbageCollectionMonitor.class);
 
     //  --<! DO NOT CHANGE!>-- Memory management types
     private final static String EDEN_SPACE = "PS Eden Space";
-    private final static String CODE_CACHE= "Code Cache";
+    private final static String CODE_CACHE = "Code Cache";
     private final static String COMPRESSED_CLASS_SPACE = "Compressed Class Space";
     private final static String SURVIVOR_SPACE = "PS Survivor Space";
     private final static String OLD_GENERATION_SPACE = "PS Old Gen";
     private final static String METASPACE = "Metaspace";
 
-    final static Logger logger = Logger.getLogger(GarbageCollectionMonitor.class);
+    private List<GarbageCollectionLog> gcUsages;
+    private List<GarbageCollectionListener> listeners;
+    private long jvmStartTime;
 
 
     /**
      * Constructor
-     *
+     * <p>
      * Obtain the Garbage Collection MX beans from any given Server Connection to the JVMs
      * Construct the obj using those GC beans
-     *
+     * <p>
      * Added notifications to trigger when any garbage collection activity happens
      *
      * @param serverConnection
@@ -86,7 +82,7 @@ public class GarbageCollectionMonitor {
         this.listeners = new ArrayList<GarbageCollectionListener>();
 
         Set<ObjectName> gcnames = serverConnection.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
-        this.gcBeans = new ArrayList<GarbageCollectorMXBean>(gcnames.size());
+        List<GarbageCollectorMXBean> gcBeans = new ArrayList<GarbageCollectorMXBean>(gcnames.size());
 
         GarbageCollectorMXBean gcbean;
 
@@ -102,22 +98,38 @@ public class GarbageCollectionMonitor {
         }
 
 
-        this.jvmStartTime = ManagementFactory.newPlatformMXBeanProxy(serverConnection, ManagementFactory.RUNTIME_MXBEAN_NAME , RuntimeMXBean.class).getStartTime();
-        logger.info("Start time jvm " + jvmStartTime );
+        this.jvmStartTime = ManagementFactory.newPlatformMXBeanProxy(serverConnection, ManagementFactory.RUNTIME_MXBEAN_NAME, RuntimeMXBean.class).getStartTime();
+        logger.info("Start time jvm " + jvmStartTime);
     }
 
+    /**
+     * Register GarbageCollectionListeners
+     * Notification listeners can listen to notifications trigger when any GC log arrives
+     *
+     * @param listener
+     */
+    public void registerListener(GarbageCollectionListener listener) {
+        this.listeners.add(listener);
+    }
+
+    /**
+     * Return garbage collection usages reference
+     */
+    public List<GarbageCollectionLog> getGCUsages() {
+        return gcUsages;
+    }
 
     /**
      * Implements a notification listener to listen notifications happens after Garbage collection
-     *
      */
-    protected  class GCNotificationListener implements NotificationListener {
+    private class GCNotificationListener implements NotificationListener {
 
         /**
          * implement the notifier callback handler
-         *  when gc event happens this method will be executed
-         *  collect gc log data and add it to gc log queue
-         *  trigger the GarbageCollectionListeners
+         * when gc event happens this method will be executed
+         * collect gc log data and add it to gc log queue
+         * trigger the GarbageCollectionListeners
+         *
          * @param notification
          * @param handback
          */
@@ -146,10 +158,10 @@ public class GarbageCollectionMonitor {
                 gcInfo = info.getGcInfo();
 
                 logger.info("GC collected >> GC type :".concat(gctype).concat(" GC Start Time :")
-                        .concat(String.valueOf(gcInfo.getStartTime())) );
+                        .concat(String.valueOf(gcInfo.getStartTime())));
 
                 //=========memory Usage After GC==============================
-                memoryUsageMap= gcInfo.getMemoryUsageAfterGc();
+                memoryUsageMap = gcInfo.getMemoryUsageAfterGc();
 
                 //eden space memory management
                 memoryUsage = memoryUsageMap.get(EDEN_SPACE);
@@ -169,11 +181,8 @@ public class GarbageCollectionMonitor {
                 gclog.setOldGenMaxMemoryAfterGC(memoryUsage.getMax());
                 gclog.setOldGenUsedMemoryAfterGC(memoryUsage.getUsed());
 
-
-                //============================================================
-
                 //===========memory management before GC============================
-                memoryUsageMap= gcInfo.getMemoryUsageBeforeGc();
+                memoryUsageMap = gcInfo.getMemoryUsageBeforeGc();
 
                 //eden space memory management
                 memoryUsage = memoryUsageMap.get(EDEN_SPACE);
@@ -193,55 +202,24 @@ public class GarbageCollectionMonitor {
                 gclog.setOldGenMaxMemoryBeforeGC(memoryUsage.getMax());
                 gclog.setOldGenUsedMemoryBeforeGC(memoryUsage.getUsed());
 
-                //============================================================
-
-
                 //=====================general info===========================
                 gclog.setDuration(gcInfo.getDuration());
                 gclog.setGcCause(info.getGcCause());
-                gclog.setStartTime(gcInfo.getEndTime() + jvmStartTime );
+                gclog.setStartTime(gcInfo.getEndTime() + jvmStartTime);
                 gclog.setGcType(gctype);
                 //============================================================
 
-                synchronized (gcUsages){
+                synchronized (gcUsages) {
                     gcUsages.add(gclog);
                 }
 
                 //notify the GarbageCollectionListeners that GC logs has arrived
-                if (gcUsages.size() > 0){
-                    for ( GarbageCollectionListener l : listeners) {
+                if (gcUsages.size() > 0) {
+                    for (GarbageCollectionListener l : listeners) {
                         l.processGClogs((LinkedList<GarbageCollectionLog>) gcUsages);
                     }
                 }
-
             }
         }
-    }
-
-
-    /**
-     * Register GarbageCollectionListeners
-     * Notification listeners can listen to notifications trigger when any GC log arrives
-     * @param listener
-     */
-    public void registerListener(GarbageCollectionListener listener){
-        this.listeners.add(listener);
-    }
-
-    /**
-     * Return garbage collection usages reference
-     */
-    public List<GarbageCollectionLog> getGCUsages() {
-        return gcUsages;
-    }
-
-
-    //====================setters and getters=============================
-    public List<GarbageCollectorMXBean> getGcBeans() {
-        return gcBeans;
-    }
-
-    public void setGcBeans(List<GarbageCollectorMXBean> gcBeans) {
-        this.gcBeans = gcBeans;
     }
 }

@@ -21,12 +21,12 @@ package jvmmonitor.model;
 
 /**
  * Memory usage model class
- *
+ * <p>
  * Store
- *  Heap memory parameters
- *  Non-Heap memory parameters
+ * Heap memory parameters
+ * Non-Heap memory parameters
  */
-public class MemoryUsageLog {
+public class MemoryUsageLog implements UsageLog {
 
     private long maxHeapMemory;
     private long allocatedHeapMemory;
@@ -40,7 +40,7 @@ public class MemoryUsageLog {
         this.maxHeapMemory = 0;
         this.allocatedHeapMemory = 0;
         this.usedHeapMemory = 0;
-        this.allocatedNonHeapMemory = 0 ;
+        this.allocatedNonHeapMemory = 0;
         this.maxNonHeapMemory = 0;
         this.usedNonHeapMemory = 0;
         this.pendingFinalizations = 0;

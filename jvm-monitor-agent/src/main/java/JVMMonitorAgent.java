@@ -21,7 +21,6 @@ import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
-
 import communicator.DAScpuPublisher;
 import communicator.DASgcPublisher;
 import communicator.DASmemoryPublisher;
@@ -34,15 +33,13 @@ import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.model.GarbageCollectionLog;
 import jvmmonitor.model.UsageMonitorLog;
 import jvmmonitor.util.GarbageCollectionListener;
-import util.PropertyLoader;
-
 import org.apache.log4j.Logger;
-
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+import util.PropertyLoader;
 
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
@@ -186,7 +183,7 @@ public class JVMMonitorAgent {
 
         //check if credentials are not required
         //check if username == "null"
-        if ("null".equals(PropertyLoader.targetUsername)){
+        if ("null".equals(PropertyLoader.targetUsername)) {
             PropertyLoader.targetUsername = null;
             PropertyLoader.targetPassword = null;
         }

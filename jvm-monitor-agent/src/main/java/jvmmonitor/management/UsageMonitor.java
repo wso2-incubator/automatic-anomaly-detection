@@ -1,4 +1,8 @@
-package jvmmonitor.model;
+package jvmmonitor.management;
+
+import jvmmonitor.model.UsageLog;
+
+import java.lang.management.PlatformManagedObject;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,32 +21,27 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
+abstract class UsageMonitor<T extends PlatformManagedObject> {
 
-/**
- * CPU load model class
- * <p>
- * Stores
- * Process CPU Load
- * System CPU Load
- */
-public class CPULoadLog implements UsageLog {
+    protected T mxBean;
 
-    private double processCPULoad;
-    private double systemCPULoad;
-
-    public double getProcessCPULoad() {
-        return processCPULoad;
+    /**
+     * Create UsageLog obj according to the management class type
+     *
+     * @return
+     */
+    public UsageLog getUsageLog() {
+        if (mxBean != null) {
+            return getUsageDataFromMXBean();
+        } else {
+            throw new NullPointerException();
+        }
     }
 
-    public void setProcessCPULoad(double processCPULoad) {
-        this.processCPULoad = processCPULoad;
-    }
-
-    public double getSystemCPULoad() {
-        return systemCPULoad;
-    }
-
-    public void setSystemCPULoad(double systemCPULoad) {
-        this.systemCPULoad = systemCPULoad;
-    }
+    /**
+     * Access the MXBeans and collect the desired usage data into the UsageLog obj
+     *
+     * @return
+     */
+    protected abstract UsageLog getUsageDataFromMXBean();
 }

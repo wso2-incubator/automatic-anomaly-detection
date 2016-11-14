@@ -3,8 +3,6 @@ package jvmmonitor;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.attach.VirtualMachineDescriptor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.management.CPUUsageMonitor;
 import jvmmonitor.management.GarbageCollectionMonitor;
@@ -17,7 +15,6 @@ import org.apache.log4j.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -41,25 +38,15 @@ import java.util.ArrayList;
  * Monitor the JVM usage metrics using the Usage monitoring classes
  * Return an Usage Log object
  */
-public class UsageMonitor {
+public class UsageMonitorAgent {
 
-    private final static Logger logger = Logger.getLogger(UsageMonitor.class);
+    private final static Logger logger = Logger.getLogger(UsageMonitorAgent.class);
 
-    private Connection connection;
     private GarbageCollectionMonitor garbageCollectionMonitor;
     private MemoryUsageMonitor memoryUsageMonitor;
     private CPUUsageMonitor cpuUsageMonitor;
 
-
     /**
-     * Constructor
-     */
-    public UsageMonitor() {
-        this.connection = Connection.getConnection();
-    }
-
-    /**
-     *
      * Start monitoring usage metrics of JVM
      * <p>
      * Create a Local MBean Server Connection to the targeted JVM
@@ -74,29 +61,28 @@ public class UsageMonitor {
      * @throws AttachNotSupportedException
      * @throws IOException
      */
-    public boolean stratMonitoring(String pid) throws MalformedObjectNameException,
+    public boolean startMonitoring(String pid) throws MalformedObjectNameException,
             InterruptedException,
             AgentInitializationException,
             AgentLoadException,
             AttachNotSupportedException,
             IOException {
 
-        MBeanServerConnection serverConnection = connection.getLocalMBeanServerConnection(pid);
+        MBeanServerConnection serverConnection = Connection.getLocalMBeanServerConnection(pid);
         return getMXBeans(serverConnection);
     }
 
     /**
-     *
      * Start monitoring usage metrics of JVM
      * <p>
      * Create a Remote MBean Server Connection to the targeted JVM
      * Get the required MXBeans from targeted JVM
      *
-     * @param hostname - hostname(ip) of targeted JVM
-     * @param RMI_Server_Port -Java RMI connection server port
-     * @param RMI_Registry_Port -Java RMI connection registry port
-     * @param username - access role of the JMX service for authorization
-     * @param password - password of the access role for authentication
+     * @param hostname          - Hostname(ip) of targeted JVM
+     * @param RMI_Server_Port   - Java RMI connection server port
+     * @param RMI_Registry_Port - Java RMI connection registry port
+     * @param username          - Access role of the JMX service for authorization
+     * @param password          - Password of the access role for authentication
      * @return - boolean to express if the startMonitoring was successful
      * @throws MalformedObjectNameException
      * @throws InterruptedException
@@ -105,35 +91,30 @@ public class UsageMonitor {
      * @throws AttachNotSupportedException
      * @throws IOException
      */
-    public boolean stratMonitoring(String hostname,String RMI_Server_Port, String RMI_Registry_Port, String username, String password) throws MalformedObjectNameException,
+    public boolean startMonitoring(String hostname, String RMI_Server_Port, String RMI_Registry_Port, String username, String password) throws MalformedObjectNameException,
             InterruptedException,
             AgentInitializationException,
             AgentLoadException,
             AttachNotSupportedException,
             IOException {
 
-        MBeanServerConnection serverConnection = connection.getRemoteMBeanServerConnection(hostname,RMI_Server_Port,RMI_Registry_Port,username,password);
+        MBeanServerConnection serverConnection = Connection.getRemoteMBeanServerConnection(hostname, RMI_Server_Port, RMI_Registry_Port, username, password);
         return getMXBeans(serverConnection);
     }
 
     /**
-     * Create and assign Monitor objs with MXBeans to monitor the targeted JVM
+     * Create and assign Monitor objects with MXBeans to monitor the targeted JVM
+     *
      * @param serverConnection - connection to get MXBeans from the targeted machine
      * @return - return true if method executed successfully
      * @throws MalformedObjectNameException
      */
-    private boolean getMXBeans(MBeanServerConnection serverConnection) throws MalformedObjectNameException {
-        try {
-
-            if (serverConnection != null) {
-                this.garbageCollectionMonitor = new GarbageCollectionMonitor(serverConnection);
-                this.memoryUsageMonitor = new MemoryUsageMonitor(serverConnection);
-                this.cpuUsageMonitor = new CPUUsageMonitor(serverConnection);
-                return true;
-            }
-        } catch (IOException e) {
-            logger.error("Failed to get MXBeans using the MBeanServerConnection");
-            e.printStackTrace();
+    private boolean getMXBeans(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
+        if (serverConnection != null) {
+            this.garbageCollectionMonitor = new GarbageCollectionMonitor(serverConnection);
+            this.memoryUsageMonitor = new MemoryUsageMonitor(serverConnection);
+            this.cpuUsageMonitor = new CPUUsageMonitor(serverConnection);
+            return true;
         }
         return false;
     }
@@ -148,12 +129,12 @@ public class UsageMonitor {
 
         //if all the monitoring metrics are available, return them using UsageMonitorLog model
         if (memoryUsageMonitor != null && garbageCollectionMonitor != null && cpuUsageMonitor != null) {
-            UsageMonitorLog usageMonitorLog = new UsageMonitorLog(memoryUsageMonitor.getMemoryUsage(), garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getCPULoads());
-            return usageMonitorLog;
+            return new UsageMonitorLog(memoryUsageMonitor.getUsageLog(), garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getUsageLog());
         } else {
-            throw new MonitoringNotStartedException();
+            String msg = "Monitoring JVM is not started";
+            logger.error(msg);
+            throw new MonitoringNotStartedException(msg);
         }
-
     }
 
     /**
@@ -168,33 +149,10 @@ public class UsageMonitor {
         if (garbageCollectionMonitor != null) {
             this.garbageCollectionMonitor.registerListener(listener);
         } else {
-            throw new MonitoringNotStartedException();
+            String msg = "Monitoring JVM is not started";
+            logger.error(msg);
+            throw new MonitoringNotStartedException(msg);
         }
-
     }
 
-
-    /**
-     * Display currently running JVMs in the same machine
-     */
-    public void displayCurrentlyRunningJVMs() {
-        logger.info("Currently running");
-        for (VirtualMachineDescriptor vmd : VirtualMachine.list())
-            logger.info(vmd.id() + "\t" + vmd.displayName());
-
-    }
-
-
-    // ===================Getters=======================
-    public GarbageCollectionMonitor getGarbageCollectionMonitor() {
-        return garbageCollectionMonitor;
-    }
-
-    public MemoryUsageMonitor getMemoryUsageMonitor() {
-        return memoryUsageMonitor;
-    }
-
-    public CPUUsageMonitor getCpuUsageMonitor() {
-        return cpuUsageMonitor;
-    }
 }

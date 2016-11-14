@@ -20,17 +20,17 @@ package jvmmonitor.model;
 
 /**
  * Garbage Collection logs model class
- *
+ * <p>
  * Stores
- *  GC Type
- *  GC Cause
- *  GC Duration
- *  GC Start Time
- *  GC eden space memory parameters
- *  GC survivor space memory parameters
- *  GC old space memory parameters
+ * GC Type
+ * GC Cause
+ * GC Duration
+ * GC Start Time
+ * GC eden space memory parameters
+ * GC survivor space memory parameters
+ * GC old space memory parameters
  */
-public class GarbageCollectionLog {
+public class GarbageCollectionLog implements UsageLog {
 
     private long EdenUsedMemoryAfterGC;
     private long EdenUsedMemoryBeforeGC;

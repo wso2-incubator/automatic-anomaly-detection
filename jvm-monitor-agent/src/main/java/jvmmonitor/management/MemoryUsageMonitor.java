@@ -1,7 +1,6 @@
 package jvmmonitor.management;
 
 import jvmmonitor.model.MemoryUsageLog;
-import org.apache.log4j.Logger;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -30,73 +29,55 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 */
 
 
-
 /**
  * Collect MemoryMXBeans from given JVM Connections
  */
-public class MemoryUsageMonitor {
-
-    private MemoryMXBean memoryMXBean ;
-
-    final static Logger logger = Logger.getLogger(MemoryUsageMonitor.class);
+public class MemoryUsageMonitor extends UsageMonitor<MemoryMXBean> {
 
     /**
      * Constructor
-     *
+     * <p>
      * Create a MemoryMXBean provided the ServerConnection
      * Object created can be used to collect the Memory management data
      *
      * @param serverConnection
      * @throws IOException
      */
-    public MemoryUsageMonitor(MBeanServerConnection serverConnection) throws IOException  {
-        this.memoryMXBean = newPlatformMXBeanProxy(serverConnection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
+    public MemoryUsageMonitor(MBeanServerConnection serverConnection) throws IOException {
+        mxBean = newPlatformMXBeanProxy(serverConnection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
     }
-
 
     /**
      * Collect the memory usages using the MemoryMXBean
+     *
      * @return {MemoryUsageLog} Memory usage log model with memory usages
      */
-    public MemoryUsageLog getMemoryUsage() {
-
+    @Override
+    protected MemoryUsageLog getUsageDataFromMXBean() {
         MemoryUsage mu;
         MemoryUsageLog memoryUsageLog;
 
-        if (memoryMXBean != null) {
-            memoryUsageLog = new MemoryUsageLog();
+        memoryUsageLog = new MemoryUsageLog();
 
-            //heap memory management data
-            mu = memoryMXBean.getHeapMemoryUsage();
+        //heap memory management data
+        mu = mxBean.getHeapMemoryUsage();
+        memoryUsageLog.setMaxHeapMemory(mu.getMax());
+        memoryUsageLog.setAllocatedHeapMemory(mu.getCommitted());
+        memoryUsageLog.setUsedHeapMemory(mu.getUsed());
 
-            memoryUsageLog.setMaxHeapMemory(mu.getMax());
-            memoryUsageLog.setAllocatedHeapMemory(mu.getCommitted());
-            memoryUsageLog.setUsedHeapMemory(mu.getUsed());
+        //non heap memory management data
+        mu = mxBean.getNonHeapMemoryUsage();
+        memoryUsageLog.setMaxNonHeapMemory(mu.getMax());
+        memoryUsageLog.setAllocatedNonHeapMemory(mu.getCommitted());
+        memoryUsageLog.setUsedNonHeapMemory(mu.getUsed());
 
+        memoryUsageLog.setPendingFinalizations(mxBean.getObjectPendingFinalizationCount());
 
-            //non heap memory management data
-            mu = memoryMXBean.getNonHeapMemoryUsage();
-
-            memoryUsageLog.setMaxNonHeapMemory(mu.getMax());
-            memoryUsageLog.setAllocatedNonHeapMemory(mu.getCommitted());
-            memoryUsageLog.setUsedNonHeapMemory(mu.getUsed());
-
-            memoryUsageLog.setPendingFinalizations(memoryMXBean.getObjectPendingFinalizationCount());
-
-            return memoryUsageLog;
-
-        }else{
-            throw new NullPointerException();
-        }
+        return memoryUsageLog;
     }
 
-
-    //===========getters and setters====================
-    public MemoryMXBean getMemoryMXBean() {
-        return memoryMXBean;
-    }
-
-    public void setMemoryMXBean(MemoryMXBean memoryMXBean) {
-        this.memoryMXBean = memoryMXBean;
+    @Override
+    public MemoryUsageLog getUsageLog() {
+        return (MemoryUsageLog) super.getUsageLog();
     }
 }
