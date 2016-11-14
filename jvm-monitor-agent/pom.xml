@@ -84,7 +84,6 @@
 
     <build>
         <plugins>
-
             <!--maven assembly plugin. To create .jar file with all dependencies.-->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -92,7 +91,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>controller.JVMMonitorAgent</mainClass>
+                            <mainClass>JVMMonitorAgent</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -154,7 +153,7 @@
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>log4j.properties</include>
-                    <include>jma.properties</include>
+                    <!--<include>jma.properties</include>-->
                 </includes>
             </resource>
         </resources>
