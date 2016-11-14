@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -21,9 +21,9 @@ package controller;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
-import communicator.DAScpuPublisher;
-import communicator.DASmemoryPublisher;
-import communicator.DASgcPublisher;
+import communicator.CPUPublisher;
+import communicator.MemoryPublisher;
+import communicator.GCPublisher;
 import jvmmonitor.UsageMonitor;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
 import jvmmonitor.model.GarbageCollectionLog;
@@ -48,12 +48,11 @@ import java.util.concurrent.Executors;
 
 public class Controller {
 
-    private final static Logger logger = Logger.getLogger(Controller.class);
+    private final static Logger LOGGER = Logger.getLogger(Controller.class);
 
-    private final DASgcPublisher dasGCPublisher;
-    private final DASmemoryPublisher dasMemoryPublisher;
-    private final DAScpuPublisher dasCPUPublisher;
-
+    private final GCPublisher dasGCPublisher;
+    private final MemoryPublisher dasMemoryPublisher;
+    private final CPUPublisher dasCPUPublisher;
 
     /**
      * Constructor
@@ -84,9 +83,9 @@ public class Controller {
         password = PropertyLoader.DAS_PASSWORD;
         thrift_port = PropertyLoader.DAS_THRIFT_PORT;
 
-        dasMemoryPublisher = new DASmemoryPublisher(hostname, thrift_port, username, password);
-        dasCPUPublisher = new DAScpuPublisher(hostname, thrift_port, username, password);
-        dasGCPublisher = new DASgcPublisher(hostname, thrift_port, username, password);
+        dasMemoryPublisher = new MemoryPublisher(hostname, thrift_port, username, password);
+        dasCPUPublisher = new CPUPublisher(hostname, thrift_port, username, password);
+        dasGCPublisher = new GCPublisher(hostname, thrift_port, username, password);
 
     }
 
@@ -119,7 +118,7 @@ public class Controller {
                 PropertyLoader.TARGET_PASSWORD)) {
 
             Thread.sleep(1000);
-            logger.info("Start Monitoring Failed. Trying again...");
+            LOGGER.info("Start Monitoring Failed. Trying again...");
         }
 
         usageObj.registerGCNotifications(new GarbageCollectionLogHandler());
@@ -153,7 +152,7 @@ public class Controller {
 
         while (!usageObj.stratMonitoring(pid)) {
             Thread.sleep(1000);
-            logger.info("Start Monitoring Failed. Trying again...");
+            LOGGER.info("Start Monitoring Failed. Trying again...");
         }
 
         usageObj.registerGCNotifications(new GarbageCollectionLogHandler());
@@ -181,7 +180,6 @@ public class Controller {
         dasGCPublisher.setAppID(appId);
 
         while (true) {
-
             UsageMonitorLog usageLogObj = usageMonitor.getUsageLog();
 
             //Set UsageMonitorLog
