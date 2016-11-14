@@ -19,5 +19,13 @@ package jvmmonitor.exceptions;
 */
 public class MonitoringNotStartedException extends Exception {
 
+    public MonitoringNotStartedException(String message) {
+        super(message);
+    }
+
+    public MonitoringNotStartedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 
 }
