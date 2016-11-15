@@ -1,6 +1,5 @@
 package jvmmonitor.management;
 
-import com.sun.management.OperatingSystemMXBean;
 import com.sun.management.ThreadMXBean;
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -43,10 +42,8 @@ public class ThreadPoolLog {
             System.out.println(vmd.id() + "\t" + vmd.displayName());
 
 
-        Connection connection = Connection.getConnection();
-
        ThreadMXBean bean = (com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean();
-        bean = newPlatformMXBeanProxy(connection.getLocalMBeanServerConnection(pid), THREAD_MXBEAN_NAME, ThreadMXBean.class);
+        bean = newPlatformMXBeanProxy(Connection.getLocalMBeanServerConnection(pid), THREAD_MXBEAN_NAME, ThreadMXBean.class);
         while (true) {
 
             System.out.println( "Thread Count: " + bean.getThreadCount());

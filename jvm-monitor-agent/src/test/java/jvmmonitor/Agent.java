@@ -16,23 +16,6 @@ package jvmmonitor;/*
 * under the License.
 */
 
-import com.sun.tools.attach.AttachNotSupportedException;
-import com.sun.tools.attach.VirtualMachine;
-import com.sun.tools.attach.VirtualMachineDescriptor;
-import jvmmonitor.exceptions.MonitoringNotStartedException;
-import jvmmonitor.management.MemoryUsageMonitor;
-import jvmmonitor.model.GarbageCollectionLog;
-import org.apache.log4j.Logger;
-
-import javax.management.MalformedObjectNameException;
-import java.io.IOException;
-import java.lang.management.GarbageCollectorMXBean;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 public class Agent {
 
 //    final static Logger logger = Logger.getLogger(Agent.class);
@@ -49,8 +32,8 @@ public class Agent {
 //            logger.info(vmd.id() + "\t" + vmd.displayName());
 //
 //        try {
-//            UsageMonitor usageMonitor = new UsageMonitor(pid);
-//            usageMonitor.stratMonitoring();
+//            UsageMonitorAgent usageMonitor = new UsageMonitorAgent(pid);
+//            usageMonitor.startMonitoring();
 //
 //            LinkedList<GarbageCollectionLog> gm = (LinkedList<GarbageCollectionLog>) usageMonitor.getGarbageCollectionMonitor().getGCUsages();
 //
@@ -69,7 +52,7 @@ public class Agent {
 //                String formattedDate1 = sdf1.format(date1);
 //                System.out.println("Usage Received Time : " + formattedDate1);
 //
-////                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitor.MEMORY_USAGE_LOG);
+////                Map<String,Long> mem_usage = (Map<String,Long>) usageMonitor.getUsageLog().get(UsageMonitorAgent.MEMORY_USAGE_LOG);
 ////                logger.info(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.ALLOCATED_HEAP_MEMORY))));
 ////                logger.info(MemoryUsageMonitor.USED_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.USED_HEAP_MEMORY))));
 ////                logger.info(MemoryUsageMonitor.MAX_HEAP_MEMORY.concat(" : ").concat(String.valueOf(mem_usage.get(MemoryUsageMonitor.MAX_HEAP_MEMORY))));

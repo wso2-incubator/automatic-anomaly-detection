@@ -42,10 +42,9 @@ public class CPUUsageLog {
             System.out.println(vmd.id() + "\t" + vmd.displayName());
 
 
-        Connection connection = Connection.getConnection();
 
         OperatingSystemMXBean bean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        bean = newPlatformMXBeanProxy(connection.getLocalMBeanServerConnection(pid), OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+        bean = newPlatformMXBeanProxy(Connection.getLocalMBeanServerConnection(pid), OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
         while (true) {
             System.out.println( "Process CPU load : " +bean.getProcessCpuLoad()*100 + "%");
             System.out.println( "System CPU load : " + bean.getSystemCpuLoad()*100 + "%");
