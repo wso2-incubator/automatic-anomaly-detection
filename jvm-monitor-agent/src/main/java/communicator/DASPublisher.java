@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -30,25 +30,26 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.io.File;
 import java.net.*;
-import java.util.Enumeration;
 
 
 public class DASPublisher {
+
+    private final static Logger LOGGER = Logger.getLogger(DASPublisher.class);
 
     DataPublisher dataPublisher;
     String dataStream;
     EventPublisher eventAgent;
     String appID = "";
 
-    final static Logger logger = Logger.getLogger(DASPublisher.class);
-
     /**
      * Constructor
-     * Need to set client-truststore.jks file located path
      *
+     * @param host
      * @param defaultThriftPort
      * @param username
      * @param password
+     * @param streamName
+     * @param streamVersion
      * @throws SocketException
      * @throws UnknownHostException
      * @throws DataEndpointAuthenticationException
@@ -57,7 +58,7 @@ public class DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(String host, int defaultThriftPort, String username, String password) throws
+    public DASPublisher(String host, int defaultThriftPort, String username, String password, String streamName, String streamVersion) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -66,18 +67,11 @@ public class DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        logger.info("Starting DAS HttpLog Agent");
-        String currentDir = System.getProperty("user.dir");
-
-        //Set the client-truststore.jks file located path in here
-        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
+        LOGGER.info("Starting DAS HttpLog Agent");
 
         AgentHolder.setConfigPath(getDataAgentConfigPath());
-
         String type = getProperty("type", "Thrift");
         int receiverPort = defaultThriftPort;
-
         int securePort = receiverPort + 100;
 
         String url = getProperty("url", "tcp://" + host + ":" + receiverPort);
@@ -85,6 +79,7 @@ public class DASPublisher {
         username = getProperty("username", username);
         password = getProperty("password", password);
 
+        setDataStream(streamName, streamVersion);
         dataPublisher = new DataPublisher(type, url, authURL, username, password);
         eventAgent = new EventPublisher();
 
@@ -102,11 +97,11 @@ public class DASPublisher {
     /**
      * Generate Stream ID
      *
-     * @param HTTPD_LOG_STREAM
-     * @param VERSION
+     * @param streamName
+     * @param streamVersion
      */
-    public void setDataStream(String HTTPD_LOG_STREAM, String VERSION) {
-        dataStream = DataBridgeCommonsUtils.generateStreamId(HTTPD_LOG_STREAM, VERSION);
+    private void setDataStream(String streamName, String streamVersion) {
+        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
     }
 
     /**
@@ -114,7 +109,7 @@ public class DASPublisher {
      *
      * @throws DataEndpointException
      */
-    public void shutdownDataPublisher() throws DataEndpointException {
+    public void shutdown() throws DataEndpointException {
         dataPublisher.shutdown();
     }
 
@@ -123,7 +118,7 @@ public class DASPublisher {
      *
      * @return Data agent config path
      */
-    public static String getDataAgentConfigPath() {
+    private static String getDataAgentConfigPath() {
         File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
@@ -132,27 +127,6 @@ public class DASPublisher {
             filePath = new File("resources");
         }
         return filePath.getAbsolutePath() + File.separator + "data-agent-conf.xml";
-    }
-
-    /**
-     * @return Local Host Address
-     * @throws SocketException
-     * @throws UnknownHostException
-     */
-    public static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
-        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-        while (ifaces.hasMoreElements()) {
-            NetworkInterface iface = ifaces.nextElement();
-            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-                    return addr;
-                }
-            }
-        }
-        return InetAddress.getLocalHost();
     }
 
     /**
@@ -167,5 +141,26 @@ public class DASPublisher {
         }
         return result;
     }
+
+//    /**
+//     * @return Local Host Address
+//     * @throws SocketException
+//     * @throws UnknownHostException
+//     */
+//    private static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
+//        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+//        while (ifaces.hasMoreElements()) {
+//            NetworkInterface iface = ifaces.nextElement();
+//            Enumeration<InetAddress> addresses = iface.getInetAddresses();
+//
+//            while (addresses.hasMoreElements()) {
+//                InetAddress addr = addresses.nextElement();
+//                if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+//                    return addr;
+//                }
+//            }
+//        }
+//        return InetAddress.getLocalHost();
+//    }
 
 }

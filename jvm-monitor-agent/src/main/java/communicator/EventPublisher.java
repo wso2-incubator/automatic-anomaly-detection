@@ -1,7 +1,5 @@
-package communicator;
-
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +16,7 @@ package communicator;
 * under the License.
 */
 
+package communicator;
 
 import jvmmonitor.model.CPULoadLog;
 import jvmmonitor.model.GarbageCollectionLog;
@@ -31,13 +30,12 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 
-
 /**
  * This class creates Event according to Usage data and send to DataPublisher
  */
 public class EventPublisher {
 
-    final static Logger logger = Logger.getLogger(EventPublisher.class);
+    private final static Logger LOGGER = Logger.getLogger(EventPublisher.class);
 
     /**
      * This method publish CPU Load Log data to DAS
@@ -68,7 +66,7 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        logger.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
+        LOGGER.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
 
     }
 
@@ -118,7 +116,7 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        logger.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
+        LOGGER.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
                 gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
                 + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
                 + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
@@ -165,7 +163,7 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        logger.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
+        LOGGER.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
                 + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
                 + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations());
 

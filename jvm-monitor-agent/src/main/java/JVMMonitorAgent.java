@@ -21,9 +21,9 @@ import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 import com.sun.tools.attach.VirtualMachineDescriptor;
-import communicator.DAScpuPublisher;
-import communicator.DASgcPublisher;
-import communicator.DASmemoryPublisher;
+import communicator.CPUPublisher;
+import communicator.GCPublisher;
+import communicator.MemoryPublisher;
 import exceptions.PropertyCannotBeLoadedException;
 import exceptions.StartMonitoringFailedException;
 import exceptions.StartPublishingFailedException;
@@ -54,9 +54,9 @@ public class JVMMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
-    private DASgcPublisher dasGCPublisher;
-    private DASmemoryPublisher dasMemoryPublisher;
-    private DAScpuPublisher dasCPUPublisher;
+    private GCPublisher dasGCPublisher;
+    private MemoryPublisher dasMemoryPublisher;
+    private CPUPublisher dasCPUPublisher;
 
     /**
      * Constructor
@@ -65,9 +65,9 @@ public class JVMMonitorAgent {
     private JVMMonitorAgent() throws StartPublishingFailedException {
 
         try {
-            dasMemoryPublisher = new DASmemoryPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-            dasCPUPublisher = new DAScpuPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-            dasGCPublisher = new DASgcPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
+            dasMemoryPublisher = new MemoryPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
+            dasCPUPublisher = new CPUPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
+            dasGCPublisher = new GCPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
         } catch (SocketException e) {
             logger.error(e.getMessage(), e);
             throw new StartPublishingFailedException(e.getMessage(), e);
