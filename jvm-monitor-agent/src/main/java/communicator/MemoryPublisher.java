@@ -38,18 +38,18 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
      * <p>
      * Data format must be in the following order in given types in "MemoryUsageStream":-
      * <p>
-     * long    Timestamp
-     * String  AppID
-     * long    MAX_HEAP_MEMORY
-     * long    ALLOCATED_HEAP_MEMORY
-     * long    USED_HEAP_MEMORY
-     * long    MAX_NON_HEAP_MEMORY
-     * long    ALLOCATED_NON_HEAP_MEMORY
-     * long    USED_NON_HEAP_MEMORY
-     * long    PENDING_FINALIZATIONS
+     * long    timeStamp
+     * String  appID
+     * long    maxHeapMemory
+     * long    allocatedHeapMemory
+     * long    usedHeapMemory
+     * long    maxNonHeapMemory
+     * long    allocatedNonHeapMemory
+     * long    usedNonHeapMemory
+     * long    pendingFinalizations
      */
-    private static final String STREAM_NAME = "MemoryUsageStream";
-    private static final String STREAM_VERSION = "1.0.0";
+    private static final String streamName = "MemoryUsageStream";
+    private static final String streamVersion = "1.0.0";
 
     /**
      * Constructor
@@ -74,7 +74,7 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password, STREAM_NAME, STREAM_VERSION);
+        super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
 
     }
 

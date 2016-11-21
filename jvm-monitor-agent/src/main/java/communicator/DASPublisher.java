@@ -29,12 +29,13 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.io.File;
-import java.net.*;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 
 public class DASPublisher {
 
-    private final static Logger LOGGER = Logger.getLogger(DASPublisher.class);
+    private final static Logger logger = Logger.getLogger(DASPublisher.class);
 
     DataPublisher dataPublisher;
     String dataStream;
@@ -67,7 +68,7 @@ public class DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        LOGGER.info("Starting DAS HttpLog Agent");
+        logger.info("Starting DAS HttpLog Agent");
 
         AgentHolder.setConfigPath(getDataAgentConfigPath());
         String type = getProperty("type", "Thrift");

@@ -19,7 +19,6 @@
 package communicator;
 
 import jvmmonitor.model.UsageMonitorLog;
-import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -39,13 +38,13 @@ public class CPUPublisher extends DASPublisher implements Runnable {
      * <p>
      * Data format must be in the following order in given types in "CPUUsageStream":-
      * <p>
-     * long      Timestamp
-     * String    AppID
+     * long      timeStamp
+     * String    appID
      * double    processCPULoad
      * double    systemCPULoad
      */
-    private static final String STREAM_NAME = "CPUUsageStream";
-    private static final String STREAM_VERSION = "1.0.0";
+    private static final String streamName = "CPUUsageStream";
+    private static final String streamVersion = "1.0.0";
 
     /**
      * Constructor
@@ -70,7 +69,7 @@ public class CPUPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password, STREAM_NAME, STREAM_VERSION);
+        super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
 
     }
 
