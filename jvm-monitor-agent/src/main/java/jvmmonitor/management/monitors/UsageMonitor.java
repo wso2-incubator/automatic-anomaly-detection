@@ -1,6 +1,6 @@
-package jvmmonitor.management;
+package jvmmonitor.management.monitors;
 
-import jvmmonitor.model.UsageLog;
+import jvmmonitor.management.models.UsageLog;
 
 import java.lang.management.PlatformManagedObject;
 
@@ -21,7 +21,7 @@ import java.lang.management.PlatformManagedObject;
 * specific language governing permissions and limitations
 * under the License.
 */
-abstract class UsageMonitor<T extends PlatformManagedObject> {
+public abstract class UsageMonitor<T extends PlatformManagedObject> {
 
     protected T mxBean;
 

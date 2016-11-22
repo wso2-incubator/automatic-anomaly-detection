@@ -1,6 +1,6 @@
-package jvmmonitor.management;
+package jvmmonitor.management.monitors;
 
-import jvmmonitor.model.MemoryUsageLog;
+import jvmmonitor.management.models.MemoryUsageLog;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class MemoryUsageMonitor extends UsageMonitor<MemoryMXBean> {
     /**
      * Collect the memory usages using the MemoryMXBean
      *
-     * @return {MemoryUsageLog} Memory usage log model with memory usages
+     * @return {MemoryUsageLog} Memory usage log models with memory usages
      */
     @Override
     protected MemoryUsageLog getUsageDataFromMXBean() {
@@ -76,8 +76,4 @@ public class MemoryUsageMonitor extends UsageMonitor<MemoryMXBean> {
         return memoryUsageLog;
     }
 
-    @Override
-    public MemoryUsageLog getUsageLog() {
-        return (MemoryUsageLog) super.getUsageLog();
-    }
 }

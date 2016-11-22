@@ -1,4 +1,4 @@
-package jvmmonitor.model;
+package jvmmonitor.management.models;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,32 +17,6 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
+public interface UsageLog {
 
-/**
- * CPU load model class
- * <p>
- * Stores
- * Process CPU Load
- * System CPU Load
- */
-public class CPULoadLog implements UsageLog {
-
-    private double processCPULoad;
-    private double systemCPULoad;
-
-    public double getProcessCPULoad() {
-        return processCPULoad;
-    }
-
-    public void setProcessCPULoad(double processCPULoad) {
-        this.processCPULoad = processCPULoad;
-    }
-
-    public double getSystemCPULoad() {
-        return systemCPULoad;
-    }
-
-    public void setSystemCPULoad(double systemCPULoad) {
-        this.systemCPULoad = systemCPULoad;
-    }
 }

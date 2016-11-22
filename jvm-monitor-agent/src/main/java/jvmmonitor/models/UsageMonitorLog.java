@@ -1,7 +1,10 @@
-package jvmmonitor.model;
+package jvmmonitor.models;
+
+import jvmmonitor.exceptions.UnknownMonitorTypeException;
+import jvmmonitor.management.models.UsageLog;
 
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -25,48 +28,39 @@ import java.util.List;
  * Model for all collected JVM monitoring parameters
  * <p>
  * Stores
- * MemoryUsageLog model
- * CPUUsageLog model
- * List of GarbageCollectionLog model
+ * MemoryUsageLog models
+ * CPUUsageLog models
+ * List of GarbageCollectionLog models
  * Time Stamp created at usage collection
  */
 public class UsageMonitorLog {
 
-    private MemoryUsageLog memoryUsageLog;
-    private List<GarbageCollectionLog> garbageCollectionLog;
-    private CPULoadLog cpuLoadLog;
+    private HashMap<String, UsageLog> usageLogs;
     private long timeStamp;
 
     /**
-     * Constructor
-     * Add usage models at object creation time
-     *
-     * @param memoryLog            - Memory Usage model obj
-     * @param garbageCollectionLog - Garbage Collection log model obj
-     * @param cpuLoadLog           - CPU load model obj
+     * Assumed that usage logs are taken when UsageMonitorLog obj created
      */
-    public UsageMonitorLog(MemoryUsageLog memoryLog, List<GarbageCollectionLog> garbageCollectionLog, CPULoadLog cpuLoadLog) {
+    public UsageMonitorLog() {
         this.timeStamp = new Date().getTime(); //added the time stamp at object creation
-        this.memoryUsageLog = memoryLog;
-        this.garbageCollectionLog = garbageCollectionLog;
-        this.cpuLoadLog = cpuLoadLog;
+        this.usageLogs = new HashMap<>();
     }
 
-
-    public MemoryUsageLog getMemoryUsageLog() {
-        return memoryUsageLog;
+    public void addUsageLog(String monitorType, UsageLog usageLog) {
+        usageLogs.put(monitorType, usageLog);
     }
 
-    public List<GarbageCollectionLog> getGarbageCollectionLog() {
-        return garbageCollectionLog;
+    public UsageLog getUsageLog(String monitorType) throws UnknownMonitorTypeException {
+        UsageLog usageLog = usageLogs.get(monitorType);
+        if (usageLog != null) {
+            return usageLog;
+        } else {
+            throw new UnknownMonitorTypeException("No Usage Log found with monitor type : " + monitorType);
+        }
     }
 
     public long getTimeStamp() {
         return timeStamp;
-    }
-
-    public CPULoadLog getCpuLoadLog() {
-        return cpuLoadLog;
     }
 
 }

@@ -4,10 +4,12 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import jvmmonitor.exceptions.MonitoringNotStartedException;
-import jvmmonitor.management.CPUUsageMonitor;
-import jvmmonitor.management.GarbageCollectionMonitor;
-import jvmmonitor.management.MemoryUsageMonitor;
-import jvmmonitor.model.UsageMonitorLog;
+import jvmmonitor.exceptions.UnknownMonitorTypeException;
+import jvmmonitor.management.MonitorType;
+import jvmmonitor.management.UsageMonitorFactory;
+import jvmmonitor.management.monitors.GarbageCollectionMonitor;
+import jvmmonitor.management.monitors.UsageMonitor;
+import jvmmonitor.models.UsageMonitorLog;
 import jvmmonitor.server.Connection;
 import jvmmonitor.util.GarbageCollectionListener;
 import org.apache.log4j.Logger;
@@ -15,6 +17,8 @@ import org.apache.log4j.Logger;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import java.io.IOException;
+import java.util.HashMap;
+
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -42,9 +46,7 @@ public class UsageMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(UsageMonitorAgent.class);
 
-    private GarbageCollectionMonitor garbageCollectionMonitor;
-    private MemoryUsageMonitor memoryUsageMonitor;
-    private CPUUsageMonitor cpuUsageMonitor;
+    private HashMap<MonitorType, UsageMonitor> usageMonitors;
 
     /**
      * Start monitoring usage metrics of JVM
@@ -103,17 +105,24 @@ public class UsageMonitorAgent {
     }
 
     /**
-     * Create and assign Monitor objects with MXBeans to monitor the targeted JVM
+     * Create and assign Monitor objects with MXBeans to monitors the targeted JVM
      *
      * @param serverConnection - connection to get MXBeans from the targeted machine
      * @return - return true if method executed successfully
      * @throws MalformedObjectNameException
      */
-    private boolean getMXBeans(MBeanServerConnection serverConnection) throws MalformedObjectNameException, IOException {
+    private boolean getMXBeans(MBeanServerConnection serverConnection) throws MalformedObjectNameException,
+            IOException {
         if (serverConnection != null) {
-            this.garbageCollectionMonitor = new GarbageCollectionMonitor(serverConnection);
-            this.memoryUsageMonitor = new MemoryUsageMonitor(serverConnection);
-            this.cpuUsageMonitor = new CPUUsageMonitor(serverConnection);
+            usageMonitors = new HashMap<>();
+            for (MonitorType type :
+                    MonitorType.values()) {
+                try {
+                    usageMonitors.put(type, UsageMonitorFactory.getUsageMonitor(type.getValue(), serverConnection));
+                } catch (UnknownMonitorTypeException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
             return true;
         }
         return false;
@@ -127,9 +136,14 @@ public class UsageMonitorAgent {
      */
     public UsageMonitorLog getUsageLog() throws MonitoringNotStartedException {
 
-        //if all the monitoring metrics are available, return them using UsageMonitorLog model
-        if (memoryUsageMonitor != null && garbageCollectionMonitor != null && cpuUsageMonitor != null) {
-            return new UsageMonitorLog(memoryUsageMonitor.getUsageLog(), garbageCollectionMonitor.getGCUsages(), cpuUsageMonitor.getUsageLog());
+        //if any the monitoring metrics are available, return them using UsageMonitorLog models
+        if (usageMonitors != null && usageMonitors.size() > 0) {
+
+            UsageMonitorLog usageMonitorLog = new UsageMonitorLog();
+            for (MonitorType type : usageMonitors.keySet()) {
+                usageMonitorLog.addUsageLog(type.getValue(), usageMonitors.get(type).getUsageLog());
+            }
+            return usageMonitorLog;
         } else {
             String msg = "Monitoring JVM is not started";
             logger.error(msg);
@@ -145,9 +159,9 @@ public class UsageMonitorAgent {
      * @throws MonitoringNotStartedException
      */
     public void registerGCNotifications(GarbageCollectionListener listener) throws MonitoringNotStartedException {
-
+        GarbageCollectionMonitor garbageCollectionMonitor = (GarbageCollectionMonitor) usageMonitors.get(MonitorType.GARBAGE_COLLECTION_EVENTS_MONITOR);
         if (garbageCollectionMonitor != null) {
-            this.garbageCollectionMonitor.registerListener(listener);
+            garbageCollectionMonitor.registerListener(listener);
         } else {
             String msg = "Monitoring JVM is not started";
             logger.error(msg);

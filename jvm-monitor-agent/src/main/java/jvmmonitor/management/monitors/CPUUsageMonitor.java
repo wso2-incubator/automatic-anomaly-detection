@@ -1,7 +1,7 @@
-package jvmmonitor.management;
+package jvmmonitor.management.monitors;
 
 import com.sun.management.OperatingSystemMXBean;
-import jvmmonitor.model.CPULoadLog;
+import jvmmonitor.management.models.CPUUsageLog;
 
 import javax.management.MBeanServerConnection;
 import java.io.IOException;
@@ -43,19 +43,15 @@ public class CPUUsageMonitor extends UsageMonitor<OperatingSystemMXBean> {
     /**
      * Return CPU load percentages
      * which was taken from  the OperatingSystemMXBean
-     * @return {CPULoadLog}
+     * @return {CPUUsageLog}
      */
     @Override
-    protected CPULoadLog getUsageDataFromMXBean() {
-        CPULoadLog cpuLoadLog = new CPULoadLog();
+    protected CPUUsageLog getUsageDataFromMXBean() {
+        CPUUsageLog cpuLoadLog = new CPUUsageLog();
         cpuLoadLog.setProcessCPULoad(mxBean.getProcessCpuLoad());
         cpuLoadLog.setSystemCPULoad(mxBean.getSystemCpuLoad());
 
         return cpuLoadLog;
     }
 
-    @Override
-    public CPULoadLog getUsageLog() {
-        return (CPULoadLog) super.getUsageLog();
-    }
 }

@@ -1,8 +1,4 @@
-package jvmmonitor.util;
-
-import jvmmonitor.management.models.GarbageCollectionLog;
-
-import java.util.LinkedList;
+package jvmmonitor.exceptions;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -21,19 +17,14 @@ import java.util.LinkedList;
 * specific language governing permissions and limitations
 * under the License.
 */
+public class UnknownMonitorTypeException extends Exception {
 
-/**
- * Can be implemented by any listener of the GarbageCollectionMonitor notifications
- */
-public interface GarbageCollectionListener {
+    public UnknownMonitorTypeException(String message) {
+        super(message);
+    }
 
+    public UnknownMonitorTypeException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    /**
-     * Process GC Log queue
-     * Triggered by GarbageCollectionMonitor
-     * Triggered when new garbage collection log arrives
-     * GC Log queue is thread safe
-     * @param gcLogList
-     */
-    void processGClogs(LinkedList<GarbageCollectionLog> gcLogList);
 }

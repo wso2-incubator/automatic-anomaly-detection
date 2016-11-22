@@ -1,4 +1,4 @@
-package jvmmonitor.model;
+package jvmmonitor.management;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,6 +17,29 @@ package jvmmonitor.model;
 * specific language governing permissions and limitations
 * under the License.
 */
-public interface UsageLog {
+public enum MonitorType {
+    CPU_USAGE_MONITOR("cpu"), MEMORY_USAGE_MONITOR("memory"), GARBAGE_COLLECTION_EVENTS_MONITOR("gc");
+
+    private String value = null;
+
+    private MonitorType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return this.value;
+    }
+
+    /**
+     * get {@link MonitorType} for a given value.
+     */
+    public static MonitorType getMonitorType(String value) {
+        for (MonitorType type : MonitorType.values()) {
+            if (type.getValue().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        return null;
+    }
 
 }

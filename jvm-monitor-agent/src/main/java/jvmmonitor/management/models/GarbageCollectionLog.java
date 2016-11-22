@@ -1,4 +1,4 @@
-package jvmmonitor.model;
+package jvmmonitor.management.models;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -19,7 +19,7 @@ package jvmmonitor.model;
 */
 
 /**
- * Garbage Collection logs model class
+ * Garbage Collection logs models class
  * <p>
  * Stores
  * GC Type

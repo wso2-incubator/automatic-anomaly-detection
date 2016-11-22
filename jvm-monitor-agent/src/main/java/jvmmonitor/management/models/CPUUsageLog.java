@@ -1,8 +1,4 @@
-package jvmmonitor.util;
-
-import jvmmonitor.management.models.GarbageCollectionLog;
-
-import java.util.LinkedList;
+package jvmmonitor.management.models;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -23,17 +19,30 @@ import java.util.LinkedList;
 */
 
 /**
- * Can be implemented by any listener of the GarbageCollectionMonitor notifications
+ * CPU load models class
+ * <p>
+ * Stores
+ * Process CPU Load
+ * System CPU Load
  */
-public interface GarbageCollectionListener {
+public class CPUUsageLog implements UsageLog {
 
+    private double processCPULoad;
+    private double systemCPULoad;
 
-    /**
-     * Process GC Log queue
-     * Triggered by GarbageCollectionMonitor
-     * Triggered when new garbage collection log arrives
-     * GC Log queue is thread safe
-     * @param gcLogList
-     */
-    void processGClogs(LinkedList<GarbageCollectionLog> gcLogList);
+    public double getProcessCPULoad() {
+        return processCPULoad;
+    }
+
+    public void setProcessCPULoad(double processCPULoad) {
+        this.processCPULoad = processCPULoad;
+    }
+
+    public double getSystemCPULoad() {
+        return systemCPULoad;
+    }
+
+    public void setSystemCPULoad(double systemCPULoad) {
+        this.systemCPULoad = systemCPULoad;
+    }
 }

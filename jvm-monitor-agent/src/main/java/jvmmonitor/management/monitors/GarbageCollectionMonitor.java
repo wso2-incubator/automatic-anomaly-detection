@@ -1,8 +1,9 @@
-package jvmmonitor.management;
+package jvmmonitor.management.monitors;
 
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
-import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.management.models.GarbageCollectionLog;
+import jvmmonitor.management.models.UsageLog;
 import jvmmonitor.util.GarbageCollectionListener;
 import org.apache.log4j.Logger;
 
@@ -46,16 +47,16 @@ import java.util.Set;
 /**
  * Collect the Garbage Collection logs from any connected JVMs
  */
-public class GarbageCollectionMonitor {
+public class GarbageCollectionMonitor extends UsageMonitor<GarbageCollectorMXBean> {
 
     private final static Logger logger = Logger.getLogger(GarbageCollectionMonitor.class);
 
     //  --<! DO NOT CHANGE!>-- Memory management types
     private final static String EDEN_SPACE = "PS Eden Space";
-    private final static String CODE_CACHE = "Code Cache";
-    private final static String COMPRESSED_CLASS_SPACE = "Compressed Class Space";
     private final static String SURVIVOR_SPACE = "PS Survivor Space";
     private final static String OLD_GENERATION_SPACE = "PS Old Gen";
+    private final static String CODE_CACHE = "Code Cache";
+    private final static String COMPRESSED_CLASS_SPACE = "Compressed Class Space";
     private final static String METASPACE = "Metaspace";
 
     private List<GarbageCollectionLog> gcUsages;
@@ -117,6 +118,11 @@ public class GarbageCollectionMonitor {
      */
     public List<GarbageCollectionLog> getGCUsages() {
         return gcUsages;
+    }
+
+    @Override
+    protected UsageLog getUsageDataFromMXBean() {
+        return gcUsages.get(gcUsages.size() - 1);
     }
 
     /**
