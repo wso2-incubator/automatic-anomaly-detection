@@ -38,7 +38,7 @@ public class AnomalyDetection implements Serializable {
     private static final Log log = LogFactory.getLog(AnomalyDetection.class);
 
     /**
-     * This methods trains Anomaly detection model
+     * This methods trains Anomaly detection models
      *
      * @param trainData Training data as a JavaRDD of Vectors
      * @param noOfClusters Number of clusters
@@ -101,9 +101,9 @@ public class AnomalyDetection implements Serializable {
     }
 
     /**
-     * This method applies a anomaly detection model to a given dataset
+     * This method applies a anomaly detection models to a given dataset
      *
-     * @param anomalyDetectionModel anomaly detection model
+     * @param anomalyDetectionModel anomaly detection models
      * @param data a single data point as a Vector
      * @param percentile percentile value to identify the cluster boundaries
      * @return prediction label as a String
@@ -114,9 +114,9 @@ public class AnomalyDetection implements Serializable {
     }
 
     /**
-     * This method applies a anomaly detection model to a given dataset
+     * This method applies a anomaly detection models to a given dataset
      *
-     * @param anomalyDetectionModel anomaly detection model
+     * @param anomalyDetectionModel anomaly detection models
      * @param data JavaRDD containing feature vectors
      * @param percentile percentile value to identify the cluster boundaries
      * @return prediction labels as a List of Strings
@@ -127,9 +127,9 @@ public class AnomalyDetection implements Serializable {
     }
 
     /**
-     * This method applies a anomaly detection model to a given dataset for a range of percentile values
+     * This method applies a anomaly detection models to a given dataset for a range of percentile values
      *
-     * @param anomalyDetectionModel anomaly detection model
+     * @param anomalyDetectionModel anomaly detection models
      * @param data a single data point as a Vector
      * @param minPercentile min percentile value of the range
      * @param maxPercentile max percentile value of the range
@@ -142,9 +142,9 @@ public class AnomalyDetection implements Serializable {
     }
 
     /**
-     * This method applies a anomaly detection model to a given dataset for a range of percentile values
+     * This method applies a anomaly detection models to a given dataset for a range of percentile values
      *
-     * @param anomalyDetectionModel anomaly detection model
+     * @param anomalyDetectionModel anomaly detection models
      * @param data JavaRDD containing feature vectors
      * @param minPercentile min percentile value of the range
      * @param maxPercentile max percentile value of the range

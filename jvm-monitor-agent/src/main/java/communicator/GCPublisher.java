@@ -37,31 +37,34 @@ public class GCPublisher extends DASPublisher {
      * <p>
      * Data format must be in the following order in given types in "GarbageCollectionStream":-
      * <p>
-     * String	GC_TYPE
-     * long     GC_DURATION
-     * long     GC_START_TIME
-     * String	GC_CAUSE
-     * long     EDEN_USED_MEMORY_AFTER_GC
-     * long     EDEN_USED_MEMORY_BEFORE_GC
-     * long	    SURVIVOR_USED_MEMORY_AFTER_GC
-     * long	    SURVIVOR_USED_MEMORY_BEFORE_GC
-     * long	    OLD_GEN_USED_MEMORY_AFTER_GC
-     * long  	OLD_GEN_USED_MEMORY_BEFORE_GC
-     * long 	EDEN_COMMITTED_MEMORY_AFTER_GC
-     * long 	EDEN_COMMITTED_MEMORY_BEFORE_GC
-     * long 	SURVIVOR_COMMITTED_MEMORY_AFTER_GC
-     * long 	SURVIVOR_COMMITTED_MEMORY_BEFORE_GC
-     * long 	OLD_GEN_COMMITTED_MEMORY_AFTER_GC
-     * long 	OLD_GEN_COMMITTED_MEMORY_BEFORE_GC
-     * long 	EDEN_MAX_MEMORY_AFTER_GC
-     * long 	EDEN_MAX_MEMORY_BEFORE_GC
-     * long 	SURVIVOR_MAX_MEMORY_AFTER_GC
-     * long 	SURVIVOR_MAX_MEMORY_BEFORE_GC
-     * long 	OLD_GEN_MAX_MEMORY_AFTER_GC
-     * long 	OLD_GEN_MAX_MEMORY_BEFORE_GC
+     * String  gcType
+     * long    duration
+     * long    startTime
+     * String  gcCause
+     * <p>
+     * long    EdenUsedMemoryAfterGC
+     * long    EdenUsedMemoryBeforeGC
+     * long    EdenCommittedMemoryAfterGC
+     * long    EdenCommittedMemoryBeforeGC
+     * long    EdenMaxMemoryAfterGC
+     * long    EdenMaxMemoryBeforeGC
+     * <p>
+     * long    SurvivorUsedMemoryAfterGC
+     * long    SurvivorUsedMemoryBeforeGC
+     * long    SurvivorCommittedMemoryAfterGC
+     * long    SurvivorCommittedMemoryBeforeGC
+     * long    SurvivorMaxMemoryAfterGC
+     * long    SurvivorMaxMemoryBeforeGC
+     * <p>
+     * long    OldGenUsedMemoryAfterGC
+     * long    OldGenUsedMemoryBeforeGC
+     * long    OldGenCommittedMemoryAfterGC
+     * long    OldGenCommittedMemoryBeforeGC
+     * long    OldGenMaxMemoryAfterGC
+     * long    OldGenMaxMemoryBeforeGC
      */
-    private static final String STREAM_NAME = "GarbageCollectionStream";
-    private static final String STREAM_VERSION = "1.0.0";
+    private static final String streamName = "GarbageCollectionStream";
+    private static final String streamVersion = "1.0.0";
 
     /**
      * Constructor
@@ -86,7 +89,7 @@ public class GCPublisher extends DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password, STREAM_NAME, STREAM_VERSION);
+        super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
 
     }
 

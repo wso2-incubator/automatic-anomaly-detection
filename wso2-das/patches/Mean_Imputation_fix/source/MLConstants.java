@@ -87,7 +87,7 @@ public class MLConstants {
     public static final String YES = "yes";
     public static final String NO = "no";
 
-    // model settings json
+    // models settings json
     public static final String MODEL_ID = "modelID";
     public static final String MODEL_SETTINGS_ID = "modelSettingsID";
     public static final String WORKFLOW_ID = "workflowID";
@@ -108,7 +108,7 @@ public class MLConstants {
 
     public static final String MODEL_NAME = "Model";
 
-    // model statuses
+    // models statuses
     public static final String MODEL_STATUS_NOT_STARTED = "Not Started";
     public static final String MODEL_STATUS_IN_PROGRESS = "In Progress";
     public static final String MODEL_STATUS_COMPLETE = "Complete";

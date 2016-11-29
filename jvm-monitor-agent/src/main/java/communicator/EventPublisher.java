@@ -35,7 +35,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
  */
 public class EventPublisher {
 
-    private final static Logger LOGGER = Logger.getLogger(EventPublisher.class);
+    private final static Logger logger = Logger.getLogger(EventPublisher.class);
 
     /**
      * This method publish CPU Load Log data to DAS
@@ -51,7 +51,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUUsageLog cpuLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPULoadLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -66,7 +66,7 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        LOGGER.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
+        logger.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
 
     }
 
@@ -83,7 +83,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionLog gcLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionLog gcLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -116,7 +116,7 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        LOGGER.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
+        logger.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
                 gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
                 + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
                 + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
@@ -143,7 +143,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, MemoryUsageLog memoryLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, MemoryUsageLog memoryLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -163,7 +163,7 @@ public class EventPublisher {
 
         dataPublisher.publish(event);
 
-        LOGGER.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
+        logger.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
                 + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
                 + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations());
 
