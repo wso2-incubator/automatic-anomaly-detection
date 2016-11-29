@@ -70,6 +70,11 @@ public class DASPublisher {
 
         logger.info("Starting DAS HttpLog Agent");
 
+        //Set the client-truststore.jks file located path in here
+        String currentDir = System.getProperty("user.dir");
+        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
+
         AgentHolder.setConfigPath(getDataAgentConfigPath());
         String type = getProperty("type", "Thrift");
         int receiverPort = defaultThriftPort;
