@@ -18,7 +18,7 @@
 echo Starting JVM Monitor Agent
 
 cd ..
-java -cp $JAVA_HOME/lib/tools.jar:jvm-monitor-agent-1.0-SNAPSHOT-jar-with-dependencies.jar controller.JVMMonitorAgent
+java -cp $JAVA_HOME/lib/tools.jar:jvm-monitor-agent-1.0-SNAPSHOT-jar-with-dependencies.jar JVMMonitorAgent
 
 
 
