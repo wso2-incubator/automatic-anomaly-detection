@@ -22,6 +22,7 @@ import jvmmonitor.exceptions.UnknownMonitorTypeException;
 import jvmmonitor.management.MonitorType;
 import jvmmonitor.management.models.CPUUsageLog;
 import jvmmonitor.models.UsageMonitorLog;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -34,6 +35,7 @@ import java.net.UnknownHostException;
 
 public class CPUPublisher extends DASPublisher implements Runnable {
 
+    private final static Logger logger = Logger.getLogger(CPUPublisher.class);
     private UsageMonitorLog usageLogObj;
 
     /**
@@ -73,6 +75,7 @@ public class CPUPublisher extends DASPublisher implements Runnable {
             DataEndpointConfigurationException {
 
         super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
+        logger.info("Starting DAS CPU Publisher");
 
     }
 

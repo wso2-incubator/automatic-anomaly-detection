@@ -18,7 +18,6 @@
 
 package communicator;
 
-import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.AgentHolder;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -34,8 +33,6 @@ import java.net.UnknownHostException;
 
 
 public class DASPublisher {
-
-    private final static Logger logger = Logger.getLogger(DASPublisher.class);
 
     DataPublisher dataPublisher;
     String dataStream;
@@ -68,8 +65,6 @@ public class DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        logger.info("Starting DAS HttpLog Agent");
-
         //Set the client-truststore.jks file located path in here
         File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "client-truststore.jks");
         if (!filePath.exists()) {
@@ -81,10 +76,9 @@ public class DASPublisher {
 
         AgentHolder.setConfigPath(getDataAgentConfigPath());
         String type = getProperty("type", "Thrift");
-        int receiverPort = defaultThriftPort;
-        int securePort = receiverPort + 100;
+        int securePort = defaultThriftPort + 100;
 
-        String url = getProperty("url", "tcp://" + host + ":" + receiverPort);
+        String url = getProperty("url", "tcp://" + host + ":" + defaultThriftPort);
         String authURL = getProperty("authURL", "ssl://" + host + ":" + securePort);
         username = getProperty("username", username);
         password = getProperty("password", password);
