@@ -28,7 +28,9 @@ import java.io.IOException;
 * under the License.
 */
 
-
+/**
+ * Factory class to build UsageMonitors of different types
+ */
 public class UsageMonitorFactory {
 
     public static UsageMonitor getUsageMonitor(String monitorType, MBeanServerConnection connection) throws IOException,

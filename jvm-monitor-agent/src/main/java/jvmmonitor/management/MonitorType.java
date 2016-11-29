@@ -17,6 +17,10 @@ package jvmmonitor.management;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Usage monitor types enum
+ */
 public enum MonitorType {
     CPU_USAGE_MONITOR("cpu"), MEMORY_USAGE_MONITOR("memory"), GARBAGE_COLLECTION_EVENTS_MONITOR("gc");
 
