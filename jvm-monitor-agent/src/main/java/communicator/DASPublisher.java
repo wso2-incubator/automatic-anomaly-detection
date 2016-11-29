@@ -71,8 +71,12 @@ public class DASPublisher {
         logger.info("Starting DAS HttpLog Agent");
 
         //Set the client-truststore.jks file located path in here
-        String currentDir = System.getProperty("user.dir");
-        System.setProperty("javax.net.ssl.trustStore", currentDir + "/jvm-monitor-agent/src/main/resources/client-truststore.jks");
+        File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "client-truststore.jks");
+        if (!filePath.exists()) {
+            filePath = new File("resources" + File.separator + "client-truststore.jks");
+        }
+
+        System.setProperty("javax.net.ssl.trustStore", filePath.getAbsolutePath());
         System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
 
         AgentHolder.setConfigPath(getDataAgentConfigPath());
