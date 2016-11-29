@@ -18,7 +18,6 @@
 
 package communicator;
 
-import jvmmonitor.management.models.CPUUsageLog;
 import jvmmonitor.management.models.GarbageCollectionLog;
 import jvmmonitor.management.models.MemoryUsageLog;
 import org.apache.log4j.Logger;
