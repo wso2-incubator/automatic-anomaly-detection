@@ -141,7 +141,8 @@ public class UsageMonitorAgent {
 
             UsageMonitorLog usageMonitorLog = new UsageMonitorLog();
             for (MonitorType type : usageMonitors.keySet()) {
-                usageMonitorLog.addUsageLog(type.getValue(), usageMonitors.get(type).getUsageLog());
+                if (!type.equals(MonitorType.GARBAGE_COLLECTION_EVENTS_MONITOR))
+                    usageMonitorLog.addUsageLog(type.getValue(), usageMonitors.get(type).getUsageLog());
             }
             return usageMonitorLog;
         } else {
