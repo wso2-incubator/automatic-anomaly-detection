@@ -18,7 +18,7 @@
 
 package communicator;
 
-import jvmmonitor.model.GarbageCollectionLog;
+import jvmmonitor.management.models.GarbageCollectionLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;

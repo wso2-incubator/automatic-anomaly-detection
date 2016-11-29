@@ -18,9 +18,9 @@
 
 package communicator;
 
-import jvmmonitor.model.CPULoadLog;
-import jvmmonitor.model.GarbageCollectionLog;
-import jvmmonitor.model.MemoryUsageLog;
+import jvmmonitor.management.models.CPUUsageLog;
+import jvmmonitor.management.models.GarbageCollectionLog;
+import jvmmonitor.management.models.MemoryUsageLog;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -51,7 +51,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPULoadLog cpuLog) throws DataEndpointException,
+    public void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUUsageLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,

@@ -18,8 +18,7 @@
 
 package communicator;
 
-import jvmmonitor.model.UsageMonitorLog;
-import org.apache.log4j.Logger;
+import jvmmonitor.models.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
