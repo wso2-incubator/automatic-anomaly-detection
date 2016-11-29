@@ -19,6 +19,7 @@
 package communicator;
 
 import jvmmonitor.management.models.GarbageCollectionLog;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -31,6 +32,8 @@ import java.util.LinkedList;
 
 
 public class GCPublisher extends DASPublisher {
+
+    private final static Logger logger = Logger.getLogger(GCPublisher.class);
 
     /**
      * Set default Garbage collection log Stream
@@ -90,6 +93,7 @@ public class GCPublisher extends DASPublisher {
             DataEndpointConfigurationException {
 
         super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
+        logger.info("Starting DAS GC Publisher");
 
     }
 

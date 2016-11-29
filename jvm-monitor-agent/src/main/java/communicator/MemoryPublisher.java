@@ -22,6 +22,7 @@ import jvmmonitor.exceptions.UnknownMonitorTypeException;
 import jvmmonitor.management.MonitorType;
 import jvmmonitor.management.models.MemoryUsageLog;
 import jvmmonitor.models.UsageMonitorLog;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -34,6 +35,7 @@ import java.net.UnknownHostException;
 
 public class MemoryPublisher extends DASPublisher implements Runnable {
 
+    private final static Logger logger = Logger.getLogger(MemoryPublisher.class);
     private UsageMonitorLog usageLogObj;
 
     /**
@@ -78,7 +80,7 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
             DataEndpointConfigurationException {
 
         super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
-
+        logger.info("Starting DAS Memory Publisher");
     }
 
     /**
@@ -95,21 +97,20 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
 
         try {
             //Send data to EventPublisher
-            try {
-                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (MemoryUsageLog) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
-            } catch (UnknownMonitorTypeException e) {
-                e.printStackTrace();
-            }
+            eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (MemoryUsageLog) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
+
         } catch (DataEndpointConfigurationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (DataEndpointAgentConfigurationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (DataEndpointException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (TransportException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (DataEndpointAuthenticationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        } catch (UnknownMonitorTypeException e) {
+            logger.error(e.getMessage(), e);
         }
 
     }
