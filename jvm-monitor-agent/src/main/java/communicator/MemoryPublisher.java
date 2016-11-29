@@ -18,6 +18,9 @@
 
 package communicator;
 
+import jvmmonitor.exceptions.UnknownMonitorTypeException;
+import jvmmonitor.management.MonitorType;
+import jvmmonitor.management.models.MemoryUsageLog;
 import jvmmonitor.models.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -92,7 +95,11 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
 
         try {
             //Send data to EventPublisher
-            eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, usageLogObj.getMemoryUsageLog());
+            try {
+                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (MemoryUsageLog) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
+            } catch (UnknownMonitorTypeException e) {
+                e.printStackTrace();
+            }
         } catch (DataEndpointConfigurationException e) {
             e.printStackTrace();
         } catch (DataEndpointAgentConfigurationException e) {

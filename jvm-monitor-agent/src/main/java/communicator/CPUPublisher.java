@@ -18,6 +18,9 @@
 
 package communicator;
 
+import jvmmonitor.exceptions.UnknownMonitorTypeException;
+import jvmmonitor.management.MonitorType;
+import jvmmonitor.management.models.CPUUsageLog;
 import jvmmonitor.models.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -87,7 +90,11 @@ public class CPUPublisher extends DASPublisher implements Runnable {
 
         try {
             //Send data to EventPublisher
-            eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, usageLogObj.getCpuLoadLog());
+            try {
+                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (CPUUsageLog) usageLogObj.getUsageLog(MonitorType.CPU_USAGE_MONITOR.getValue()));
+            } catch (UnknownMonitorTypeException e) {
+                e.printStackTrace();
+            }
         } catch (DataEndpointConfigurationException e) {
             e.printStackTrace();
         } catch (DataEndpointAgentConfigurationException e) {

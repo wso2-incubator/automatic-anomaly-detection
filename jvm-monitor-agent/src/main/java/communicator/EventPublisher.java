@@ -18,6 +18,7 @@
 
 package communicator;
 
+import jvmmonitor.management.models.CPUUsageLog;
 import jvmmonitor.management.models.GarbageCollectionLog;
 import jvmmonitor.management.models.MemoryUsageLog;
 import org.apache.log4j.Logger;
@@ -50,7 +51,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPULoadLog cpuLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUUsageLog cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
