@@ -1,0 +1,155 @@
+@Plan:name('MemoryFeatures')
+
+@Plan:trace('true')
+
+@Plan:statistics('true')		
+
+
+define trigger StacTableTrigger at every 4 min ;
+
+--- Define Memory ---
+@Import('MemoryUsageStream:1.0.0')
+define stream MemoryUsageStream (time_stamp long, app_id string, 
+								 max_heap long, allocated_heap long, used_heap long, 
+								 max_non_heap long, allocated_non_heap long, used_non_heap long, 
+								 pending_finalizations long);
+
+@IndexBy('app_id')					 
+define table memory_stac_table (time_stamp long, app_id string,
+								x_allocated_heap long, xx_allocated_heap long,
+								x_used_heap long, xx_used_heap long,
+								x_max_non_heap long, xx_max_non_heap long,
+								x_allocated_non_heap long, xx_allocated_non_heap long,
+								x_used_non_heap long, xx_used_non_heap long,
+								x_pending_finalizations long, xx_pending_finalizations long,
+								
+								min_allocated_heap long, max_allocated_heap long,
+								min_used_heap long, max_used_heap long,
+								min_max_non_heap long, max_max_non_heap long,
+								min_allocated_non_heap long, max_allocated_non_heap long,
+								min_used_non_heap long, max_used_non_heap long,
+								min_pending_finalizations long, max_pending_finalizations long,
+								n int);
+
+@Export('MemoryFeatures:1.0.0')
+define stream MemoryFeatures (time_stamp long, app_id string,
+							  
+							  max_heap long,
+							  allocated_heap long,
+							  used_heap long,
+							  max_non_heap long,
+							  allocated_non_heap long,
+							  used_non_heap long,
+							  pending_finalizations long,
+							  
+							  sd_allocated_heap double,
+							  sd_used_heap double,
+							  sd_max_non_heap double,
+							  sd_allocated_non_heap double,
+							  sd_used_non_heap double,
+							  sd_pending_finalizations double,
+							 
+							  z_allocated_heap double,
+							  z_used_heap double,
+							  z_max_non_heap double,
+							  z_allocated_non_heap double,
+							  z_used_non_heap double,
+							  z_pending_finalizations double,
+							  
+							  p_allocated_heap double,
+							  p_used_heap double,
+							  p_max_non_heap double,
+							  p_allocated_non_heap double,
+							  p_used_non_heap double,
+							  p_pending_finalizations double);
+
+
+
+from StacTableTrigger 
+delete memory_stac_table on true;
+
+--- Memory Usage ---
+from MemoryUsageStream#window.length(1) as m left outer join memory_stac_table as stac on (m.app_id==stac.app_id)
+select
+	m.time_stamp,
+	m.app_id,
+	
+	--X & XX
+	statistic:x(m.allocated_heap, stac.x_allocated_heap) as x_allocated_heap, 
+	statistic:xx(m.allocated_heap, stac.xx_allocated_heap) as xx_allocated_heap,
+
+	statistic:x(m.used_heap, stac.x_used_heap) as x_used_heap,
+	statistic:xx(m.used_heap, stac.xx_used_heap) as xx_used_heap,
+
+	statistic:x(m.max_non_heap, stac.x_max_non_heap) as x_max_non_heap, 
+	statistic:xx(m.max_non_heap, stac.xx_max_non_heap) as xx_max_non_heap,
+
+	statistic:x(m.allocated_non_heap, stac.x_allocated_non_heap) as x_allocated_non_heap, 
+	statistic:xx(m.allocated_non_heap, stac.xx_allocated_non_heap) as xx_allocated_non_heap,
+
+	statistic:x(m.used_non_heap, stac.x_used_non_heap) as x_used_non_heap, 
+	statistic:xx(m.used_non_heap, stac.xx_used_non_heap) as xx_used_non_heap,
+
+	statistic:x(m.pending_finalizations, stac.x_pending_finalizations) as x_pending_finalizations, 
+	statistic:xx(m.pending_finalizations, stac.xx_pending_finalizations) as xx_pending_finalizations,
+	
+	--Min & Max
+	ifThenElse(stac.min_allocated_heap is null, m.allocated_heap, ifThenElse(stac.min_allocated_heap > m.allocated_heap, m.allocated_heap, stac.min_allocated_heap)) as min_allocated_heap,
+	ifThenElse(stac.max_allocated_heap is null, m.allocated_heap, ifThenElse(stac.max_allocated_heap < m.allocated_heap, m.allocated_heap, stac.max_allocated_heap)) as max_allocated_heap,
+	
+	ifThenElse(stac.min_used_heap is null, m.used_heap, ifThenElse(stac.min_used_heap > m.used_heap, m.used_heap, stac.min_used_heap)) as min_used_heap,
+	ifThenElse(stac.max_used_heap is null, m.used_heap, ifThenElse(stac.max_used_heap < m.used_heap, m.used_heap, stac.max_used_heap)) as max_used_heap,
+	
+	ifThenElse(stac.min_max_non_heap is null, m.max_non_heap, ifThenElse(stac.min_max_non_heap > m.max_non_heap, m.max_non_heap, stac.min_max_non_heap)) as min_max_non_heap,
+	ifThenElse(stac.max_max_non_heap is null, m.max_non_heap, ifThenElse(stac.max_max_non_heap < m.max_non_heap, m.max_non_heap, stac.max_max_non_heap)) as max_max_non_heap,
+	
+	ifThenElse(stac.min_allocated_non_heap is null, m.allocated_non_heap, ifThenElse(stac.min_allocated_non_heap > m.allocated_non_heap, m.allocated_non_heap, stac.min_allocated_non_heap)) as min_allocated_non_heap,
+	ifThenElse(stac.max_allocated_non_heap is null, m.allocated_non_heap, ifThenElse(stac.max_allocated_non_heap > m.allocated_non_heap, m.allocated_non_heap, stac.max_allocated_non_heap)) as max_allocated_non_heap,
+	
+	ifThenElse(stac.min_used_non_heap is null, m.used_non_heap, ifThenElse(stac.min_used_non_heap > m.used_non_heap, m.used_non_heap, stac.min_used_non_heap)) as min_used_non_heap,
+	ifThenElse(stac.max_used_non_heap is null, m.used_non_heap, ifThenElse(stac.max_used_non_heap < m.used_non_heap, m.used_non_heap, stac.max_used_non_heap)) as max_used_non_heap,
+	
+	ifThenElse(stac.min_pending_finalizations is null, m.pending_finalizations, ifThenElse(stac.min_pending_finalizations > m.pending_finalizations, m.pending_finalizations, stac.min_pending_finalizations)) as min_pending_finalizations,
+	ifThenElse(stac.max_pending_finalizations is null, m.pending_finalizations, ifThenElse(stac.max_pending_finalizations < m.pending_finalizations, m.pending_finalizations, stac.max_pending_finalizations)) as max_pending_finalizations,
+
+	coalesce(stac.n, 0) + 1 as n
+insert into memory_stac_table;
+
+--Add a delay to wait MemoryUsageStream until the memory stac is processed
+from MemoryUsageStream#window.time(100)
+insert expired events into MemoryUsageStreamExpired;
+
+from MemoryUsageStreamExpired#window.time(3 min) as m left outer join memory_stac_table as stac on (m.app_id==stac.app_id)
+select
+	m.time_stamp,
+	m.app_id,
+	
+	m.max_heap,
+	allocated_heap,
+	used_heap,
+	max_non_heap,
+	allocated_non_heap,
+	used_non_heap,
+	pending_finalizations,
+
+	statistic:sd(stac.x_allocated_heap, stac.xx_allocated_heap, stac.n) as sd_allocated_heap,
+	statistic:sd(stac.x_used_heap, stac.xx_used_heap, stac.n) as sd_used_heap,
+	statistic:sd(stac.x_max_non_heap, stac.xx_max_non_heap, stac.n) as sd_max_non_heap,
+	statistic:sd(stac.x_allocated_non_heap, stac.xx_allocated_non_heap, stac.n) as sd_allocated_non_heap,
+	statistic:sd(stac.x_used_non_heap, stac.xx_used_non_heap, stac.n) as sd_used_non_heap,
+	statistic:sd(stac.x_pending_finalizations, stac.xx_pending_finalizations, stac.n) as sd_pending_finalizations,
+							 
+	statistic:z(m.allocated_heap, stac.x_allocated_heap, stac.xx_allocated_heap, stac.n) as z_allocated_heap,
+	statistic:z(m.used_heap, stac.x_used_heap, stac.xx_used_heap, stac.n) as z_used_heap,
+	statistic:z(m.max_non_heap, stac.x_max_non_heap, stac.xx_max_non_heap, stac.n) as z_max_non_heap,
+	statistic:z(m.allocated_non_heap, stac.x_allocated_non_heap, stac.xx_allocated_non_heap, stac.n) as z_allocated_non_heap,
+	statistic:z(m.used_non_heap, stac.x_used_non_heap, stac.xx_used_non_heap, stac.n) as z_used_non_heap,
+	statistic:z(m.pending_finalizations, stac.x_pending_finalizations, stac.xx_pending_finalizations, stac.n) as z_pending_finalizations,
+
+	statistic:prob(min_allocated_heap, max_allocated_heap, 10, m.allocated_heap) as p_allocated_heap,
+	statistic:prob(min_used_heap, max_used_heap, 10, m.used_heap) as p_used_heap,
+	statistic:prob(min_max_non_heap, max_max_non_heap, 10, m.max_non_heap) as p_max_non_heap,
+	statistic:prob(min_allocated_non_heap, max_allocated_non_heap, 10, m.allocated_non_heap) as p_allocated_non_heap,
+	statistic:prob(min_used_non_heap, max_used_non_heap, 10, m.used_non_heap) as p_used_non_heap,
+	statistic:prob(min_pending_finalizations, max_pending_finalizations, 10, m.pending_finalizations) as p_pending_finalizations
+insert into MemoryFeatures;
