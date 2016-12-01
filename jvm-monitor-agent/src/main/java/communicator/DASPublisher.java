@@ -26,31 +26,27 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.io.File;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-
-public class DASPublisher {
+/**
+ *
+ */
+public abstract class DASPublisher {
 
     private final static Logger logger = Logger.getLogger(DASPublisher.class);
 
     DataPublisher dataPublisher;
     String dataStream;
-    EventPublisher eventAgent;
     String appID = "";
 
     /**
      * Constructor
      *
-     * @param host
-     * @param defaultThriftPort
-     * @param username
-     * @param password
-     * @param streamName
-     * @param streamVersion
+     * @param dasConfigurations
+     *
      * @throws SocketException
      * @throws UnknownHostException
      * @throws DataEndpointAuthenticationException
@@ -59,7 +55,7 @@ public class DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(String host, int defaultThriftPort, String username, String password, String streamName, String streamVersion) throws
+    public DASPublisher(DASConfigurations dasConfigurations) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -68,51 +64,14 @@ public class DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        logger.info("Starting DAS HttpLog Agent");
+        setDataAgentConfigurations(dasConfigurations.getDataAgentConfPath(), dasConfigurations.getTrustStorePath(), dasConfigurations.getTrustStorePassword());
 
-        AgentHolder.setConfigPath(getDataAgentConfigPath());
-        String type = getProperty("type", "Thrift");
-        int receiverPort = defaultThriftPort;
-        int securePort = receiverPort + 100;
+        String type = "Thrift";
+        String url = "tcp://" + dasConfigurations.getHost() + ":" + dasConfigurations.getDefaultThriftPort();
+        String authURL = "ssl://" + dasConfigurations.getHost() + ":" + dasConfigurations.getSecurePort();
 
-        String url = getProperty("url", "tcp://" + host + ":" + receiverPort);
-        String authURL = getProperty("authURL", "ssl://" + host + ":" + securePort);
-        username = getProperty("username", username);
-        password = getProperty("password", password);
+        dataPublisher = new DataPublisher(type, url, authURL, dasConfigurations.getUsername(), dasConfigurations.getPassword());
 
-        setDataStream(streamName, streamVersion);
-        dataPublisher = new DataPublisher(type, url, authURL, username, password);
-        eventAgent = new EventPublisher();
-
-    }
-
-    /**
-     * Need to set resource files located path
-     *
-     * @return Data agent config path
-     */
-    private static String getDataAgentConfigPath() {
-        File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
-        if (!filePath.exists()) {
-            filePath = new File("test" + File.separator + "resources");
-        }
-        if (!filePath.exists()) {
-            filePath = new File("resources");
-        }
-        return filePath.getAbsolutePath() + File.separator + "data-agent-conf.xml";
-    }
-
-    /**
-     * @param name
-     * @param def
-     * @return
-     */
-    private static String getProperty(String name, String def) {
-        String result = System.getProperty(name);
-        if (result == null || result.length() == 0 || result == "") {
-            result = def;
-        }
-        return result;
     }
 
     /**
@@ -130,9 +89,7 @@ public class DASPublisher {
      * @param streamName
      * @param streamVersion
      */
-    private void setDataStream(String streamName, String streamVersion) {
-        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
-    }
+    protected abstract void setDataStream(String streamName, String streamVersion);
 
     /**
      * Shutdown the DataPublisher
@@ -143,25 +100,40 @@ public class DASPublisher {
         dataPublisher.shutdown();
     }
 
-//    /**
-//     * @return Local Host Address
-//     * @throws SocketException
-//     * @throws UnknownHostException
-//     */
-//    private static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
-//        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-//        while (ifaces.hasMoreElements()) {
-//            NetworkInterface iface = ifaces.nextElement();
-//            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-//
-//            while (addresses.hasMoreElements()) {
-//                InetAddress addr = addresses.nextElement();
-//                if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-//                    return addr;
-//                }
-//            }
-//        }
-//        return InetAddress.getLocalHost();
-//    }
+    private void setDataAgentConfigurations(String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
+
+        //Set data-agent-conf.xml file path
+        File dataAgentFilePath = new File(dataAgentConfPath + File.separator + "data-agent-conf.xml");
+
+        if (!dataAgentFilePath.exists()) {
+            dataAgentFilePath = new File("resources" + File.separator + "data-agent-conf.xml");
+        } else if (!dataAgentFilePath.exists()) {
+            dataAgentFilePath = new File("test" + File.separator + "resources" + "data-agent-conf.xml");
+        } else {
+            logger.error("data-agent-conf.xml File not found in : " + dataAgentConfPath);
+        }
+        AgentHolder.setConfigPath(dataAgentFilePath.getAbsolutePath());
+
+
+        //Set the client-truststore.jks file located path and trustStorePassword
+        File trustStoreFilePath = new File(trustStorePath + File.separator + "client-truststore.jks");
+
+        if (!trustStoreFilePath.exists()) {
+            trustStoreFilePath = new File("resources" + File.separator + "client-truststore.jks");
+        } else if (!trustStoreFilePath.exists()) {
+            trustStoreFilePath = new File("test" + File.separator + "resources" + "client-truststore.jks");
+        } else {
+            logger.error("client-truststore.jks File not found in : " + trustStoreFilePath);
+        }
+
+        try {
+            System.setProperty("javax.net.ssl.trustStore", trustStoreFilePath.getAbsolutePath());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+
+    }
+
 
 }
