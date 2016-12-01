@@ -19,6 +19,7 @@
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import communicator.CPUPublisher;
+import communicator.DASConfigurations;
 import communicator.GCPublisher;
 import communicator.MemoryPublisher;
 import exceptions.PropertyCannotBeLoadedException;
@@ -37,8 +38,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import util.PropertyLoader;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,25 +48,6 @@ import java.util.concurrent.Executors;
 public class JVMMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
-
-    private GCPublisher dasGCPublisher;
-    private MemoryPublisher dasMemoryPublisher;
-    private CPUPublisher dasCPUPublisher;
-
-    /**
-     * Constructor
-     * Initialize DASPublisher objects
-     */
-    private JVMMonitorAgent() throws PublisherInitializationException {
-
-        try {
-            dasMemoryPublisher = new MemoryPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-            dasCPUPublisher = new CPUPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-            dasGCPublisher = new GCPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-        } catch (SocketException | UnknownHostException | DataEndpointException | TransportException | DataEndpointAuthenticationException | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
-            throw new PublisherInitializationException(e.getMessage(), e);
-        }
-    }
 
     public static void main(String[] args) throws AgentLoadException,
             AgentInitializationException {
@@ -89,25 +69,54 @@ public class JVMMonitorAgent {
      * Start monitoring of JVMs
      * Select between remote monitoring and local monitoring according to the configurations
      */
-    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException, AccessingUsageStatisticFailedException {
+    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException, AccessingUsageStatisticFailedException, PublisherInitializationException {
+
+        GCPublisher dasGCPublisher;
+        MemoryPublisher dasMemoryPublisher;
+        CPUPublisher dasCPUPublisher;
+
+        DASConfigurations dasConfigurations = new DASConfigurations(PropertyLoader.dasAddress,
+                PropertyLoader.dasThriftPort, PropertyLoader.dasSecurePort, PropertyLoader.dasUsername,
+                PropertyLoader.dasPassword, PropertyLoader.dataAgentConfPath, PropertyLoader.trustStorePath,
+                PropertyLoader.trustStorePassword);
+
+        try {
+            dasMemoryPublisher = new MemoryPublisher(dasConfigurations);
+            dasCPUPublisher = new CPUPublisher(dasConfigurations);
+            dasGCPublisher = new GCPublisher(dasConfigurations);
+        } catch (DataEndpointException | TransportException | DataEndpointAuthenticationException | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
+            throw new PublisherInitializationException(e.getMessage(), e);
+        }
+
         UsageMonitorAgent usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitor(PropertyLoader.mode);
         String targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
 
-
-        ExecutorService executor = Executors.newFixedThreadPool(3);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
         UsageStatistic usageStatistic;
+        int counter = 1;
         while (true) {
             usageStatistic = usageMonitorAgent.getUsageStatistic();
 
-            //            //Set UsageMonitorLog
-//            dasMemoryPublisher.setUsageLogObj(usageLogObj);
-//            dasCPUPublisher.setUsageLogObj(usageLogObj);
-//
-//            executor.execute(dasMemoryPublisher);
-//            executor.execute(dasCPUPublisher);
-//
-//            Thread.sleep(1000);
-        }
+            //Set data to publisher
+            dasGCPublisher.setGarbageCollectionStatistic(usageStatistic.getGarbageCollectionStatistics(), targetedApplicationId, usageStatistic.getTimeStamp());
+            dasMemoryPublisher.setMemoryStatistic(usageStatistic.getMemoryStatistics(), targetedApplicationId, usageStatistic.getTimeStamp());
+            dasCPUPublisher.setCPUStatistic(usageStatistic.getCpuStatistics(), targetedApplicationId, usageStatistic.getTimeStamp());
 
+            executor.execute(dasGCPublisher);
+
+            if (counter == 10) {
+                executor.execute(dasMemoryPublisher);
+                executor.execute(dasCPUPublisher);
+                counter = 1;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            counter++;
+        }
     }
 }
