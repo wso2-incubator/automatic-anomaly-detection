@@ -18,7 +18,6 @@ package jvmmonitor.models;
 * under the License.
 */
 
-
 /**
  * Memory usage models class
  * <p>

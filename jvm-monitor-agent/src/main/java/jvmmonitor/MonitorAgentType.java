@@ -17,12 +17,16 @@ package jvmmonitor;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Monitor agent types
+ */
 public enum MonitorAgentType {
     JMX("jmx"), PROCESS_ID("pid"), SNMP("snmp");
 
     private String value = null;
 
-    private MonitorAgentType(String value) {
+    MonitorAgentType(String value) {
         this.value = value;
     }
 
@@ -41,6 +45,5 @@ public enum MonitorAgentType {
         }
         return null;
     }
-
 
 }

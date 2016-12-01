@@ -62,27 +62,41 @@ import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
+/**
+ * Implements JMX usage monitor agent which is capable of monitoring JVMs using JMX services or local Process
+ * <p>
+ * Can uses JMX services for remote monitoring
+ * Can uses Process Id to obtain JMX connection for local monitoring
+ */
+public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JMXUsageMonitorAgent.class);
     private final static String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
 
+    //store mxBeans for reuse
     private MemoryMXBean memoryMXBean;
     private OperatingSystemMXBean operatingSystemMXBean;
     private List<GarbageCollectorMXBean> garbageCollectorMXBeans;
 
+    //store Garbage Collection events from JMX notifications
     private final LinkedList<GarbageCollectionStatistic> garbageCollectionStatistics;
+
     private long jvmStartTime;
     private final String targetedApplicationId;
 
-
+    /**
+     * Create JMXMonitorAgent to monitor local JVM using its PID
+     *
+     * @param pid
+     * @throws MonitorAgentInitializationFailed
+     */
     public JMXUsageMonitorAgent(String pid) throws MonitorAgentInitializationFailed {
         try {
             //attach VM using the pid given
             VirtualMachine vm = VirtualMachine.attach(pid);
 
-            //getting the connector address to the local JVM
+            //getting the jmx connector address to the local JVM
             String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
             if (connectorAddress == null) {
                 Properties props = vm.getSystemProperties();
@@ -96,14 +110,16 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                         Thread.sleep(1000);
                         connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
                     } catch (InterruptedException e) {
-                        logger.error("Retrieving connector address from the Connected VM(PID : " + pid + ") failed. Trying to reconnect.", e);
+                        logger.error("Retrieving connector address from the Connected VM(PID : " + pid
+                                + ") failed. Trying to reconnect.", e);
                     }
                 }
             }
-            vm.detach();
+            vm.detach(); //detach from the connected vm
 
             logger.info("JMX Address for given PID :" + pid + " is :" + connectorAddress);
-            MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress)).getMBeanServerConnection();
+            MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress))
+                    .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
             targetedApplicationId = getAppNameFromPID(pid);
@@ -113,43 +129,68 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
         }
 
-
     }
 
-    public JMXUsageMonitorAgent(String hostname, String rmiServerPort, String rmiRegistryPort) throws MonitorAgentInitializationFailed {
+    /**
+     * Creates JMX Connection using the JMX services without credentials
+     *
+     * @param hostname        - Targeted JVM id address
+     * @param rmiServerPort   - Targeted JVM RMI server port
+     * @param rmiRegistryPort - Targeted JVM RMI registry port
+     * @throws MonitorAgentInitializationFailed
+     */
+    public JMXUsageMonitorAgent(String hostname, String rmiServerPort, String rmiRegistryPort)
+            throws MonitorAgentInitializationFailed {
         String jmxURL = createJMXURL(hostname, rmiServerPort, rmiRegistryPort);
         logger.info("Trying to connect : " + jmxURL);
         try {
-            MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(jmxURL)).getMBeanServerConnection();
+            MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(jmxURL))
+                    .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
-            targetedApplicationId = getAppNameFromPID(hostname + ":" + rmiServerPort);
+            targetedApplicationId = hostname + ":" + rmiServerPort;
             getMXBeans(connection); //get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
         }
 
-
     }
 
-    public JMXUsageMonitorAgent(String hostname, String rmiServerPort, String rmiRegistryPort, String username, String password) throws MonitorAgentInitializationFailed {
+    /**
+     * Creates JMX Connection using the JMX services. Credentials are required for authentication to the JMX service
+     *
+     * @param hostname        - Targeted JVM id address
+     * @param rmiServerPort   - Targeted JVM RMI server port
+     * @param rmiRegistryPort - Targeted JVM RMI registry port
+     * @param username        - Username to access the JMX service of the targeted JVM
+     * @param password        - Password to access the JMX service of the targeted JVM
+     * @throws MonitorAgentInitializationFailed
+     */
+    public JMXUsageMonitorAgent(String hostname, String rmiServerPort, String rmiRegistryPort, String username,
+            String password) throws MonitorAgentInitializationFailed {
         String jmxURL = createJMXURL(hostname, rmiServerPort, rmiRegistryPort);
         logger.info("Trying to connect : " + jmxURL);
         try {
             Map<String, String[]> credential = new HashMap<String, String[]>();
-            credential.put(JMXConnector.CREDENTIALS, new String[]{username, password});
-            MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(jmxURL), credential).getMBeanServerConnection();
+            credential.put(JMXConnector.CREDENTIALS, new String[] { username, password });
+            MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(jmxURL), credential)
+                    .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
-            targetedApplicationId = getAppNameFromPID(hostname + ":" + rmiServerPort);
+            targetedApplicationId = hostname + ":" + rmiServerPort;
             getMXBeans(connection); //get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
         }
     }
 
-    @Override
-    public List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
+    /**
+     * Get CPU statistics using {@link OperatingSystemMXBean}
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
+    @Override public List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
 
         if (operatingSystemMXBean != null) {
             ArrayList<CPUStatistic> cpuStatistics = new ArrayList<>(1);
@@ -161,12 +202,18 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
             return cpuStatistics;
         } else {
-            throw new AccessingUsageStatisticFailedException("Can't access CPU statistics : Operating System MXBean is null");
+            throw new AccessingUsageStatisticFailedException(
+                    "Can't access CPU statistics : Operating System MXBean is null");
         }
     }
 
-    @Override
-    public List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
+    /**
+     * Get Memory statistics using the {@link MemoryMXBean}
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
+    @Override public List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
 
         if (memoryMXBean != null) {
             ArrayList<MemoryStatistic> memoryStatistics = new ArrayList<>(1);
@@ -197,24 +244,33 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
         }
     }
 
-    @Override
-    public synchronized List<GarbageCollectionStatistic> getGarbageCollectionStatistics() throws AccessingUsageStatisticFailedException {
+    /**
+     * Get all the Garbage Collection statistics until the method call from garbageCollectionStatistics list and
+     * clear that list
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
+    @Override public synchronized List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
+            throws AccessingUsageStatisticFailedException {
         if (garbageCollectionStatistics.size() > 0) {
             ArrayList<GarbageCollectionStatistic> gcStatistics = new ArrayList<>(garbageCollectionStatistics.size());
             while (garbageCollectionStatistics.size() > 0) {
                 gcStatistics.add(garbageCollectionStatistics.poll());
             }
-
             return gcStatistics;
         }
         return null;
     }
 
-    @Override
-    public String getTargetedApplicationId() {
+    /**
+     * Return the monitored application id
+     *
+     * @return
+     */
+    @Override public String getTargetedApplicationId() {
         return targetedApplicationId;
     }
-
 
     private String createJMXURL(String hostname, String rmiServerPort, String rmiRegistryPort) {
         if (hostname != null) {
@@ -224,11 +280,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
             RMI_Server_Address = hostname.concat(":").concat(rmiServerPort);
             RMI_Registry_Address = hostname.concat(":").concat(rmiRegistryPort);
 
-            jmxURL = "service:agents:rmi://"
-                    .concat(RMI_Server_Address)
-                    .concat("/jndi/rmi://")
-                    .concat(RMI_Registry_Address)
-                    .concat("/jmxrmi");
+            jmxURL = "service:jmx:rmi://".concat(RMI_Server_Address).concat("/jndi/rmi://")
+                    .concat(RMI_Registry_Address).concat("/jmxrmi");
 
             return jmxURL;
         }
@@ -237,15 +290,18 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
     private void getMXBeans(MBeanServerConnection connection) throws IOException, MalformedObjectNameException {
 
-        operatingSystemMXBean = newPlatformMXBeanProxy(connection, OPERATING_SYSTEM_MXBEAN_NAME, OperatingSystemMXBean.class);
+        operatingSystemMXBean = newPlatformMXBeanProxy(connection, OPERATING_SYSTEM_MXBEAN_NAME,
+                OperatingSystemMXBean.class);
         memoryMXBean = newPlatformMXBeanProxy(connection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
 
         //retrieving gcBeans
-        Set<ObjectName> gcNames = connection.queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
+        Set<ObjectName> gcNames = connection
+                .queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
         garbageCollectorMXBeans = new ArrayList<>(gcNames.size());
 
         for (ObjectName gcName : gcNames) {
-            GarbageCollectorMXBean garbageCollectorMXBean = ManagementFactory.newPlatformMXBeanProxy(connection, gcName.toString(), GarbageCollectorMXBean.class);
+            GarbageCollectorMXBean garbageCollectorMXBean = ManagementFactory
+                    .newPlatformMXBeanProxy(connection, gcName.toString(), GarbageCollectorMXBean.class);
             garbageCollectorMXBeans.add(garbageCollectorMXBean);
 
             NotificationEmitter emitter = (NotificationEmitter) garbageCollectorMXBean;
@@ -254,10 +310,11 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
         }
 
-        this.jvmStartTime = ManagementFactory.newPlatformMXBeanProxy(connection, ManagementFactory.RUNTIME_MXBEAN_NAME, RuntimeMXBean.class).getStartTime();
+        this.jvmStartTime = ManagementFactory
+                .newPlatformMXBeanProxy(connection, ManagementFactory.RUNTIME_MXBEAN_NAME, RuntimeMXBean.class)
+                .getStartTime();
         logger.info("Start time jvm " + jvmStartTime);
     }
-
 
     /**
      * Get Display name of given PID
@@ -280,7 +337,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
     }
 
     /**
-     * Implements a notification listener to listen notifications happens after Garbage collection
+     * Implements a notification listener to listen JMX notifications happen after Garbage collection
      */
     private class GCNotificationListener implements NotificationListener {
 
@@ -289,10 +346,9 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
         private final static String OLD_GENERATION_SPACE = "PS Old Gen";
 
         /**
-         * implement the notifier callback handler
-         * when gc event happens this method will be executed
-         * collect gc log data and add it to gc log queue
-         * trigger the GarbageCollectionListeners
+         * Implements the notifier callback handler
+         * When gc event happens this method will be executed
+         * Collect garbage collection events and store them in the garbageCollectionStatistics list
          *
          * @param notification
          * @param handback
@@ -303,7 +359,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
             if (notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
 
                 //get the information associated with this notification
-                GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
+                GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo
+                        .from((CompositeData) notification.getUserData());
 
                 //get all the info
                 String gctype = info.getGcAction();

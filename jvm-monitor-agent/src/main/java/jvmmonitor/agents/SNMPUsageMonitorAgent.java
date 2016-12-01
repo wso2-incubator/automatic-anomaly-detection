@@ -54,26 +54,22 @@ public class SNMPUsageMonitorAgent extends UsageMonitorAgent {
         }
     }
 
-    @Override
-    protected List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
+    @Override protected List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
         return null;
     }
 
-    @Override
-    protected List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
+    @Override protected List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
         return null;
     }
 
-    @Override
-    protected List<GarbageCollectionStatistic> getGarbageCollectionStatistics() throws AccessingUsageStatisticFailedException {
+    @Override protected List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
+            throws AccessingUsageStatisticFailedException {
         return null;
     }
 
-    @Override
-    public String getTargetedApplicationId() {
+    @Override public String getTargetedApplicationId() {
         return null;
     }
-
 
     /**
      * This method returns a Target, which contains information about

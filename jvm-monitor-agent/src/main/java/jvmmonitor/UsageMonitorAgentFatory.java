@@ -23,33 +23,44 @@ import util.PropertyLoader;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Monitor agent factory
+ */
 public class UsageMonitorAgentFatory {
 
-    public static UsageMonitorAgent getUsageMonitor(String monitorType) throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException {
-        MonitorAgentType type = MonitorAgentType.getMonitorType(monitorType);
+    /**
+     * @param monitorAgentType
+     * @return UsageMonitorAgent
+     * @throws MonitorAgentInitializationFailed
+     * @throws UnknownMonitorAgentTypeException
+     */
+    public static UsageMonitorAgent getUsageMonitor(String monitorAgentType)
+            throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException {
+        MonitorAgentType type = MonitorAgentType.getMonitorType(monitorAgentType);
 
+        //If the given type not found in MonitorAgentType throws an exception indicating that
         if (type == null) {
-            throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorType);
+            throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorAgentType);
         }
 
         UsageMonitorAgent usageMonitorAgent;
         switch (type) {
-            case JMX:
-                usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.targetAddress,
-                        PropertyLoader.targetRmiServerPort,
-                        PropertyLoader.targetRmiRegistryPort,
-                        PropertyLoader.targetUsername,
-                        PropertyLoader.targetPassword);
-                break;
-            case PROCESS_ID:
-                usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.pid);
-                break;
-            case SNMP:
-                usageMonitorAgent = new SNMPUsageMonitorAgent(PropertyLoader.snmpAddress, PropertyLoader.snmpPort);
-                break;
-            default:
-                throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorType);
+        case JMX:
+            usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.targetAddress,
+                    PropertyLoader.targetRmiServerPort, PropertyLoader.targetRmiRegistryPort,
+                    PropertyLoader.targetUsername, PropertyLoader.targetPassword);
+            break;
+        case PROCESS_ID:
+            usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.pid);
+            break;
+        case SNMP:
+            usageMonitorAgent = new SNMPUsageMonitorAgent(PropertyLoader.snmpAddress, PropertyLoader.snmpPort);
+            break;
+        default:
+            throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorAgentType);
         }
+
         return usageMonitorAgent;
     }
 }

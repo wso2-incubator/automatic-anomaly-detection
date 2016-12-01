@@ -1,6 +1,5 @@
 package util;
 
-
 import exceptions.PropertyCannotBeLoadedException;
 import org.apache.log4j.Logger;
 
@@ -27,6 +26,10 @@ import java.util.Properties;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+/**
+ * Load the properties from jma.properties to configure JVM monitor agent
+ */
 public class PropertyLoader {
 
     private final static String PROPERTY_FILE = "jma.properties";
@@ -60,16 +63,20 @@ public class PropertyLoader {
     //monitor running app using PID configurations
     public static String pid;
 
-
+    /**
+     * Load JVM monitor agent properties form the jma.properties file
+     *
+     * @throws PropertyCannotBeLoadedException
+     */
     public static void loadProperties() throws PropertyCannotBeLoadedException {
-
 
         Properties prop = new Properties();
         InputStream input;
 
         try {
-            input = new FileInputStream("bin/" + PROPERTY_FILE);
+            input = new FileInputStream("bin/" + PROPERTY_FILE); //load properties from the bin file when deployed
         } catch (FileNotFoundException e1) {
+            //load properties at development environments
             input = PropertyLoader.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
         }
 
