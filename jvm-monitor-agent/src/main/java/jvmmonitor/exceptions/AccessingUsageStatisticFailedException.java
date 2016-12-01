@@ -1,4 +1,4 @@
-package jvmmonitor.management.models;
+package jvmmonitor.exceptions;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,32 +17,13 @@ package jvmmonitor.management.models;
 * specific language governing permissions and limitations
 * under the License.
 */
+public class AccessingUsageStatisticFailedException extends Exception {
 
-/**
- * CPU load models class
- * <p>
- * Stores
- * Process CPU Load
- * System CPU Load
- */
-public class CPUUsageLog implements UsageLog {
-
-    private double processCPULoad;
-    private double systemCPULoad;
-
-    public double getProcessCPULoad() {
-        return processCPULoad;
+    public AccessingUsageStatisticFailedException(String message) {
+        super(message);
     }
 
-    public void setProcessCPULoad(double processCPULoad) {
-        this.processCPULoad = processCPULoad;
-    }
-
-    public double getSystemCPULoad() {
-        return systemCPULoad;
-    }
-
-    public void setSystemCPULoad(double systemCPULoad) {
-        this.systemCPULoad = systemCPULoad;
+    public AccessingUsageStatisticFailedException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -18,9 +18,9 @@
 
 package communicator;
 
-import jvmmonitor.exceptions.UnknownMonitorTypeException;
+import jvmmonitor.exceptions.UnknownMonitorAgentTypeException;
 import jvmmonitor.management.MonitorType;
-import jvmmonitor.management.models.MemoryUsageLog;
+import jvmmonitor.models.MemoryStatistic;
 import jvmmonitor.models.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -33,8 +33,6 @@ import java.net.UnknownHostException;
 
 
 public class MemoryPublisher extends DASPublisher implements Runnable {
-
-    private UsageMonitorLog usageLogObj;
 
     /**
      * Set default Memory usage stream
@@ -53,6 +51,7 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
      */
     private static final String streamName = "MemoryUsageStream";
     private static final String streamVersion = "1.0.0";
+    private UsageMonitorLog usageLogObj;
 
     /**
      * Constructor
@@ -96,8 +95,8 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
         try {
             //Send data to EventPublisher
             try {
-                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (MemoryUsageLog) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
-            } catch (UnknownMonitorTypeException e) {
+                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (MemoryStatistic) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
+            } catch (UnknownMonitorAgentTypeException e) {
                 e.printStackTrace();
             }
         } catch (DataEndpointConfigurationException e) {

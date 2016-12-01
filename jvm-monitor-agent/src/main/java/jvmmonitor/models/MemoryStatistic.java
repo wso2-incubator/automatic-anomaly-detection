@@ -1,4 +1,4 @@
-package jvmmonitor.management.models;
+package jvmmonitor.models;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -26,7 +26,7 @@ package jvmmonitor.management.models;
  * Heap memory parameters
  * Non-Heap memory parameters
  */
-public class MemoryUsageLog implements UsageLog {
+public class MemoryStatistic {
 
     private long maxHeapMemory;
     private long allocatedHeapMemory;
@@ -36,7 +36,7 @@ public class MemoryUsageLog implements UsageLog {
     private long usedNonHeapMemory;
     private long pendingFinalizations;
 
-    public MemoryUsageLog() {
+    public MemoryStatistic() {
         this.maxHeapMemory = 0;
         this.allocatedHeapMemory = 0;
         this.usedHeapMemory = 0;

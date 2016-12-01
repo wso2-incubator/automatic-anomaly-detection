@@ -18,9 +18,9 @@
 
 package communicator;
 
-import jvmmonitor.exceptions.UnknownMonitorTypeException;
+import jvmmonitor.exceptions.UnknownMonitorAgentTypeException;
 import jvmmonitor.management.MonitorType;
-import jvmmonitor.management.models.CPUUsageLog;
+import jvmmonitor.models.CPUStatistic;
 import jvmmonitor.models.UsageMonitorLog;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -34,8 +34,6 @@ import java.net.UnknownHostException;
 
 public class CPUPublisher extends DASPublisher implements Runnable {
 
-    private UsageMonitorLog usageLogObj;
-
     /**
      * Set default CPU usage stream
      * <p>
@@ -48,6 +46,7 @@ public class CPUPublisher extends DASPublisher implements Runnable {
      */
     private static final String streamName = "CPUUsageStream";
     private static final String streamVersion = "1.0.0";
+    private UsageMonitorLog usageLogObj;
 
     /**
      * Constructor
@@ -91,8 +90,8 @@ public class CPUPublisher extends DASPublisher implements Runnable {
         try {
             //Send data to EventPublisher
             try {
-                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (CPUUsageLog) usageLogObj.getUsageLog(MonitorType.CPU_USAGE_MONITOR.getValue()));
-            } catch (UnknownMonitorTypeException e) {
+                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (CPUStatistic) usageLogObj.getUsageLog(MonitorType.CPU_USAGE_MONITOR.getValue()));
+            } catch (UnknownMonitorAgentTypeException e) {
                 e.printStackTrace();
             }
         } catch (DataEndpointConfigurationException e) {

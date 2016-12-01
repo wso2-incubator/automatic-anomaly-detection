@@ -87,34 +87,6 @@ public class DASPublisher {
     }
 
     /**
-     * Need to set this to identify particular application
-     *
-     * @param appID
-     */
-    public void setAppID(String appID) {
-        this.appID = appID;
-    }
-
-    /**
-     * Generate Stream ID
-     *
-     * @param streamName
-     * @param streamVersion
-     */
-    private void setDataStream(String streamName, String streamVersion) {
-        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
-    }
-
-    /**
-     * Shutdown the DataPublisher
-     *
-     * @throws DataEndpointException
-     */
-    public void shutdown() throws DataEndpointException {
-        dataPublisher.shutdown();
-    }
-
-    /**
      * Need to set resource files located path
      *
      * @return Data agent config path
@@ -141,6 +113,34 @@ public class DASPublisher {
             result = def;
         }
         return result;
+    }
+
+    /**
+     * Need to set this to identify particular application
+     *
+     * @param appID
+     */
+    public void setAppID(String appID) {
+        this.appID = appID;
+    }
+
+    /**
+     * Generate Stream ID
+     *
+     * @param streamName
+     * @param streamVersion
+     */
+    private void setDataStream(String streamName, String streamVersion) {
+        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
+    }
+
+    /**
+     * Shutdown the DataPublisher
+     *
+     * @throws DataEndpointException
+     */
+    public void shutdown() throws DataEndpointException {
+        dataPublisher.shutdown();
     }
 
 //    /**

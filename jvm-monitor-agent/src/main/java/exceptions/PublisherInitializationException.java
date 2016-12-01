@@ -1,4 +1,4 @@
-package jvmmonitor.management.models;
+package exceptions;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,6 +17,13 @@ package jvmmonitor.management.models;
 * specific language governing permissions and limitations
 * under the License.
 */
-public interface UsageLog {
+public class PublisherInitializationException extends Exception {
 
+    public PublisherInitializationException(String message) {
+        super(message);
+    }
+
+    public PublisherInitializationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

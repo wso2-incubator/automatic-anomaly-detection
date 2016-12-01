@@ -1,4 +1,4 @@
-package jvmmonitor.management;
+package jvmmonitor.exceptions;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,33 +17,13 @@ package jvmmonitor.management;
 * specific language governing permissions and limitations
 * under the License.
 */
+public class MonitorAgentInitializationFailed extends Exception {
 
-/**
- * Usage monitor types enum
- */
-public enum MonitorType {
-    CPU_USAGE_MONITOR("cpu"), MEMORY_USAGE_MONITOR("memory"), GARBAGE_COLLECTION_EVENTS_MONITOR("gc");
-
-    private String value = null;
-
-    private MonitorType(String value) {
-        this.value = value;
+    public MonitorAgentInitializationFailed(String message) {
+        super(message);
     }
 
-    public String getValue() {
-        return this.value;
+    public MonitorAgentInitializationFailed(String message, Throwable cause) {
+        super(message, cause);
     }
-
-    /**
-     * get {@link MonitorType} for a given value.
-     */
-    public static MonitorType getMonitorType(String value) {
-        for (MonitorType type : MonitorType.values()) {
-            if (type.getValue().equalsIgnoreCase(value)) {
-                return type;
-            }
-        }
-        return null;
-    }
-
 }

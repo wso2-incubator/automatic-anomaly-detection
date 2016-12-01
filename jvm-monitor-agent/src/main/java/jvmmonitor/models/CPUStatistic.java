@@ -1,4 +1,4 @@
-package exceptions;
+package jvmmonitor.models;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -17,13 +17,32 @@ package exceptions;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class StartMonitoringFailedException extends Exception {
 
-    public StartMonitoringFailedException(String message) {
-        super(message);
+/**
+ * CPU load models class
+ * <p>
+ * Stores
+ * Process CPU Load
+ * System CPU Load
+ */
+public class CPUStatistic {
+
+    private double processCPULoad;
+    private double systemCPULoad;
+
+    public double getProcessCPULoad() {
+        return processCPULoad;
     }
 
-    public StartMonitoringFailedException(String message, Throwable cause) {
-        super(message, cause);
+    public void setProcessCPULoad(double processCPULoad) {
+        this.processCPULoad = processCPULoad;
+    }
+
+    public double getSystemCPULoad() {
+        return systemCPULoad;
+    }
+
+    public void setSystemCPULoad(double systemCPULoad) {
+        this.systemCPULoad = systemCPULoad;
     }
 }

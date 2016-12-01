@@ -1,4 +1,4 @@
-package jvmmonitor.management.models;
+package jvmmonitor.models;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -30,7 +30,7 @@ package jvmmonitor.management.models;
  * GC survivor space memory parameters
  * GC old space memory parameters
  */
-public class GarbageCollectionLog implements UsageLog {
+public class GarbageCollectionStatistic {
 
     private long EdenUsedMemoryAfterGC;
     private long EdenUsedMemoryBeforeGC;

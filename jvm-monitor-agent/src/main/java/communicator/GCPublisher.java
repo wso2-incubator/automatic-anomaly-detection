@@ -18,7 +18,7 @@
 
 package communicator;
 
-import jvmmonitor.management.models.GarbageCollectionLog;
+import jvmmonitor.models.GarbageCollectionStatistic;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -103,7 +103,7 @@ public class GCPublisher extends DASPublisher {
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public void publishGCData(LinkedList<GarbageCollectionLog> garbageCollectionLog) throws DataEndpointAuthenticationException,
+    public void publishGCData(LinkedList<GarbageCollectionStatistic> garbageCollectionLog) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             DataEndpointException,
             DataEndpointConfigurationException,

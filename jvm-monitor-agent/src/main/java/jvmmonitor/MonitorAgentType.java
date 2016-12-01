@@ -1,8 +1,4 @@
-package jvmmonitor.management.monitors;
-
-import jvmmonitor.management.models.UsageLog;
-
-import java.lang.management.PlatformManagedObject;
+package jvmmonitor;
 
 /*
 *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -21,27 +17,30 @@ import java.lang.management.PlatformManagedObject;
 * specific language governing permissions and limitations
 * under the License.
 */
-public abstract class UsageMonitor<T extends PlatformManagedObject> {
+public enum MonitorAgentType {
+    JMX("jmx"), PROCESS_ID("pid"), SNMP("snmp");
 
-    protected T mxBean;
+    private String value = null;
 
-    /**
-     * Create UsageLog obj according to the management class type
-     *
-     * @return
-     */
-    public UsageLog getUsageLog() {
-        if (mxBean != null) {
-            return getUsageDataFromMXBean();
-        } else {
-            throw new NullPointerException();
-        }
+    private MonitorAgentType(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return this.value;
     }
 
     /**
-     * Access the MXBeans and collect the desired usage data into the UsageLog obj
-     *
-     * @return
+     * get {@link MonitorAgentType} for a given value.
      */
-    protected abstract UsageLog getUsageDataFromMXBean();
+    public static MonitorAgentType getMonitorType(String value) {
+        for (MonitorAgentType type : MonitorAgentType.values()) {
+            if (type.getValue().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+
 }

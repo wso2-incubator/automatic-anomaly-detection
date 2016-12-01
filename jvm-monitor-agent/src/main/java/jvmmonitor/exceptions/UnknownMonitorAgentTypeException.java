@@ -17,15 +17,14 @@ package jvmmonitor.exceptions;
 * specific language governing permissions and limitations
 * under the License.
 */
-public class MonitoringNotStartedException extends Exception {
+public class UnknownMonitorAgentTypeException extends Exception {
 
-    public MonitoringNotStartedException(String message) {
+    public UnknownMonitorAgentTypeException(String message) {
         super(message);
     }
 
-    public MonitoringNotStartedException(String message, Throwable cause) {
+    public UnknownMonitorAgentTypeException(String message, Throwable cause) {
         super(message, cause);
     }
-
 
 }

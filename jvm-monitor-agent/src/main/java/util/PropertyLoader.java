@@ -48,6 +48,10 @@ public class PropertyLoader {
     public static String targetUsername;
     public static String targetPassword;
 
+    //targeted remote server snmp configurations
+    public static String snmpAddress;
+    public static String snmpPort;
+
     //monitor running app using PID configurations
     public static String pid;
 
@@ -83,6 +87,9 @@ public class PropertyLoader {
                 targetPassword = prop.getProperty("jma.target.password");
 
                 pid = prop.getProperty("jma.target.pid");
+
+                snmpAddress = prop.getProperty("jma.target.snmp.address");
+                snmpPort = prop.getProperty("jma.target.snmp.port");
 
                 input.close();
 

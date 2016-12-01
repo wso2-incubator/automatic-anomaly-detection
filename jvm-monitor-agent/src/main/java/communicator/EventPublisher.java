@@ -18,9 +18,9 @@
 
 package communicator;
 
-import jvmmonitor.management.models.CPUUsageLog;
-import jvmmonitor.management.models.GarbageCollectionLog;
-import jvmmonitor.management.models.MemoryUsageLog;
+import jvmmonitor.models.CPUStatistic;
+import jvmmonitor.models.GarbageCollectionStatistic;
+import jvmmonitor.models.MemoryStatistic;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
@@ -51,7 +51,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUUsageLog cpuLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUStatistic cpuLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -83,7 +83,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionLog gcLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionStatistic gcLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
@@ -143,7 +143,7 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, MemoryUsageLog memoryLog) throws DataEndpointException,
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, MemoryStatistic memoryLog) throws DataEndpointException,
             DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             TransportException,
