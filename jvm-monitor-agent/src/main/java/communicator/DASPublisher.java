@@ -28,8 +28,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import java.io.File;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 /**
  *
@@ -40,28 +38,21 @@ public abstract class DASPublisher {
 
     DataPublisher dataPublisher;
     String dataStream;
-    String appID = "";
+    String applicationId;
 
     /**
      * Constructor
      *
      * @param dasConfigurations
-     *
-     * @throws SocketException
-     * @throws UnknownHostException
      * @throws DataEndpointAuthenticationException
      * @throws DataEndpointAgentConfigurationException
      * @throws TransportException
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(DASConfigurations dasConfigurations) throws
-            SocketException,
-            UnknownHostException,
-            DataEndpointAuthenticationException,
+    public DASPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointException,
+            TransportException, DataEndpointException,
             DataEndpointConfigurationException {
 
         setDataAgentConfigurations(dasConfigurations.getDataAgentConfPath(), dasConfigurations.getTrustStorePath(), dasConfigurations.getTrustStorePassword());
@@ -74,14 +65,14 @@ public abstract class DASPublisher {
 
     }
 
-    /**
-     * Need to set this to identify particular application
-     *
-     * @param appID
-     */
-    public void setAppID(String appID) {
-        this.appID = appID;
-    }
+//    /**
+//     * Need to set this to identify particular application
+//     *
+//     * @param applicationId
+//     */
+//    public void setApplicationId(String applicationId) {
+//        this.applicationId = applicationId;
+//    }
 
     /**
      * Generate Stream ID
@@ -90,6 +81,11 @@ public abstract class DASPublisher {
      * @param streamVersion
      */
     protected abstract void setDataStream(String streamName, String streamVersion);
+
+    /**
+     * Publish data to DAS
+     */
+    protected abstract void publishEvents();
 
     /**
      * Shutdown the DataPublisher
@@ -107,10 +103,12 @@ public abstract class DASPublisher {
 
         if (!dataAgentFilePath.exists()) {
             dataAgentFilePath = new File("resources" + File.separator + "data-agent-conf.xml");
-        } else if (!dataAgentFilePath.exists()) {
+        }
+        if (!dataAgentFilePath.exists()) {
             dataAgentFilePath = new File("test" + File.separator + "resources" + "data-agent-conf.xml");
-        } else {
-            logger.error("data-agent-conf.xml File not found in : " + dataAgentConfPath);
+        }
+        if (!dataAgentFilePath.exists()) {
+            logger.error("data-agent-conf.xml File not found in : " + dataAgentFilePath.getAbsolutePath());
         }
         AgentHolder.setConfigPath(dataAgentFilePath.getAbsolutePath());
 
@@ -120,10 +118,12 @@ public abstract class DASPublisher {
 
         if (!trustStoreFilePath.exists()) {
             trustStoreFilePath = new File("resources" + File.separator + "client-truststore.jks");
-        } else if (!trustStoreFilePath.exists()) {
+        }
+        if (!trustStoreFilePath.exists()) {
             trustStoreFilePath = new File("test" + File.separator + "resources" + "client-truststore.jks");
-        } else {
-            logger.error("client-truststore.jks File not found in : " + trustStoreFilePath);
+        }
+        if (!trustStoreFilePath.exists()) {
+            logger.error("client-truststore.jks File not found in : " + trustStoreFilePath.getAbsolutePath());
         }
 
         try {

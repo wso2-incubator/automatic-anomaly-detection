@@ -18,9 +18,8 @@
 
 package communicator;
 
-import jvmmonitor.management.models.GarbageCollectionLog;
+import jvmmonitor.models.GarbageCollectionStatistic;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
@@ -29,14 +28,12 @@ import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
- *
+ * This class send Garbage collection statistic to DAS for every 100ms
  */
-public class GCPublisher extends DASPublisher {
+public class GCPublisher extends DASPublisher implements Runnable {
 
     private final static Logger logger = Logger.getLogger(GCPublisher.class);
 
@@ -73,113 +70,92 @@ public class GCPublisher extends DASPublisher {
      */
     private static final String streamName = "GarbageCollectionStream";
     private static final String streamVersion = "1.0.0";
+    private List<GarbageCollectionStatistic> garbageCollectionStatistics;
+    private long timestamp;
 
     /**
      * Constructor
      *
-     * @param defaultThriftPort
-     * @param username
-     * @param password
-     * @throws SocketException
-     * @throws UnknownHostException
+     * @param dasConfigurations
      * @throws DataEndpointAuthenticationException
      * @throws DataEndpointAgentConfigurationException
-     * @throws TransportException
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
+     * @throws TransportException
      */
-    public GCPublisher(String hostname, int defaultThriftPort, int securePort, String username, String password) throws
-            SocketException,
-            UnknownHostException,
-            DataEndpointAuthenticationException,
+    public GCPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
-            TransportException,
             DataEndpointException,
-            DataEndpointConfigurationException {
+            DataEndpointConfigurationException,
+            TransportException {
 
-        super(hostname, defaultThriftPort, securePort, username, password);
+        super(dasConfigurations);
         setDataStream(streamName, streamVersion);
         logger.info("Starting DAS GC Publisher");
 
     }
 
     /**
-     * This method publish Garbage Collection Log data to DAS
+     * Need to set GC statistic data before publish data to DAS
      *
-     * @param dataPublisher
-     * @param streamId
-     * @param appID
-     * @param gcLog
-     * @throws DataEndpointException
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointAgentConfigurationException
-     * @throws TransportException
-     * @throws DataEndpointConfigurationException
+     * @param garbageCollectionStatistics
+     * @param applicationId
+     * @param timestamp
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionLog gcLog) throws DataEndpointException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointConfigurationException {
-
-        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{gcLog.getStartTime(),
-                        appID,
-                        gcLog.getGcType(),
-                        gcLog.getGcCause(),
-                        gcLog.getDuration(),
-                        gcLog.getEdenUsedMemoryAfterGC(),
-                        gcLog.getEdenUsedMemoryBeforeGC(),
-                        gcLog.getSurvivorUsedMemoryAfterGC(),
-                        gcLog.getSurvivorUsedMemoryBeforeGC(),
-                        gcLog.getOldGenUsedMemoryAfterGC(),
-                        gcLog.getOldGenUsedMemoryBeforeGC(),
-                        gcLog.getEdenCommittedMemoryAfterGC(),
-                        gcLog.getEdenCommittedMemoryBeforeGC(),
-                        gcLog.getSurvivorCommittedMemoryAfterGC(),
-                        gcLog.getSurvivorCommittedMemoryBeforeGC(),
-                        gcLog.getOldGenCommittedMemoryAfterGC(),
-                        gcLog.getOldGenCommittedMemoryBeforeGC(),
-                        gcLog.getEdenMaxMemoryAfterGC(),
-                        gcLog.getEdenMaxMemoryBeforeGC(),
-                        gcLog.getSurvivorMaxMemoryAfterGC(),
-                        gcLog.getSurvivorMaxMemoryBeforeGC(),
-                        gcLog.getOldGenMaxMemoryAfterGC(),
-                        gcLog.getOldGenMaxMemoryBeforeGC()});
-
-        dataPublisher.publish(event);
-
-        logger.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
-                gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
-                + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
-                + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
-                + " , " + gcLog.getEdenCommittedMemoryAfterGC() + " , " + gcLog.getEdenCommittedMemoryBeforeGC()
-                + " , " + gcLog.getSurvivorCommittedMemoryAfterGC() + " , " + gcLog.getSurvivorCommittedMemoryBeforeGC()
-                + " , " + gcLog.getOldGenCommittedMemoryAfterGC() + " , " + gcLog.getOldGenCommittedMemoryBeforeGC()
-                + " , " + gcLog.getEdenMaxMemoryAfterGC() + " , " + gcLog.getEdenMaxMemoryBeforeGC()
-                + " , " + gcLog.getSurvivorMaxMemoryAfterGC() + " , " + gcLog.getSurvivorMaxMemoryBeforeGC()
-                + " , " + gcLog.getOldGenMaxMemoryAfterGC() + " , " + gcLog.getOldGenMaxMemoryBeforeGC());
-
+    public void setGarbageCollectionStatistic(List<GarbageCollectionStatistic> garbageCollectionStatistics, String applicationId, long timestamp) {
+        this.garbageCollectionStatistics = garbageCollectionStatistics;
+        this.applicationId = applicationId;
+        this.timestamp = timestamp;
     }
 
     /**
-     * Send data to EventPublisher
-     *
-     * @param garbageCollectionLog
-     * @throws DataEndpointAuthenticationException
-     * @throws DataEndpointAgentConfigurationException
-     * @throws DataEndpointException
-     * @throws DataEndpointConfigurationException
-     * @throws TransportException
+     * Publish Garbage Collection Log data to DAS
      */
-    public void publishGCData(LinkedList<GarbageCollectionLog> garbageCollectionLog) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
-            TransportException {
+    @Override
+    protected void publishEvents() {
 
-        while (!garbageCollectionLog.isEmpty()) {
-            publishLogEvents(dataPublisher, dataStream, appID, garbageCollectionLog.poll());
+        if (garbageCollectionStatistics != null) {
+            for (GarbageCollectionStatistic gcStat : garbageCollectionStatistics) {
+
+                Event event = new Event(dataStream, System.currentTimeMillis(), null, null,
+                        new Object[]{timestamp,
+                                applicationId,
+                                gcStat.getGcType(),
+                                gcStat.getGcCause(),
+                                gcStat.getDuration(),
+                                gcStat.getEdenUsedMemoryAfterGC(),
+                                gcStat.getEdenUsedMemoryBeforeGC(),
+                                gcStat.getSurvivorUsedMemoryAfterGC(),
+                                gcStat.getSurvivorUsedMemoryBeforeGC(),
+                                gcStat.getOldGenUsedMemoryAfterGC(),
+                                gcStat.getOldGenUsedMemoryBeforeGC(),
+                                gcStat.getEdenCommittedMemoryAfterGC(),
+                                gcStat.getEdenCommittedMemoryBeforeGC(),
+                                gcStat.getSurvivorCommittedMemoryAfterGC(),
+                                gcStat.getSurvivorCommittedMemoryBeforeGC(),
+                                gcStat.getOldGenCommittedMemoryAfterGC(),
+                                gcStat.getOldGenCommittedMemoryBeforeGC(),
+                                gcStat.getEdenMaxMemoryAfterGC(),
+                                gcStat.getEdenMaxMemoryBeforeGC(),
+                                gcStat.getSurvivorMaxMemoryAfterGC(),
+                                gcStat.getSurvivorMaxMemoryBeforeGC(),
+                                gcStat.getOldGenMaxMemoryAfterGC(),
+                                gcStat.getOldGenMaxMemoryBeforeGC()});
+
+                dataPublisher.publish(event);
+
+                logger.info("publish GC data : " + gcStat.getStartTime() + " , " + applicationId
+                        + " , " + gcStat.getGcType() + " , " + gcStat.getGcCause() + " , " +
+                        gcStat.getDuration() + " , " + gcStat.getEdenUsedMemoryAfterGC() + " , " + gcStat.getEdenUsedMemoryBeforeGC()
+                        + " , " + gcStat.getSurvivorUsedMemoryAfterGC() + " , " + gcStat.getSurvivorUsedMemoryBeforeGC()
+                        + " , " + gcStat.getOldGenUsedMemoryAfterGC() + " , " + gcStat.getOldGenUsedMemoryBeforeGC()
+                        + " , " + gcStat.getEdenCommittedMemoryAfterGC() + " , " + gcStat.getEdenCommittedMemoryBeforeGC()
+                        + " , " + gcStat.getSurvivorCommittedMemoryAfterGC() + " , " + gcStat.getSurvivorCommittedMemoryBeforeGC()
+                        + " , " + gcStat.getOldGenCommittedMemoryAfterGC() + " , " + gcStat.getOldGenCommittedMemoryBeforeGC()
+                        + " , " + gcStat.getEdenMaxMemoryAfterGC() + " , " + gcStat.getEdenMaxMemoryBeforeGC()
+                        + " , " + gcStat.getSurvivorMaxMemoryAfterGC() + " , " + gcStat.getSurvivorMaxMemoryBeforeGC()
+                        + " , " + gcStat.getOldGenMaxMemoryAfterGC() + " , " + gcStat.getOldGenMaxMemoryBeforeGC());
+            }
         }
 
     }
@@ -187,5 +163,10 @@ public class GCPublisher extends DASPublisher {
     @Override
     protected void setDataStream(String streamName, String streamVersion) {
         dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
+    }
+
+    @Override
+    public void run() {
+        publishEvents();
     }
 }
