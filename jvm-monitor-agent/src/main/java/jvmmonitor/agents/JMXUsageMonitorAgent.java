@@ -280,7 +280,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
             RMI_Server_Address = hostname.concat(":").concat(rmiServerPort);
             RMI_Registry_Address = hostname.concat(":").concat(rmiRegistryPort);
 
-            jmxURL = "service:agents:rmi://".concat(RMI_Server_Address).concat("/jndi/rmi://")
+            jmxURL = "service:jmx:rmi://".concat(RMI_Server_Address).concat("/jndi/rmi://")
                     .concat(RMI_Registry_Address).concat("/jmxrmi");
 
             return jmxURL;
