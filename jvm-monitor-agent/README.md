@@ -39,8 +39,11 @@ The types of usage data collected are;
       jma.das.address = --Enter DAS IP adress--
       jma.das.username = --Enter DAS username--
       jma.das.password = --Enter DAS password--
-      jma.das.thriftport = --Enter DAS Thrift port--
-      jma.das.binaryport = --Enter DAS Binary port--
+      jma.das.thrift_port= --Enter DAS Thrift port--
+      jma.das.secure_port= --Enter DAS Secure port--
+      jma.das.data_agent_conf.path= --Enter data-agent-conf.xml file located path--
+      javax.net.ssl.trust_store.path= --Enter client-truststore.jks file located path--
+      javax.net.ssl.trust_store.password= --Enter TrustStore password--
       ```
       
      Sample configurations would be:
@@ -49,8 +52,11 @@ The types of usage data collected are;
       jma.das.address = 127.0.0.1
       jma.das.username = admin
       jma.das.password = admin
-      jma.das.thriftport = 7611
-      jma.das.binaryport = 9611
+      jma.das.thrift_port=7611
+      jma.das.secure_port=7711
+      jma.das.data_agent_conf.path=jvm-monitor-agent/src/main/resources
+      javax.net.ssl.trust_store.path=jvm-monitor-agent/src/main/resources
+      javax.net.ssl.trust_store.password=wso2carbon
     ```
   3. **Configure JVM Monitor Agent**
      
@@ -102,5 +108,4 @@ The types of usage data collected are;
 1. [Run WSO2 DAS server](https://docs.wso2.com/display/DAS310/Running+the+Product)
 
 2. Run JVM monitor agent by executing ```<JMA_HOME>/bin/jma.sh```
-
 
