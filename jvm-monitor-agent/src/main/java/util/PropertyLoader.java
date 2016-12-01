@@ -35,6 +35,11 @@ public class PropertyLoader {
     //das publisher configurations
     public static String dasAddress;
     public static int dasThriftPort;
+    public static int dasSecurePort;
+    public static String dataAgentConfPath;
+    public static String trustStorePath;
+    public static String trustStorePassword;
+
     public static String dasUsername;
     public static String dasPassword;
 
@@ -74,7 +79,12 @@ public class PropertyLoader {
                 prop.load(input);
 
                 dasAddress = prop.getProperty("jma.das.address");
-                dasThriftPort = Integer.parseInt(prop.getProperty("jma.das.thriftport"));
+                dasThriftPort = Integer.parseInt(prop.getProperty("jma.das.thrift_port"));
+                dasSecurePort = Integer.parseInt(prop.getProperty("jma.das.secure_port"));
+                dataAgentConfPath = prop.getProperty("jma.das.data_agent_conf.path");
+                trustStorePath = prop.getProperty("javax.net.ssl.trust_store.path");
+                trustStorePassword = prop.getProperty("javax.net.ssl.trust_store.password");
+
                 dasUsername = prop.getProperty("jma.das.username");
                 dasPassword = prop.getProperty("jma.das.password");
 
