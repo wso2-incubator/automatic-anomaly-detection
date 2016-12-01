@@ -148,7 +148,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                     .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
-            targetedApplicationId = getAppNameFromPID(hostname + ":" + rmiServerPort);
+            targetedApplicationId = hostname + ":" + rmiServerPort;
             getMXBeans(connection); //get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
@@ -177,7 +177,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                     .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
-            targetedApplicationId = getAppNameFromPID(hostname + ":" + rmiServerPort);
+            targetedApplicationId = hostname + ":" + rmiServerPort;
             getMXBeans(connection); //get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
