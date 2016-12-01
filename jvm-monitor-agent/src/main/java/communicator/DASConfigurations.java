@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 /**
- *
+ * This class contains configurations of DAS publisher
  */
 public class DASConfigurations {
 
@@ -44,49 +44,18 @@ public class DASConfigurations {
     private final String trustStorePath;
     private final String trustStorePassword;
 
-
-    public DASConfigurations(String host, int defaultThriftPort, String username, String password, String resourcesFilePath, String trustStorePassword) {
-
-        if (host == "localhost") {
-            try {
-                host = getLocalAddress();
-            } catch (SocketException | UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-
-        this.host = host;
-        this.defaultThriftPort = defaultThriftPort;
-        this.securePort = defaultThriftPort + 100;
-        this.username = username;
-        this.password = password;
-        this.dataAgentConfPath = resourcesFilePath;
-        this.trustStorePath = resourcesFilePath;
-        this.trustStorePassword = trustStorePassword;
-
-    }
-
-    public DASConfigurations(String host, int defaultThriftPort, int securePort, String username, String password, String resourcesFilePath, String trustStorePassword) {
-
-        if (host == "localhost") {
-            try {
-                host = getLocalAddress();
-            } catch (SocketException | UnknownHostException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-
-        this.host = host;
-        this.defaultThriftPort = defaultThriftPort;
-        this.securePort = securePort;
-        this.username = username;
-        this.password = password;
-        this.dataAgentConfPath = resourcesFilePath;
-        this.trustStorePath = resourcesFilePath;
-        this.trustStorePassword = trustStorePassword;
-
-    }
-
+    /**
+     * Constructor
+     *
+     * @param host
+     * @param defaultThriftPort
+     * @param securePort
+     * @param username
+     * @param password
+     * @param dataAgentConfPath
+     * @param trustStorePath
+     * @param trustStorePassword
+     */
     public DASConfigurations(String host, int defaultThriftPort, int securePort, String username, String password, String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
 
         if (host == "localhost") {
@@ -141,6 +110,13 @@ public class DASConfigurations {
         return trustStorePassword;
     }
 
+    /**
+     * Method to find Localhost address
+     *
+     * @return Localhost Address
+     * @throws SocketException
+     * @throws UnknownHostException
+     */
     private String getLocalAddress() throws SocketException, UnknownHostException {
         Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
         while (ifaces.hasMoreElements()) {
