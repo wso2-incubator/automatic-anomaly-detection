@@ -29,7 +29,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
-
 public class GCPublisher extends DASPublisher {
 
     /**
@@ -80,13 +79,9 @@ public class GCPublisher extends DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public GCPublisher(String hostname, int defaultThriftPort, String username, String password) throws
-            SocketException,
-            UnknownHostException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointException,
+    public GCPublisher(String hostname, int defaultThriftPort, String username, String password)
+            throws SocketException, UnknownHostException, DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
             DataEndpointConfigurationException {
 
         super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
@@ -103,17 +98,14 @@ public class GCPublisher extends DASPublisher {
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public void publishGCData(LinkedList<GarbageCollectionStatistic> garbageCollectionLog) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
-            TransportException {
+    public void publishGCData(LinkedList<GarbageCollectionStatistic> garbageCollectionLog)
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, DataEndpointException,
+            DataEndpointConfigurationException, TransportException {
 
         while (!garbageCollectionLog.isEmpty()) {
             eventAgent.publishLogEvents(dataPublisher, dataStream, appID, garbageCollectionLog.poll());
         }
 
     }
-
 
 }

@@ -26,16 +26,49 @@ import java.util.List;
 * under the License.
 */
 
+/**
+ * Abstract Usage monitor agent which should be implemented in order to define new monitor agents
+ */
 public abstract class UsageMonitorAgent {
 
+    /**
+     * Returns a list of CPU usage statistics {@link CPUStatistic}
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
     protected abstract List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException;
 
+    /**
+     * Returns a list of Memory usage statistics {@link MemoryStatistic}
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
     protected abstract List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException;
 
-    protected abstract List<GarbageCollectionStatistic> getGarbageCollectionStatistics() throws AccessingUsageStatisticFailedException;
+    /**
+     * Returns a list of Garbage Collection statistics {@link GarbageCollectionStatistic}
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
+    protected abstract List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
+            throws AccessingUsageStatisticFailedException;
 
+    /**
+     * Returns identifications to identify the monitored applications
+     *
+     * @return
+     */
     public abstract String getTargetedApplicationId();
 
+    /**
+     * Returns complete set of usage statistics {@link UsageStatistic}
+     *
+     * @return
+     * @throws AccessingUsageStatisticFailedException
+     */
     public UsageStatistic getUsageStatistic() throws AccessingUsageStatisticFailedException {
 
         return new UsageStatistic(getCPUStatistics(), getMemoryStatistics(), getGarbageCollectionStatistics());

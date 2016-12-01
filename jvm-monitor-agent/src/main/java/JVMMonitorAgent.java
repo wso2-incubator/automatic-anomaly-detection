@@ -44,7 +44,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Class to start JVMMonitor agent
- * Perform the mode checks
+ * Build the monitor agent and trigger publishing usage data
  */
 public class JVMMonitorAgent {
 
@@ -61,16 +61,18 @@ public class JVMMonitorAgent {
     private JVMMonitorAgent() throws PublisherInitializationException {
 
         try {
-            dasMemoryPublisher = new MemoryPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-            dasCPUPublisher = new CPUPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
-            dasGCPublisher = new GCPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort, PropertyLoader.dasUsername, PropertyLoader.dasPassword);
+            dasMemoryPublisher = new MemoryPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort,
+                    PropertyLoader.dasUsername, PropertyLoader.dasPassword);
+            dasCPUPublisher = new CPUPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort,
+                    PropertyLoader.dasUsername, PropertyLoader.dasPassword);
+            dasGCPublisher = new GCPublisher(PropertyLoader.dasAddress, PropertyLoader.dasThriftPort,
+                    PropertyLoader.dasUsername, PropertyLoader.dasPassword);
         } catch (SocketException | UnknownHostException | DataEndpointException | TransportException | DataEndpointAuthenticationException | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
             throw new PublisherInitializationException(e.getMessage(), e);
         }
     }
 
-    public static void main(String[] args) throws AgentLoadException,
-            AgentInitializationException {
+    public static void main(String[] args) throws AgentLoadException, AgentInitializationException {
 
         try {
             PropertyLoader.loadProperties();
@@ -84,15 +86,17 @@ public class JVMMonitorAgent {
         }
     }
 
-
     /**
-     * Start monitoring of JVMs
-     * Select between remote monitoring and local monitoring according to the configurations
+     * Build monitor agent and invoke DAS publishers to publish usage data periodically
+     *
+     * @throws MonitorAgentInitializationFailed
+     * @throws UnknownMonitorAgentTypeException
+     * @throws AccessingUsageStatisticFailedException
      */
-    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException, AccessingUsageStatisticFailedException {
+    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
+            AccessingUsageStatisticFailedException {
         UsageMonitorAgent usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitor(PropertyLoader.mode);
         String targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
-
 
         ExecutorService executor = Executors.newFixedThreadPool(3);
         UsageStatistic usageStatistic;
@@ -100,13 +104,13 @@ public class JVMMonitorAgent {
             usageStatistic = usageMonitorAgent.getUsageStatistic();
 
             //            //Set UsageMonitorLog
-//            dasMemoryPublisher.setUsageLogObj(usageLogObj);
-//            dasCPUPublisher.setUsageLogObj(usageLogObj);
-//
-//            executor.execute(dasMemoryPublisher);
-//            executor.execute(dasCPUPublisher);
-//
-//            Thread.sleep(1000);
+            //            dasMemoryPublisher.setUsageLogObj(usageLogObj);
+            //            dasCPUPublisher.setUsageLogObj(usageLogObj);
+            //
+            //            executor.execute(dasMemoryPublisher);
+            //            executor.execute(dasCPUPublisher);
+            //
+            //            Thread.sleep(1000);
         }
 
     }

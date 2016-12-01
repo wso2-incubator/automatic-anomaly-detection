@@ -22,7 +22,7 @@ import java.util.List;
 */
 
 /**
- * Stores all Usage Statistices in one object with the time stamp that data has been collected
+ * Stores all Usage Statistics in one object with the time stamp that data has been collected
  * Encapsulating all the statistics with one time stamp is the main purpose
  */
 public class UsageStatistic {
@@ -32,7 +32,15 @@ public class UsageStatistic {
     private List<GarbageCollectionStatistic> garbageCollectionStatistics;
     private long timeStamp;
 
-    public UsageStatistic(List<CPUStatistic> cpuStatistics, List<MemoryStatistic> memoryStatistics, List<GarbageCollectionStatistic> garbageCollectionStatistics) {
+    /**
+     * Creates usage statistic object and encapsulate a time stamp at object creation time
+     *
+     * @param cpuStatistics
+     * @param memoryStatistics
+     * @param garbageCollectionStatistics
+     */
+    public UsageStatistic(List<CPUStatistic> cpuStatistics, List<MemoryStatistic> memoryStatistics,
+            List<GarbageCollectionStatistic> garbageCollectionStatistics) {
         this.cpuStatistics = cpuStatistics;
         this.memoryStatistics = memoryStatistics;
         this.garbageCollectionStatistics = garbageCollectionStatistics;

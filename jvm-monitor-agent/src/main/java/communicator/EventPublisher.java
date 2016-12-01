@@ -51,22 +51,19 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUStatistic cpuLog) throws DataEndpointException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointConfigurationException {
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID,
+            CPUStatistic cpuLog)
+            throws DataEndpointException, DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointConfigurationException {
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{timestamp,
-                        appID,
-                        cpuLog.getProcessCPULoad(),
-                        cpuLog.getSystemCPULoad()
-                });
+                new Object[] { timestamp, appID, cpuLog.getProcessCPULoad(), cpuLog.getSystemCPULoad() });
 
         dataPublisher.publish(event);
 
-        logger.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
+        logger.info(
+                "publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog
+                        .getSystemCPULoad());
 
     }
 
@@ -83,49 +80,36 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionStatistic gcLog) throws DataEndpointException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointConfigurationException {
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionStatistic gcLog)
+            throws DataEndpointException, DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointConfigurationException {
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{gcLog.getStartTime(),
-                        appID,
-                        gcLog.getGcType(),
-                        gcLog.getGcCause(),
-                        gcLog.getDuration(),
-                        gcLog.getEdenUsedMemoryAfterGC(),
-                        gcLog.getEdenUsedMemoryBeforeGC(),
-                        gcLog.getSurvivorUsedMemoryAfterGC(),
-                        gcLog.getSurvivorUsedMemoryBeforeGC(),
-                        gcLog.getOldGenUsedMemoryAfterGC(),
-                        gcLog.getOldGenUsedMemoryBeforeGC(),
-                        gcLog.getEdenCommittedMemoryAfterGC(),
-                        gcLog.getEdenCommittedMemoryBeforeGC(),
-                        gcLog.getSurvivorCommittedMemoryAfterGC(),
-                        gcLog.getSurvivorCommittedMemoryBeforeGC(),
-                        gcLog.getOldGenCommittedMemoryAfterGC(),
-                        gcLog.getOldGenCommittedMemoryBeforeGC(),
-                        gcLog.getEdenMaxMemoryAfterGC(),
-                        gcLog.getEdenMaxMemoryBeforeGC(),
-                        gcLog.getSurvivorMaxMemoryAfterGC(),
-                        gcLog.getSurvivorMaxMemoryBeforeGC(),
-                        gcLog.getOldGenMaxMemoryAfterGC(),
-                        gcLog.getOldGenMaxMemoryBeforeGC()});
+                new Object[] { gcLog.getStartTime(), appID, gcLog.getGcType(), gcLog.getGcCause(), gcLog.getDuration(),
+                        gcLog.getEdenUsedMemoryAfterGC(), gcLog.getEdenUsedMemoryBeforeGC(),
+                        gcLog.getSurvivorUsedMemoryAfterGC(), gcLog.getSurvivorUsedMemoryBeforeGC(),
+                        gcLog.getOldGenUsedMemoryAfterGC(), gcLog.getOldGenUsedMemoryBeforeGC(),
+                        gcLog.getEdenCommittedMemoryAfterGC(), gcLog.getEdenCommittedMemoryBeforeGC(),
+                        gcLog.getSurvivorCommittedMemoryAfterGC(), gcLog.getSurvivorCommittedMemoryBeforeGC(),
+                        gcLog.getOldGenCommittedMemoryAfterGC(), gcLog.getOldGenCommittedMemoryBeforeGC(),
+                        gcLog.getEdenMaxMemoryAfterGC(), gcLog.getEdenMaxMemoryBeforeGC(),
+                        gcLog.getSurvivorMaxMemoryAfterGC(), gcLog.getSurvivorMaxMemoryBeforeGC(),
+                        gcLog.getOldGenMaxMemoryAfterGC(), gcLog.getOldGenMaxMemoryBeforeGC() });
 
         dataPublisher.publish(event);
 
-        logger.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
-                gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
-                + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
-                + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
-                + " , " + gcLog.getEdenCommittedMemoryAfterGC() + " , " + gcLog.getEdenCommittedMemoryBeforeGC()
-                + " , " + gcLog.getSurvivorCommittedMemoryAfterGC() + " , " + gcLog.getSurvivorCommittedMemoryBeforeGC()
-                + " , " + gcLog.getOldGenCommittedMemoryAfterGC() + " , " + gcLog.getOldGenCommittedMemoryBeforeGC()
-                + " , " + gcLog.getEdenMaxMemoryAfterGC() + " , " + gcLog.getEdenMaxMemoryBeforeGC()
-                + " , " + gcLog.getSurvivorMaxMemoryAfterGC() + " , " + gcLog.getSurvivorMaxMemoryBeforeGC()
-                + " , " + gcLog.getOldGenMaxMemoryAfterGC() + " , " + gcLog.getOldGenMaxMemoryBeforeGC());
+        logger.info(
+                "publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog
+                        .getGcCause() + " , " + gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , "
+                        + gcLog.getEdenUsedMemoryBeforeGC() + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , "
+                        + gcLog.getSurvivorUsedMemoryBeforeGC() + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , "
+                        + gcLog.getOldGenUsedMemoryBeforeGC() + " , " + gcLog.getEdenCommittedMemoryAfterGC() + " , "
+                        + gcLog.getEdenCommittedMemoryBeforeGC() + " , " + gcLog.getSurvivorCommittedMemoryAfterGC()
+                        + " , " + gcLog.getSurvivorCommittedMemoryBeforeGC() + " , " + gcLog
+                        .getOldGenCommittedMemoryAfterGC() + " , " + gcLog.getOldGenCommittedMemoryBeforeGC() + " , "
+                        + gcLog.getEdenMaxMemoryAfterGC() + " , " + gcLog.getEdenMaxMemoryBeforeGC() + " , " + gcLog
+                        .getSurvivorMaxMemoryAfterGC() + " , " + gcLog.getSurvivorMaxMemoryBeforeGC() + " , " + gcLog
+                        .getOldGenMaxMemoryAfterGC() + " , " + gcLog.getOldGenMaxMemoryBeforeGC());
 
     }
 
@@ -143,31 +127,24 @@ public class EventPublisher {
      * @throws TransportException
      * @throws DataEndpointConfigurationException
      */
-    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, MemoryStatistic memoryLog) throws DataEndpointException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointConfigurationException {
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID,
+            MemoryStatistic memoryLog)
+            throws DataEndpointException, DataEndpointAuthenticationException, DataEndpointAgentConfigurationException,
+            TransportException, DataEndpointConfigurationException {
 
         Event event = new Event(streamId, System.currentTimeMillis(), null, null,
-                new Object[]{timestamp,
-                        appID,
-                        memoryLog.getMaxHeapMemory(),
-                        memoryLog.getAllocatedHeapMemory(),
-                        memoryLog.getUsedHeapMemory(),
-                        memoryLog.getMaxNonHeapMemory(),
-                        memoryLog.getAllocatedNonHeapMemory(),
-                        memoryLog.getUsedNonHeapMemory(),
-                        memoryLog.getPendingFinalizations()
-                });
+                new Object[] { timestamp, appID, memoryLog.getMaxHeapMemory(), memoryLog.getAllocatedHeapMemory(),
+                        memoryLog.getUsedHeapMemory(), memoryLog.getMaxNonHeapMemory(),
+                        memoryLog.getAllocatedNonHeapMemory(), memoryLog.getUsedNonHeapMemory(),
+                        memoryLog.getPendingFinalizations() });
 
         dataPublisher.publish(event);
 
-        logger.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , " + memoryLog.getAllocatedHeapMemory()
-                + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog.getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory()
-                + " , " + memoryLog.getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations());
+        logger.info("publish Memory data : " + timestamp + " , " + appID + " , " + memoryLog.getMaxHeapMemory() + " , "
+                + memoryLog.getAllocatedHeapMemory() + " , " + memoryLog.getUsedHeapMemory() + " , " + memoryLog
+                .getMaxNonHeapMemory() + " , " + memoryLog.getAllocatedNonHeapMemory() + " , " + memoryLog
+                .getUsedNonHeapMemory() + " , " + memoryLog.getPendingFinalizations());
 
     }
-
 
 }

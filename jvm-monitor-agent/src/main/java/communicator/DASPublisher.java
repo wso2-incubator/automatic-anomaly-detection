@@ -32,7 +32,6 @@ import java.io.File;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-
 public class DASPublisher {
 
     private final static Logger logger = Logger.getLogger(DASPublisher.class);
@@ -59,13 +58,9 @@ public class DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(String host, int defaultThriftPort, String username, String password, String streamName, String streamVersion) throws
-            SocketException,
-            UnknownHostException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointException,
+    public DASPublisher(String host, int defaultThriftPort, String username, String password, String streamName,
+            String streamVersion) throws SocketException, UnknownHostException, DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
             DataEndpointConfigurationException {
 
         logger.info("Starting DAS HttpLog Agent");
@@ -92,7 +87,8 @@ public class DASPublisher {
      * @return Data agent config path
      */
     private static String getDataAgentConfigPath() {
-        File filePath = new File("jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
+        File filePath = new File(
+                "jvm-monitor-agent" + File.separator + "src" + File.separator + "main" + File.separator + "resources");
         if (!filePath.exists()) {
             filePath = new File("test" + File.separator + "resources");
         }
@@ -143,25 +139,25 @@ public class DASPublisher {
         dataPublisher.shutdown();
     }
 
-//    /**
-//     * @return Local Host Address
-//     * @throws SocketException
-//     * @throws UnknownHostException
-//     */
-//    private static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
-//        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-//        while (ifaces.hasMoreElements()) {
-//            NetworkInterface iface = ifaces.nextElement();
-//            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-//
-//            while (addresses.hasMoreElements()) {
-//                InetAddress addr = addresses.nextElement();
-//                if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-//                    return addr;
-//                }
-//            }
-//        }
-//        return InetAddress.getLocalHost();
-//    }
+    //    /**
+    //     * @return Local Host Address
+    //     * @throws SocketException
+    //     * @throws UnknownHostException
+    //     */
+    //    private static InetAddress getLocalAddress() throws SocketException, UnknownHostException {
+    //        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+    //        while (ifaces.hasMoreElements()) {
+    //            NetworkInterface iface = ifaces.nextElement();
+    //            Enumeration<InetAddress> addresses = iface.getInetAddresses();
+    //
+    //            while (addresses.hasMoreElements()) {
+    //                InetAddress addr = addresses.nextElement();
+    //                if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+    //                    return addr;
+    //                }
+    //            }
+    //        }
+    //        return InetAddress.getLocalHost();
+    //    }
 
 }

@@ -31,7 +31,6 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-
 public class MemoryPublisher extends DASPublisher implements Runnable {
 
     /**
@@ -67,13 +66,9 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public MemoryPublisher(String hostname, int defaultThriftPort, String username, String password) throws
-            SocketException,
-            UnknownHostException,
-            DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException,
-            DataEndpointException,
+    public MemoryPublisher(String hostname, int defaultThriftPort, String username, String password)
+            throws SocketException, UnknownHostException, DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
             DataEndpointConfigurationException {
 
         super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
@@ -89,13 +84,13 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
         this.usageLogObj = usageLogObj;
     }
 
-    @Override
-    public void run() {
+    @Override public void run() {
 
         try {
             //Send data to EventPublisher
             try {
-                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (MemoryStatistic) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
+                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID,
+                        (MemoryStatistic) usageLogObj.getUsageLog(MonitorType.MEMORY_USAGE_MONITOR.getValue()));
             } catch (UnknownMonitorAgentTypeException e) {
                 e.printStackTrace();
             }
