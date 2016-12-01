@@ -18,19 +18,27 @@
 
 package communicator;
 
-import jvmmonitor.models.GarbageCollectionStatistic;
+import jvmmonitor.management.models.GarbageCollectionLog;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
-
+/**
+ *
+ */
 public class GCPublisher extends DASPublisher {
+
+    private final static Logger logger = Logger.getLogger(GCPublisher.class);
 
     /**
      * Set default Garbage collection log Stream
@@ -80,7 +88,7 @@ public class GCPublisher extends DASPublisher {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public GCPublisher(String hostname, int defaultThriftPort, String username, String password) throws
+    public GCPublisher(String hostname, int defaultThriftPort, int securePort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -89,7 +97,68 @@ public class GCPublisher extends DASPublisher {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
+        super(hostname, defaultThriftPort, securePort, username, password);
+        setDataStream(streamName, streamVersion);
+        logger.info("Starting DAS GC Publisher");
+
+    }
+
+    /**
+     * This method publish Garbage Collection Log data to DAS
+     *
+     * @param dataPublisher
+     * @param streamId
+     * @param appID
+     * @param gcLog
+     * @throws DataEndpointException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     */
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, String appID, GarbageCollectionLog gcLog) throws DataEndpointException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointConfigurationException {
+
+        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                new Object[]{gcLog.getStartTime(),
+                        appID,
+                        gcLog.getGcType(),
+                        gcLog.getGcCause(),
+                        gcLog.getDuration(),
+                        gcLog.getEdenUsedMemoryAfterGC(),
+                        gcLog.getEdenUsedMemoryBeforeGC(),
+                        gcLog.getSurvivorUsedMemoryAfterGC(),
+                        gcLog.getSurvivorUsedMemoryBeforeGC(),
+                        gcLog.getOldGenUsedMemoryAfterGC(),
+                        gcLog.getOldGenUsedMemoryBeforeGC(),
+                        gcLog.getEdenCommittedMemoryAfterGC(),
+                        gcLog.getEdenCommittedMemoryBeforeGC(),
+                        gcLog.getSurvivorCommittedMemoryAfterGC(),
+                        gcLog.getSurvivorCommittedMemoryBeforeGC(),
+                        gcLog.getOldGenCommittedMemoryAfterGC(),
+                        gcLog.getOldGenCommittedMemoryBeforeGC(),
+                        gcLog.getEdenMaxMemoryAfterGC(),
+                        gcLog.getEdenMaxMemoryBeforeGC(),
+                        gcLog.getSurvivorMaxMemoryAfterGC(),
+                        gcLog.getSurvivorMaxMemoryBeforeGC(),
+                        gcLog.getOldGenMaxMemoryAfterGC(),
+                        gcLog.getOldGenMaxMemoryBeforeGC()});
+
+        dataPublisher.publish(event);
+
+        logger.info("publish GC data : " + gcLog.getStartTime() + " , " + appID + " , " + gcLog.getGcType() + " , " + gcLog.getGcCause() + " , " +
+                gcLog.getDuration() + " , " + gcLog.getEdenUsedMemoryAfterGC() + " , " + gcLog.getEdenUsedMemoryBeforeGC()
+                + " , " + gcLog.getSurvivorUsedMemoryAfterGC() + " , " + gcLog.getSurvivorUsedMemoryBeforeGC()
+                + " , " + gcLog.getOldGenUsedMemoryAfterGC() + " , " + gcLog.getOldGenUsedMemoryBeforeGC()
+                + " , " + gcLog.getEdenCommittedMemoryAfterGC() + " , " + gcLog.getEdenCommittedMemoryBeforeGC()
+                + " , " + gcLog.getSurvivorCommittedMemoryAfterGC() + " , " + gcLog.getSurvivorCommittedMemoryBeforeGC()
+                + " , " + gcLog.getOldGenCommittedMemoryAfterGC() + " , " + gcLog.getOldGenCommittedMemoryBeforeGC()
+                + " , " + gcLog.getEdenMaxMemoryAfterGC() + " , " + gcLog.getEdenMaxMemoryBeforeGC()
+                + " , " + gcLog.getSurvivorMaxMemoryAfterGC() + " , " + gcLog.getSurvivorMaxMemoryBeforeGC()
+                + " , " + gcLog.getOldGenMaxMemoryAfterGC() + " , " + gcLog.getOldGenMaxMemoryBeforeGC());
 
     }
 
@@ -103,17 +172,20 @@ public class GCPublisher extends DASPublisher {
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public void publishGCData(LinkedList<GarbageCollectionStatistic> garbageCollectionLog) throws DataEndpointAuthenticationException,
+    public void publishGCData(LinkedList<GarbageCollectionLog> garbageCollectionLog) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException,
             DataEndpointException,
             DataEndpointConfigurationException,
             TransportException {
 
         while (!garbageCollectionLog.isEmpty()) {
-            eventAgent.publishLogEvents(dataPublisher, dataStream, appID, garbageCollectionLog.poll());
+            publishLogEvents(dataPublisher, dataStream, appID, garbageCollectionLog.poll());
         }
 
     }
 
-
+    @Override
+    protected void setDataStream(String streamName, String streamVersion) {
+        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
+    }
 }

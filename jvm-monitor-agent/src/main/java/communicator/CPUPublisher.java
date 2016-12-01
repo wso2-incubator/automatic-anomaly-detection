@@ -18,21 +18,28 @@
 
 package communicator;
 
-import jvmmonitor.exceptions.UnknownMonitorAgentTypeException;
+import jvmmonitor.exceptions.UnknownMonitorTypeException;
 import jvmmonitor.management.MonitorType;
-import jvmmonitor.models.CPUStatistic;
+import jvmmonitor.management.models.CPUUsageLog;
 import jvmmonitor.models.UsageMonitorLog;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
 
 public class CPUPublisher extends DASPublisher implements Runnable {
+
+    private final static Logger logger = Logger.getLogger(CPUPublisher.class);
+    private UsageMonitorLog usageLogObj;
 
     /**
      * Set default CPU usage stream
@@ -46,7 +53,6 @@ public class CPUPublisher extends DASPublisher implements Runnable {
      */
     private static final String streamName = "CPUUsageStream";
     private static final String streamVersion = "1.0.0";
-    private UsageMonitorLog usageLogObj;
 
     /**
      * Constructor
@@ -62,7 +68,7 @@ public class CPUPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public CPUPublisher(String hostname, int defaultThriftPort, String username, String password) throws
+    public CPUPublisher(String hostname, int defaultThriftPort, int securePort, String username, String password) throws
             SocketException,
             UnknownHostException,
             DataEndpointAuthenticationException,
@@ -71,7 +77,9 @@ public class CPUPublisher extends DASPublisher implements Runnable {
             DataEndpointException,
             DataEndpointConfigurationException {
 
-        super(hostname, defaultThriftPort, username, password, streamName, streamVersion);
+        super(hostname, defaultThriftPort, securePort, username, password);
+        setDataStream(streamName, streamVersion);
+        logger.info("Starting DAS CPU Publisher");
 
     }
 
@@ -84,28 +92,64 @@ public class CPUPublisher extends DASPublisher implements Runnable {
         this.usageLogObj = usageLogObj;
     }
 
+    /**
+     * This method publish CPU Load Log data to DAS
+     *
+     * @param dataPublisher
+     * @param streamId
+     * @param timestamp
+     * @param appID
+     * @param cpuLog
+     * @throws DataEndpointException
+     * @throws DataEndpointAuthenticationException
+     * @throws DataEndpointAgentConfigurationException
+     * @throws TransportException
+     * @throws DataEndpointConfigurationException
+     */
+    void publishLogEvents(DataPublisher dataPublisher, String streamId, long timestamp, String appID, CPUUsageLog cpuLog) throws DataEndpointException,
+            DataEndpointAuthenticationException,
+            DataEndpointAgentConfigurationException,
+            TransportException,
+            DataEndpointConfigurationException {
+
+        Event event = new Event(streamId, System.currentTimeMillis(), null, null,
+                new Object[]{timestamp,
+                        appID,
+                        cpuLog.getProcessCPULoad(),
+                        cpuLog.getSystemCPULoad()
+                });
+
+        dataPublisher.publish(event);
+
+        logger.info("publish CPU data : " + timestamp + " , " + appID + " , " + cpuLog.getProcessCPULoad() + " , " + cpuLog.getSystemCPULoad());
+
+    }
+
     @Override
     public void run() {
 
         try {
             //Send data to EventPublisher
-            try {
-                eventAgent.publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (CPUStatistic) usageLogObj.getUsageLog(MonitorType.CPU_USAGE_MONITOR.getValue()));
-            } catch (UnknownMonitorAgentTypeException e) {
-                e.printStackTrace();
-            }
+            publishLogEvents(dataPublisher, dataStream, usageLogObj.getTimeStamp(), appID, (CPUUsageLog) usageLogObj.getUsageLog(MonitorType.CPU_USAGE_MONITOR.getValue()));
+
         } catch (DataEndpointConfigurationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (DataEndpointAgentConfigurationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (DataEndpointException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (TransportException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } catch (DataEndpointAuthenticationException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        } catch (UnknownMonitorTypeException e) {
+            logger.error(e.getMessage(), e);
         }
 
     }
 
+    @Override
+    protected void setDataStream(String streamName, String streamVersion) {
+        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
+    }
 }
