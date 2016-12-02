@@ -58,7 +58,7 @@ public abstract class DASPublisher {
                 , dasConfigurations.getTrustStorePassword());
 
         String type = "Thrift";
-        String url = "tcp://" + dasConfigurations.getHost() + ":" + dasConfigurations.getDefaultThriftPort();
+        String url = "tcp://" + dasConfigurations.getHost() + ":" + dasConfigurations.getThriftPort();
         String authURL = "ssl://" + dasConfigurations.getHost() + ":" + dasConfigurations.getSecurePort();
 
         dataPublisher = new DataPublisher(type, url, authURL, dasConfigurations.getUsername()

@@ -36,7 +36,7 @@ public class DASConfigurations {
     private final static Logger logger = Logger.getLogger(DASConfigurations.class);
 
     private final String host;
-    private final int defaultThriftPort;
+    private final int thriftPort;
     private final int securePort;
     private final String username;
     private final String password;
@@ -48,7 +48,7 @@ public class DASConfigurations {
      * Constructor
      *
      * @param host
-     * @param defaultThriftPort
+     * @param thriftPort
      * @param securePort
      * @param username
      * @param password
@@ -56,7 +56,7 @@ public class DASConfigurations {
      * @param trustStorePath
      * @param trustStorePassword
      */
-    public DASConfigurations(String host, int defaultThriftPort, int securePort, String username, String password
+    public DASConfigurations(String host, int thriftPort, int securePort, String username, String password
             , String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
 
         if (host == "localhost") {
@@ -68,7 +68,7 @@ public class DASConfigurations {
         }
 
         this.host = host;
-        this.defaultThriftPort = defaultThriftPort;
+        this.thriftPort = thriftPort;
         this.securePort = securePort;
         this.username = username;
         this.password = password;
@@ -83,8 +83,8 @@ public class DASConfigurations {
         return host;
     }
 
-    public int getDefaultThriftPort() {
-        return defaultThriftPort;
+    public int getThriftPort() {
+        return thriftPort;
     }
 
     public int getSecurePort() {
