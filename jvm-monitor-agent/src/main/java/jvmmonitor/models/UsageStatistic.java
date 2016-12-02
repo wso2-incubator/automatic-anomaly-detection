@@ -40,7 +40,7 @@ public class UsageStatistic {
      * @param garbageCollectionStatistics
      */
     public UsageStatistic(List<CPUStatistic> cpuStatistics, List<MemoryStatistic> memoryStatistics,
-            List<GarbageCollectionStatistic> garbageCollectionStatistics) {
+                          List<GarbageCollectionStatistic> garbageCollectionStatistics) {
         this.cpuStatistics = cpuStatistics;
         this.memoryStatistics = memoryStatistics;
         this.garbageCollectionStatistics = garbageCollectionStatistics;

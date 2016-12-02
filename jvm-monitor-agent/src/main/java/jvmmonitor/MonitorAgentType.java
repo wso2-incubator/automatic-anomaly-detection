@@ -30,10 +30,6 @@ public enum MonitorAgentType {
         this.value = value;
     }
 
-    public String getValue() {
-        return this.value;
-    }
-
     /**
      * get {@link MonitorAgentType} for a given value.
      */
@@ -44,6 +40,10 @@ public enum MonitorAgentType {
             }
         }
         return null;
+    }
+
+    public String getValue() {
+        return this.value;
     }
 
 }

@@ -37,7 +37,7 @@ public class NormalApp2 {
                 len = Integer.parseInt(args[0]);
                 size = Integer.parseInt(args[1]);
             }
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
 
         }
 
@@ -45,10 +45,10 @@ public class NormalApp2 {
         executor.execute(len, size);
     }
 
-    public void execute(int len, int size){
+    public void execute(int len, int size) {
 
-        for(int i=0; i< len; i++){
-            Thread program = new Thread(new Program(i+1, size));
+        for (int i = 0; i < len; i++) {
+            Thread program = new Thread(new Program(i + 1, size));
             program.start();
         }
 
@@ -72,17 +72,17 @@ public class NormalApp2 {
 
             while (true) {
 
-                int limit = random.nextInt(size - size/2) + size/2;
+                int limit = random.nextInt(size - size / 2) + size / 2;
 
                 for (int i = 0; i < limit; i++) {
-                    int len = random.nextInt(size/2);
+                    int len = random.nextInt(size / 2);
 
-                    if (len > 500000){
+                    if (len > 500000) {
                         len = 500000;
                     }
                     ArrayList<Long> arrayList = new ArrayList<Long>(len);
 
-                    for(int k = 0 ; k < arrayList.size(); k++){
+                    for (int k = 0; k < arrayList.size(); k++) {
                         Long number = random.nextLong();
                         arrayList.add(number);
                         System.out.println("Thread" + index + "- Number added to the list : " + number);
@@ -98,7 +98,7 @@ public class NormalApp2 {
                 }
 
                 int j = 0;
-                while (j < limit){
+                while (j < limit) {
 
                     j++;
                     System.out.println("Thread" + index + "- count =" + j);

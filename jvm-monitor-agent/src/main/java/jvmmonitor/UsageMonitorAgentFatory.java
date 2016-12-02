@@ -46,19 +46,19 @@ public class UsageMonitorAgentFatory {
 
         UsageMonitorAgent usageMonitorAgent;
         switch (type) {
-        case JMX:
-            usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.targetAddress,
-                    PropertyLoader.targetRmiServerPort, PropertyLoader.targetRmiRegistryPort,
-                    PropertyLoader.targetUsername, PropertyLoader.targetPassword);
-            break;
-        case PROCESS_ID:
-            usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.pid);
-            break;
-        case SNMP:
-            usageMonitorAgent = new SNMPUsageMonitorAgent(PropertyLoader.snmpAddress, PropertyLoader.snmpPort);
-            break;
-        default:
-            throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorAgentType);
+            case JMX:
+                usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.targetAddress,
+                        PropertyLoader.targetRmiServerPort, PropertyLoader.targetRmiRegistryPort,
+                        PropertyLoader.targetUsername, PropertyLoader.targetPassword);
+                break;
+            case PROCESS_ID:
+                usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.pid);
+                break;
+            case SNMP:
+                usageMonitorAgent = new SNMPUsageMonitorAgent(PropertyLoader.snmpAddress, PropertyLoader.snmpPort);
+                break;
+            default:
+                throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorAgentType);
         }
 
         return usageMonitorAgent;

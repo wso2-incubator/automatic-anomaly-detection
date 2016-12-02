@@ -16,9 +16,7 @@
 * under the License.
 */
 
-import java.lang.management.GarbageCollectorMXBean;
-
-public class GenerateOOM{
+public class GenerateOOM {
 
     public static void main(String[] args) throws Exception {
         Thread.sleep(5000);
@@ -27,42 +25,42 @@ public class GenerateOOM{
         int y = 10000;
         long z = 10000000L;
 
-        try{
-            if (args.length == 1){
-                    x = Double.parseDouble(args[0]);
+        try {
+            if (args.length == 1) {
+                x = Double.parseDouble(args[0]);
 
             }
             if (args.length == 2) {
 
-                    x = Double.parseDouble(args[0]);
-                    y = Integer.parseInt(args[1]);
+                x = Double.parseDouble(args[0]);
+                y = Integer.parseInt(args[1]);
 
             }
 
             if (args.length > 2) {
 
-                    x = Double.parseDouble(args[0]);
-                    y = Integer.parseInt(args[1]);
-                    z = Long.parseLong(args[2]);
+                x = Double.parseDouble(args[0]);
+                y = Integer.parseInt(args[1]);
+                z = Long.parseLong(args[2]);
             }
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
 
         }
 
-        generateOOM(x,y,z);
+        generateOOM(x, y, z);
     }
 
 
     /**
      * This method generate Out of memory exception eventually
-     *
+     * <p>
      * Generate int arrays with growing length
      *
      * @param multiplier
      * @param addition
      * @throws Exception
      */
-    static void generateOOM(double multiplier , int addition, long limit) throws Exception {
+    static void generateOOM(double multiplier, int addition, long limit) throws Exception {
 
         int iteratorValue = 10;
 
@@ -78,14 +76,13 @@ public class GenerateOOM{
             } while (loop1 > 0);
 
             //increase the length of next array
-            iteratorValue = (int)(iteratorValue * multiplier) + addition;
+            iteratorValue = (int) (iteratorValue * multiplier) + addition;
 
-            if (limit!=-1 && iteratorValue >= limit ){
+            if (limit != -1 && iteratorValue >= limit) {
                 iteratorValue = 10;
                 System.gc();
 
             }
-
 
 
             Thread.sleep(500);
