@@ -73,7 +73,10 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
 
         super(dasConfigurations);
         setDataStream(streamName, streamVersion);
-        logger.info("Starting DAS Memory Publisher");
+
+        logger.info("Starting Memory Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
+                + dasConfigurations.getThriftPort() + "\tStreamName: " + streamName + ":" + streamVersion);
+
     }
 
 
