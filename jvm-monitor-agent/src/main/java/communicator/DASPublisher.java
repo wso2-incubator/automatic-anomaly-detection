@@ -30,7 +30,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import java.io.File;
 
 /**
- *
+ * This is set data-agent-configurations, create DataPublisher instance
  */
 public abstract class DASPublisher {
 
@@ -51,28 +51,20 @@ public abstract class DASPublisher {
      * @throws DataEndpointConfigurationException
      */
     public DASPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            TransportException, DataEndpointException,
+            DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
             DataEndpointConfigurationException {
 
-        setDataAgentConfigurations(dasConfigurations.getDataAgentConfPath(), dasConfigurations.getTrustStorePath(), dasConfigurations.getTrustStorePassword());
+        setDataAgentConfigurations(dasConfigurations.getDataAgentConfPath(), dasConfigurations.getTrustStorePath()
+                , dasConfigurations.getTrustStorePassword());
 
         String type = "Thrift";
         String url = "tcp://" + dasConfigurations.getHost() + ":" + dasConfigurations.getDefaultThriftPort();
         String authURL = "ssl://" + dasConfigurations.getHost() + ":" + dasConfigurations.getSecurePort();
 
-        dataPublisher = new DataPublisher(type, url, authURL, dasConfigurations.getUsername(), dasConfigurations.getPassword());
+        dataPublisher = new DataPublisher(type, url, authURL, dasConfigurations.getUsername()
+                , dasConfigurations.getPassword());
 
     }
-
-//    /**
-//     * Need to set this to identify particular application
-//     *
-//     * @param applicationId
-//     */
-//    public void setApplicationId(String applicationId) {
-//        this.applicationId = applicationId;
-//    }
 
     /**
      * Generate Stream ID
@@ -96,7 +88,8 @@ public abstract class DASPublisher {
         dataPublisher.shutdown();
     }
 
-    private void setDataAgentConfigurations(String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
+    private void setDataAgentConfigurations(String dataAgentConfPath, String trustStorePath,
+                                            String trustStorePassword) {
 
         //Set data-agent-conf.xml file path
         File dataAgentFilePath = new File(dataAgentConfPath + File.separator + "data-agent-conf.xml");

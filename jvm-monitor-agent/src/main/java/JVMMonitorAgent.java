@@ -49,8 +49,7 @@ public class JVMMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
-    public static void main(String[] args) throws AgentLoadException,
-            AgentInitializationException {
+    public static void main(String[] args) throws AgentLoadException, AgentInitializationException {
 
         try {
             PropertyLoader.loadProperties();
@@ -59,7 +58,8 @@ public class JVMMonitorAgent {
             JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
             jvmMonitor.runAgent();
 
-        } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed | UnknownMonitorAgentTypeException | AccessingUsageStatisticFailedException e) {
+        } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
+                | UnknownMonitorAgentTypeException | AccessingUsageStatisticFailedException e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -69,7 +69,8 @@ public class JVMMonitorAgent {
      * Start monitoring of JVMs
      * Select between remote monitoring and local monitoring according to the configurations
      */
-    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException, AccessingUsageStatisticFailedException, PublisherInitializationException {
+    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
+            AccessingUsageStatisticFailedException, PublisherInitializationException {
 
         GCPublisher dasGCPublisher;
         MemoryPublisher dasMemoryPublisher;
@@ -81,10 +82,13 @@ public class JVMMonitorAgent {
                 PropertyLoader.trustStorePassword);
 
         try {
+
             dasMemoryPublisher = new MemoryPublisher(dasConfigurations);
             dasCPUPublisher = new CPUPublisher(dasConfigurations);
             dasGCPublisher = new GCPublisher(dasConfigurations);
-        } catch (DataEndpointException | TransportException | DataEndpointAuthenticationException | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
+
+        } catch (DataEndpointException | TransportException | DataEndpointAuthenticationException
+                | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
             throw new PublisherInitializationException(e.getMessage(), e);
         }
 
@@ -94,13 +98,17 @@ public class JVMMonitorAgent {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         UsageStatistic usageStatistic;
         int counter = 1;
+
         while (true) {
             usageStatistic = usageMonitorAgent.getUsageStatistic();
 
             //Set data to publisher
-            dasGCPublisher.setGarbageCollectionStatistic(usageStatistic.getGarbageCollectionStatistics(), targetedApplicationId, usageStatistic.getTimeStamp());
-            dasMemoryPublisher.setMemoryStatistic(usageStatistic.getMemoryStatistics(), targetedApplicationId, usageStatistic.getTimeStamp());
-            dasCPUPublisher.setCPUStatistic(usageStatistic.getCpuStatistics(), targetedApplicationId, usageStatistic.getTimeStamp());
+            dasGCPublisher.setGarbageCollectionStatistic(usageStatistic.getGarbageCollectionStatistics()
+                    , targetedApplicationId, usageStatistic.getTimeStamp());
+            dasMemoryPublisher.setMemoryStatistic(usageStatistic.getMemoryStatistics(), targetedApplicationId
+                    , usageStatistic.getTimeStamp());
+            dasCPUPublisher.setCPUStatistic(usageStatistic.getCpuStatistics(), targetedApplicationId
+                    , usageStatistic.getTimeStamp());
 
             executor.execute(dasGCPublisher);
 

@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 /**
- * This class contains configurations of DAS publisher
+ * This is contains configurations of DAS publisher
  */
 public class DASConfigurations {
 
@@ -56,7 +56,8 @@ public class DASConfigurations {
      * @param trustStorePath
      * @param trustStorePassword
      */
-    public DASConfigurations(String host, int defaultThriftPort, int securePort, String username, String password, String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
+    public DASConfigurations(String host, int defaultThriftPort, int securePort, String username, String password
+            , String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
 
         if (host == "localhost") {
             try {

@@ -31,7 +31,7 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import java.util.List;
 
 /**
- * This class send Memory statistic to DAS for every 100ms
+ * This is send Memory statistic to DAS for every 1 second
  */
 public class MemoryPublisher extends DASPublisher implements Runnable {
 
@@ -68,9 +68,7 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
      * @throws TransportException
      */
     public MemoryPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
+            DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
             TransportException {
 
         super(dasConfigurations);
@@ -115,9 +113,11 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
 
             dataPublisher.publish(event);
 
-            logger.info("publish Memory data : " + timestamp + " , " + applicationId + " , " + memoryStat.getMaxHeapMemory() + " , " + memoryStat.getAllocatedHeapMemory()
-                    + " , " + memoryStat.getUsedHeapMemory() + " , " + memoryStat.getMaxNonHeapMemory() + " , " + memoryStat.getAllocatedNonHeapMemory()
-                    + " , " + memoryStat.getUsedNonHeapMemory() + " , " + memoryStat.getPendingFinalizations());
+            logger.info("publish Memory data : " + timestamp + " , " + applicationId + " , "
+                    + memoryStat.getMaxHeapMemory() + " , " + memoryStat.getAllocatedHeapMemory()
+                    + " , " + memoryStat.getUsedHeapMemory() + " , " + memoryStat.getMaxNonHeapMemory()
+                    + " , " + memoryStat.getAllocatedNonHeapMemory() + " , " + memoryStat.getUsedNonHeapMemory()
+                    + " , " + memoryStat.getPendingFinalizations());
         }
 
     }

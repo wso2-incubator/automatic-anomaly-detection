@@ -31,7 +31,7 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import java.util.List;
 
 /**
- * This class send Garbage collection statistic to DAS for every 100ms
+ * This is send Garbage collection statistic to DAS for every 100 millisecond
  */
 public class GCPublisher extends DASPublisher implements Runnable {
 
@@ -84,9 +84,7 @@ public class GCPublisher extends DASPublisher implements Runnable {
      * @throws TransportException
      */
     public GCPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
+            DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
             TransportException {
 
         super(dasConfigurations);
@@ -102,10 +100,13 @@ public class GCPublisher extends DASPublisher implements Runnable {
      * @param applicationId
      * @param timestamp
      */
-    public void setGarbageCollectionStatistic(List<GarbageCollectionStatistic> garbageCollectionStatistics, String applicationId, long timestamp) {
+    public void setGarbageCollectionStatistic(List<GarbageCollectionStatistic> garbageCollectionStatistics
+            , String applicationId, long timestamp) {
+
         this.garbageCollectionStatistics = garbageCollectionStatistics;
         this.applicationId = applicationId;
         this.timestamp = timestamp;
+
     }
 
     /**
@@ -145,16 +146,27 @@ public class GCPublisher extends DASPublisher implements Runnable {
                 dataPublisher.publish(event);
 
                 logger.info("publish GC data : " + gcStat.getStartTime() + " , " + applicationId
-                        + " , " + gcStat.getGcType() + " , " + gcStat.getGcCause() + " , " +
-                        gcStat.getDuration() + " , " + gcStat.getEdenUsedMemoryAfterGC() + " , " + gcStat.getEdenUsedMemoryBeforeGC()
-                        + " , " + gcStat.getSurvivorUsedMemoryAfterGC() + " , " + gcStat.getSurvivorUsedMemoryBeforeGC()
-                        + " , " + gcStat.getOldGenUsedMemoryAfterGC() + " , " + gcStat.getOldGenUsedMemoryBeforeGC()
-                        + " , " + gcStat.getEdenCommittedMemoryAfterGC() + " , " + gcStat.getEdenCommittedMemoryBeforeGC()
-                        + " , " + gcStat.getSurvivorCommittedMemoryAfterGC() + " , " + gcStat.getSurvivorCommittedMemoryBeforeGC()
-                        + " , " + gcStat.getOldGenCommittedMemoryAfterGC() + " , " + gcStat.getOldGenCommittedMemoryBeforeGC()
-                        + " , " + gcStat.getEdenMaxMemoryAfterGC() + " , " + gcStat.getEdenMaxMemoryBeforeGC()
-                        + " , " + gcStat.getSurvivorMaxMemoryAfterGC() + " , " + gcStat.getSurvivorMaxMemoryBeforeGC()
-                        + " , " + gcStat.getOldGenMaxMemoryAfterGC() + " , " + gcStat.getOldGenMaxMemoryBeforeGC());
+                        + " , " + gcStat.getGcType()
+                        + " , " + gcStat.getGcCause()
+                        + " , " + gcStat.getDuration()
+                        + " , " + gcStat.getEdenUsedMemoryAfterGC()
+                        + " , " + gcStat.getEdenUsedMemoryBeforeGC()
+                        + " , " + gcStat.getSurvivorUsedMemoryAfterGC()
+                        + " , " + gcStat.getSurvivorUsedMemoryBeforeGC()
+                        + " , " + gcStat.getOldGenUsedMemoryAfterGC()
+                        + " , " + gcStat.getOldGenUsedMemoryBeforeGC()
+                        + " , " + gcStat.getEdenCommittedMemoryAfterGC()
+                        + " , " + gcStat.getEdenCommittedMemoryBeforeGC()
+                        + " , " + gcStat.getSurvivorCommittedMemoryAfterGC()
+                        + " , " + gcStat.getSurvivorCommittedMemoryBeforeGC()
+                        + " , " + gcStat.getOldGenCommittedMemoryAfterGC()
+                        + " , " + gcStat.getOldGenCommittedMemoryBeforeGC()
+                        + " , " + gcStat.getEdenMaxMemoryAfterGC()
+                        + " , " + gcStat.getEdenMaxMemoryBeforeGC()
+                        + " , " + gcStat.getSurvivorMaxMemoryAfterGC()
+                        + " , " + gcStat.getSurvivorMaxMemoryBeforeGC()
+                        + " , " + gcStat.getOldGenMaxMemoryAfterGC()
+                        + " , " + gcStat.getOldGenMaxMemoryBeforeGC());
             }
         }
 
@@ -169,4 +181,5 @@ public class GCPublisher extends DASPublisher implements Runnable {
     public void run() {
         publishEvents();
     }
+
 }

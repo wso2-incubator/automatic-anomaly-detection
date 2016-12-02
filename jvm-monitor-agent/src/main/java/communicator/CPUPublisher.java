@@ -31,7 +31,7 @@ import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import java.util.List;
 
 /**
- * This class send CPU statistic to DAS for every 100ms
+ * This is send CPU statistic to DAS for every 1 second
  */
 public class CPUPublisher extends DASPublisher implements Runnable {
 
@@ -63,9 +63,7 @@ public class CPUPublisher extends DASPublisher implements Runnable {
      * @throws TransportException
      */
     public CPUPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException,
-            DataEndpointException,
-            DataEndpointConfigurationException,
+            DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
             TransportException {
 
         super(dasConfigurations);
@@ -105,7 +103,8 @@ public class CPUPublisher extends DASPublisher implements Runnable {
 
             dataPublisher.publish(event);
 
-            logger.info("publish CPU data : " + timestamp + " , " + applicationId + " , " + cpuStat.getProcessCPULoad() + " , " + cpuStat.getSystemCPULoad());
+            logger.info("publish CPU data : " + timestamp + " , " + applicationId + " , " + cpuStat.getProcessCPULoad()
+                    + " , " + cpuStat.getSystemCPULoad());
         }
 
     }
