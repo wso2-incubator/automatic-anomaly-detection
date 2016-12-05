@@ -20,7 +20,7 @@ import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
 import communicator.CPUPublisher;
 import communicator.DASConfigurations;
-import communicator.GCPublisher;
+import communicator.GarbageCollectionPublisher;
 import communicator.MemoryPublisher;
 import exceptions.PropertyCannotBeLoadedException;
 import exceptions.PublisherInitializationException;
@@ -72,7 +72,7 @@ public class JVMMonitorAgent {
     private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
             AccessingUsageStatisticFailedException, PublisherInitializationException {
 
-        GCPublisher dasGCPublisher;
+        GarbageCollectionPublisher dasGCPublisher;
         MemoryPublisher dasMemoryPublisher;
         CPUPublisher dasCPUPublisher;
 
@@ -85,7 +85,7 @@ public class JVMMonitorAgent {
 
             dasMemoryPublisher = new MemoryPublisher(dasConfigurations);
             dasCPUPublisher = new CPUPublisher(dasConfigurations);
-            dasGCPublisher = new GCPublisher(dasConfigurations);
+            dasGCPublisher = new GarbageCollectionPublisher(dasConfigurations);
 
         } catch (DataEndpointException | TransportException | DataEndpointAuthenticationException
                 | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
@@ -97,25 +97,30 @@ public class JVMMonitorAgent {
 
         ExecutorService executor = Executors.newFixedThreadPool(4);
         UsageStatistic usageStatistic;
-        int counter = 1;
+        int counter = 0;
 
         while (true) {
+
+            counter++;
             usageStatistic = usageMonitorAgent.getUsageStatistic();
 
             //Set data to publisher
             dasGCPublisher.setGarbageCollectionStatistic(usageStatistic.getGarbageCollectionStatistics()
                     , targetedApplicationId, usageStatistic.getTimeStamp());
-            dasMemoryPublisher.setMemoryStatistic(usageStatistic.getMemoryStatistics(), targetedApplicationId
-                    , usageStatistic.getTimeStamp());
-            dasCPUPublisher.setCPUStatistic(usageStatistic.getCpuStatistics(), targetedApplicationId
-                    , usageStatistic.getTimeStamp());
+
 
             executor.execute(dasGCPublisher);
 
             if (counter == 10) {
+                dasMemoryPublisher.setMemoryStatistic(usageStatistic.getMemoryStatistics(), targetedApplicationId
+                        , usageStatistic.getTimeStamp());
+                dasCPUPublisher.setCPUStatistic(usageStatistic.getCpuStatistics(), targetedApplicationId
+                        , usageStatistic.getTimeStamp());
+
                 executor.execute(dasMemoryPublisher);
                 executor.execute(dasCPUPublisher);
-                counter = 1;
+
+                counter = 0;
             }
 
             try {
@@ -124,7 +129,7 @@ public class JVMMonitorAgent {
                 e.printStackTrace();
             }
 
-            counter++;
+
         }
     }
 }
