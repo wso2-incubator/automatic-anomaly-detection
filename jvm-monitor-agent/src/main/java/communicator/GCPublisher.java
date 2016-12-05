@@ -91,7 +91,7 @@ public class GCPublisher extends DASPublisher implements Runnable {
         setDataStream(streamName, streamVersion);
 
         logger.info("Starting GC Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
-                + dasConfigurations.getThriftPort() + "\tStreamName: " + streamName + ":" + streamVersion);
+                + dasConfigurations.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
 
