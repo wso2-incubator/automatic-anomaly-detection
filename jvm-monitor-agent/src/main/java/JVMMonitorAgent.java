@@ -29,7 +29,6 @@ import jvmmonitor.UsageMonitorAgentFatory;
 import jvmmonitor.exceptions.AccessingUsageStatisticFailedException;
 import jvmmonitor.exceptions.MonitorAgentInitializationFailed;
 import jvmmonitor.exceptions.UnknownMonitorAgentTypeException;
-import jvmmonitor.models.UsageStatistic;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -38,6 +37,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import util.PropertyLoader;
 
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,23 +92,29 @@ public class JVMMonitorAgent {
             throw new PublisherInitializationException(e.getMessage(), e);
         }
 
+        //Create usage monitor agent according to the mode in jma.properties
         UsageMonitorAgent usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitor(PropertyLoader.mode);
+        //get generated targeted app_id
         String targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
 
         ExecutorService executor = Executors.newFixedThreadPool(4);
-        UsageStatistic usageStatistic;
+
         int counter = 1;
+        long timeStamp;
 
         while (true) {
-            usageStatistic = usageMonitorAgent.getUsageStatistic();
+
+            //get time stamp when publishing the data
+            //should be unique to all publishers
+            timeStamp = new Date().getTime();
 
             //Set data to publisher
-            dasGCPublisher.setGarbageCollectionStatistic(usageStatistic.getGarbageCollectionStatistics()
-                    , targetedApplicationId, usageStatistic.getTimeStamp());
-            dasMemoryPublisher.setMemoryStatistic(usageStatistic.getMemoryStatistics(), targetedApplicationId
-                    , usageStatistic.getTimeStamp());
-            dasCPUPublisher.setCPUStatistic(usageStatistic.getCpuStatistics(), targetedApplicationId
-                    , usageStatistic.getTimeStamp());
+            dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics()
+                    , targetedApplicationId, timeStamp);
+            dasMemoryPublisher.setMemoryStatistic(usageMonitorAgent.getMemoryStatistics(), targetedApplicationId
+                    , timeStamp);
+            dasCPUPublisher.setCPUStatistic(usageMonitorAgent.getCPUStatistics(), targetedApplicationId
+                    , timeStamp);
 
             executor.execute(dasGCPublisher);
 

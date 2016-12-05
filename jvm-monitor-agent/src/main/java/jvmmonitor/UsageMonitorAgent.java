@@ -4,7 +4,6 @@ import jvmmonitor.exceptions.AccessingUsageStatisticFailedException;
 import jvmmonitor.models.CPUStatistic;
 import jvmmonitor.models.GarbageCollectionStatistic;
 import jvmmonitor.models.MemoryStatistic;
-import jvmmonitor.models.UsageStatistic;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public abstract class UsageMonitorAgent {
      * @return
      * @throws AccessingUsageStatisticFailedException
      */
-    protected abstract List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException;
+    public abstract List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException;
 
     /**
      * Returns a list of Memory usage statistics {@link MemoryStatistic}
@@ -45,7 +44,7 @@ public abstract class UsageMonitorAgent {
      * @return
      * @throws AccessingUsageStatisticFailedException
      */
-    protected abstract List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException;
+    public abstract List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException;
 
     /**
      * Returns a list of Garbage Collection statistics {@link GarbageCollectionStatistic}
@@ -53,7 +52,7 @@ public abstract class UsageMonitorAgent {
      * @return
      * @throws AccessingUsageStatisticFailedException
      */
-    protected abstract List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
+    public abstract List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
             throws AccessingUsageStatisticFailedException;
 
     /**
@@ -63,14 +62,5 @@ public abstract class UsageMonitorAgent {
      */
     public abstract String getTargetedApplicationId();
 
-    /**
-     * Returns complete set of usage statistics {@link UsageStatistic}
-     *
-     * @return
-     * @throws AccessingUsageStatisticFailedException
-     */
-    public UsageStatistic getUsageStatistic() throws AccessingUsageStatisticFailedException {
 
-        return new UsageStatistic(getCPUStatistics(), getMemoryStatistics(), getGarbageCollectionStatistics());
-    }
 }

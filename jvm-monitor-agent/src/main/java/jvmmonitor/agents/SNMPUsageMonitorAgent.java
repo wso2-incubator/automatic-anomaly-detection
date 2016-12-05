@@ -55,17 +55,17 @@ public class SNMPUsageMonitorAgent extends UsageMonitorAgent {
     }
 
     @Override
-    protected List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
+    public List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
         return null;
     }
 
     @Override
-    protected List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
+    public List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
         return null;
     }
 
     @Override
-    protected List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
+    public List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
             throws AccessingUsageStatisticFailedException {
         return null;
     }
