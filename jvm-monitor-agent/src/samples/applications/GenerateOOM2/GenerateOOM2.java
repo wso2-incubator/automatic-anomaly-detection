@@ -39,7 +39,7 @@ public class GenerateOOM2 {
 
         if (args.length == 1) {
 
-            try{
+            try {
                 sleepTime = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
                 System.err.println(e);
@@ -47,7 +47,7 @@ public class GenerateOOM2 {
 
         } else if (args.length == 2) {
 
-            try{
+            try {
                 sleepTime = Integer.parseInt(args[0]);
                 numberOfThread = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
@@ -69,8 +69,8 @@ public class GenerateOOM2 {
 
 class GenerateOOME implements Runnable {
 
-    private List<Integer> numbers = new ArrayList<Integer>();
     public static int threadSleepTime = 0;
+    private List<Integer> numbers = new ArrayList<Integer>();
 
     private void addNumber() {
 

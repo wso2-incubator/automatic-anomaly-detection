@@ -19,7 +19,6 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -125,8 +124,8 @@ class NumberBuilder implements Runnable {
 
 class ListSort {
 
-    public ArrayList<Integer> mainNumberList = new ArrayList<Integer>(maxMainlistSize * 2 + (new Random()).nextInt(1000));
     public static int maxMainlistSize;
+    public ArrayList<Integer> mainNumberList = new ArrayList<Integer>(maxMainlistSize * 2 + (new Random()).nextInt(1000));
 
     public synchronized void addtoMainList(List<Integer> numbers) {
 

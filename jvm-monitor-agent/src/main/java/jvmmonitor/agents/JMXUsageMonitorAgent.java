@@ -73,17 +73,14 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JMXUsageMonitorAgent.class);
     private final static String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
-
+    //store Garbage Collection events from JMX notifications
+    private final LinkedList<GarbageCollectionStatistic> garbageCollectionStatistics;
+    private final String targetedApplicationId;
     //store mxBeans for reuse
     private MemoryMXBean memoryMXBean;
     private OperatingSystemMXBean operatingSystemMXBean;
     private List<GarbageCollectorMXBean> garbageCollectorMXBeans;
-
-    //store Garbage Collection events from JMX notifications
-    private final LinkedList<GarbageCollectionStatistic> garbageCollectionStatistics;
-
     private long jvmStartTime;
-    private final String targetedApplicationId;
 
     /**
      * Create JMXMonitorAgent to monitor local JVM using its PID
@@ -167,12 +164,12 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
      * @throws MonitorAgentInitializationFailed
      */
     public JMXUsageMonitorAgent(String hostname, String rmiServerPort, String rmiRegistryPort, String username,
-            String password) throws MonitorAgentInitializationFailed {
+                                String password) throws MonitorAgentInitializationFailed {
         String jmxURL = createJMXURL(hostname, rmiServerPort, rmiRegistryPort);
         logger.info("Trying to connect : " + jmxURL);
         try {
             Map<String, String[]> credential = new HashMap<String, String[]>();
-            credential.put(JMXConnector.CREDENTIALS, new String[] { username, password });
+            credential.put(JMXConnector.CREDENTIALS, new String[]{username, password});
             MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(jmxURL), credential)
                     .getMBeanServerConnection();
 
@@ -190,7 +187,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
      * @return
      * @throws AccessingUsageStatisticFailedException
      */
-    @Override public List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
+    @Override
+    public List<CPUStatistic> getCPUStatistics() throws AccessingUsageStatisticFailedException {
 
         if (operatingSystemMXBean != null) {
             ArrayList<CPUStatistic> cpuStatistics = new ArrayList<>(1);
@@ -213,7 +211,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
      * @return
      * @throws AccessingUsageStatisticFailedException
      */
-    @Override public List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
+    @Override
+    public List<MemoryStatistic> getMemoryStatistics() throws AccessingUsageStatisticFailedException {
 
         if (memoryMXBean != null) {
             ArrayList<MemoryStatistic> memoryStatistics = new ArrayList<>(1);
@@ -251,7 +250,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
      * @return
      * @throws AccessingUsageStatisticFailedException
      */
-    @Override public synchronized List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
+    @Override
+    public synchronized List<GarbageCollectionStatistic> getGarbageCollectionStatistics()
             throws AccessingUsageStatisticFailedException {
         if (garbageCollectionStatistics.size() > 0) {
             ArrayList<GarbageCollectionStatistic> gcStatistics = new ArrayList<>(garbageCollectionStatistics.size());
@@ -268,7 +268,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
      *
      * @return
      */
-    @Override public String getTargetedApplicationId() {
+    @Override
+    public String getTargetedApplicationId() {
         return targetedApplicationId;
     }
 
@@ -280,8 +281,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
             RMI_Server_Address = hostname.concat(":").concat(rmiServerPort);
             RMI_Registry_Address = hostname.concat(":").concat(rmiRegistryPort);
 
-            jmxURL = "service:jmx:rmi://".concat(RMI_Server_Address).concat("/jndi/rmi://")
-                    .concat(RMI_Registry_Address).concat("/jmxrmi");
+            jmxURL = "service:jmx:rmi://".concat(RMI_Server_Address).concat("/jndi/rmi://").concat(RMI_Registry_Address)
+                    .concat("/jmxrmi");
 
             return jmxURL;
         }
