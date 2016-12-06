@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
  * Class to start JVMMonitor agent
  * Perform the mode checks
  */
-public class JVMMonitorAgent extends TimerTask {
+public class JVMMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
@@ -57,7 +57,6 @@ public class JVMMonitorAgent extends TimerTask {
     private UsageMonitorAgent usageMonitorAgent;
     private String targetedApplicationId;
     private ExecutorService executor;
-    private int counter = 1;
 
     /**
      * Constructor
@@ -94,23 +93,60 @@ public class JVMMonitorAgent extends TimerTask {
 
     }
 
-    @Override
-    public void run() {
+    /**
+     * To schedule the Garbage collection event
+     *
+     * @param period
+     */
+    private void startGarbageCollectionTimer(long period) {
+        Timer timer = new Timer();
+        timer.schedule(new GarbageCollectionTaskScheduler(), 0, period);
+    }
 
-        //get time stamp when publishing the data (should be unique to all publishers)
-        long timeStamp = new Date().getTime();
+    /**
+     * To schedule the Memory and CPU event
+     *
+     * @param period
+     */
+    private void startMemoryCpuTimer(long period) {
+        Timer timer = new Timer();
+        timer.schedule(new MemoryCpuTaskScheduler(), 0, period);
+    }
 
-        try {
-            //Set garbage collection statistic to publish
-            dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics()
-                    , targetedApplicationId, timeStamp);
-            executor.execute(dasGCPublisher);
+    /**
+     * Inner class
+     * Implementation of TimerTask
+     */
+    private class GarbageCollectionTaskScheduler extends TimerTask {
 
-        } catch (AccessingUsageStatisticFailedException e) {
-            logger.error(e.getMessage(), e);
+        @Override
+        public void run() {
+
+            try {
+                //Set garbage collection statistic to publish
+                dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics()
+                        , targetedApplicationId, new Date().getTime());
+                executor.execute(dasGCPublisher);
+
+            } catch (AccessingUsageStatisticFailedException e) {
+                logger.error(e.getMessage(), e);
+            }
+
         }
+    }
 
-        if (counter == 10) {
+    /**
+     * Inner class
+     * Implementation of TimerTask
+     */
+    private class MemoryCpuTaskScheduler extends TimerTask {
+
+        @Override
+        public void run() {
+
+            //get time stamp when publishing the data (should be unique to all publishers)
+            long timeStamp = new Date().getTime();
+
             try {
                 //Set Memory statistic to publish
                 dasMemoryPublisher.setMemoryStatistic(usageMonitorAgent.getMemoryStatistics(), targetedApplicationId
@@ -126,10 +162,7 @@ public class JVMMonitorAgent extends TimerTask {
                 logger.error(e.getMessage(), e);
             }
 
-            counter = 0;
         }
-
-        counter++;
     }
 
 
@@ -141,8 +174,9 @@ public class JVMMonitorAgent extends TimerTask {
 
             JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
 
-            Timer timer = new Timer();
-            timer.schedule(jvmMonitor, 0, 100);
+            jvmMonitor.startGarbageCollectionTimer(100);
+            jvmMonitor.startMemoryCpuTimer(1000);
+
 
         } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
                 | UnknownMonitorAgentTypeException e) {
