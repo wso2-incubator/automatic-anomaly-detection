@@ -70,7 +70,7 @@ public class CPUPublisher extends DASPublisher implements Runnable {
         setDataStream(streamName, streamVersion);
 
         logger.info("Starting CPU Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
-                + dasConfigurations.getThriftPort() + "\tStreamName: " + streamName + ":" + streamVersion);
+                + dasConfigurations.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
 
@@ -105,8 +105,22 @@ public class CPUPublisher extends DASPublisher implements Runnable {
 
             dataPublisher.publish(event);
 
-            logger.info("publish CPU data : " + timestamp + " , " + applicationId + " , " + cpuStat.getProcessCPULoad()
-                    + " , " + cpuStat.getSystemCPULoad());
+            //check is debug enable
+            if (logger.isDebugEnabled()) {
+
+                StringBuilder cpuEvent = new StringBuilder();
+                cpuEvent.append("publish CPU data : ");
+                cpuEvent.append(timestamp);
+                cpuEvent.append(" , ");
+                cpuEvent.append(applicationId);
+                cpuEvent.append(" , ");
+                cpuEvent.append(cpuStat.getProcessCPULoad());
+                cpuEvent.append(" , ");
+                cpuEvent.append(cpuStat.getSystemCPULoad());
+
+                logger.debug(cpuEvent.toString());
+            }
+
         }
 
     }

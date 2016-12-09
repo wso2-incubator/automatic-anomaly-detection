@@ -16,11 +16,9 @@
 * under the License.
 */
 
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.AgentLoadException;
 import communicator.CPUPublisher;
 import communicator.DASConfigurations;
-import communicator.GCPublisher;
+import communicator.GarbageCollectionPublisher;
 import communicator.MemoryPublisher;
 import exceptions.PropertyCannotBeLoadedException;
 import exceptions.PublisherInitializationException;
@@ -38,6 +36,8 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import util.PropertyLoader;
 
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -49,32 +49,24 @@ public class JVMMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
-    public static void main(String[] args) throws AgentLoadException, AgentInitializationException {
+    //DAS Publisher
+    private GarbageCollectionPublisher dasGCPublisher;
+    private MemoryPublisher dasMemoryPublisher;
+    private CPUPublisher dasCPUPublisher;
 
-        try {
-            PropertyLoader.loadProperties();
-            logger.info("Properties loaded successfully");
-
-            JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
-            jvmMonitor.runAgent();
-
-        } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
-                | UnknownMonitorAgentTypeException | AccessingUsageStatisticFailedException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
+    private UsageMonitorAgent usageMonitorAgent;
+    private String targetedApplicationId;
+    private ExecutorService executor;
 
     /**
-     * Start monitoring of JVMs
+     * Constructor
+     * <p>
+     * Initialize DASConfigurations
+     * Initialize DAS publisher
      * Select between remote monitoring and local monitoring according to the configurations
      */
-    private void runAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
-            AccessingUsageStatisticFailedException, PublisherInitializationException {
-
-        GCPublisher dasGCPublisher;
-        MemoryPublisher dasMemoryPublisher;
-        CPUPublisher dasCPUPublisher;
+    private JVMMonitorAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
+            PublisherInitializationException {
 
         DASConfigurations dasConfigurations = new DASConfigurations(PropertyLoader.dasAddress,
                 PropertyLoader.dasThriftPort, PropertyLoader.dasSecurePort, PropertyLoader.dasUsername,
@@ -85,52 +77,112 @@ public class JVMMonitorAgent {
 
             dasMemoryPublisher = new MemoryPublisher(dasConfigurations);
             dasCPUPublisher = new CPUPublisher(dasConfigurations);
-            dasGCPublisher = new GCPublisher(dasConfigurations);
+            dasGCPublisher = new GarbageCollectionPublisher(dasConfigurations);
 
         } catch (DataEndpointException | TransportException | DataEndpointAuthenticationException
                 | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {
             throw new PublisherInitializationException(e.getMessage(), e);
         }
 
-        //Create usage monitor agent according to the mode in jma.properties
-        UsageMonitorAgent usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitorAgent(PropertyLoader.mode);
-        //get generated targeted app_id
-        String targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
+        //Initialize usage monitor agent according to the mode in jma.properties
+        usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitor(PropertyLoader.mode);
+        //Get generated targeted app_id
+        targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
 
-        ExecutorService executor = Executors.newFixedThreadPool(4);
+        executor = Executors.newFixedThreadPool(4);
 
-        int counter = 1;
-        long timeStamp;
+    }
 
-        while (true) {
+    /**
+     * To schedule the Garbage collection event
+     *
+     * @param period
+     */
+    private void startGarbageCollectionTimer(long period) {
+        Timer timer = new Timer();
+        timer.schedule(new GarbageCollectionTaskScheduler(), 0, period);
+    }
 
-            //get time stamp when publishing the data
-            //should be unique to all publishers
-            timeStamp = new Date().getTime();
+    /**
+     * To schedule the Memory and CPU event
+     *
+     * @param period
+     */
+    private void startMemoryCpuTimer(long period) {
+        Timer timer = new Timer();
+        timer.schedule(new MemoryCpuTaskScheduler(), 0, period);
+    }
 
-            //Set data to publisher
-            dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics()
-                    , targetedApplicationId, timeStamp);
-            dasMemoryPublisher.setMemoryStatistic(usageMonitorAgent.getMemoryStatistics(), targetedApplicationId
-                    , timeStamp);
-            dasCPUPublisher.setCPUStatistic(usageMonitorAgent.getCPUStatistics(), targetedApplicationId
-                    , timeStamp);
+    /**
+     * Inner class
+     * Implementation of TimerTask
+     */
+    private class GarbageCollectionTaskScheduler extends TimerTask {
 
-            executor.execute(dasGCPublisher);
-
-            if (counter == 10) {
-                executor.execute(dasMemoryPublisher);
-                executor.execute(dasCPUPublisher);
-                counter = 1;
-            }
+        @Override
+        public void run() {
 
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                //Set garbage collection statistic to publish
+                dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics()
+                        , targetedApplicationId, new Date().getTime());
+                executor.execute(dasGCPublisher);
+
+            } catch (AccessingUsageStatisticFailedException e) {
+                logger.error(e.getMessage(), e);
             }
 
-            counter++;
         }
     }
+
+    /**
+     * Inner class
+     * Implementation of TimerTask
+     */
+    private class MemoryCpuTaskScheduler extends TimerTask {
+
+        @Override
+        public void run() {
+
+            //get time stamp when publishing the data (should be unique to all publishers)
+            long timeStamp = new Date().getTime();
+
+            try {
+                //Set Memory statistic to publish
+                dasMemoryPublisher.setMemoryStatistic(usageMonitorAgent.getMemoryStatistics(), targetedApplicationId
+                        , timeStamp);
+                executor.execute(dasMemoryPublisher);
+
+                //Set CPU statistic to publish
+                dasCPUPublisher.setCPUStatistic(usageMonitorAgent.getCPUStatistics(), targetedApplicationId
+                        , timeStamp);
+                executor.execute(dasCPUPublisher);
+
+            } catch (AccessingUsageStatisticFailedException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        }
+    }
+
+
+    public static void main(String[] args) {
+
+        try {
+            PropertyLoader.loadProperties();
+            logger.info("Properties loaded successfully");
+
+            JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
+
+            jvmMonitor.startGarbageCollectionTimer(100);
+            jvmMonitor.startMemoryCpuTimer(1000);
+
+
+        } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
+                | UnknownMonitorAgentTypeException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+    }
+
 }

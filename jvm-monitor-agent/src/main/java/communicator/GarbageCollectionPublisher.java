@@ -33,9 +33,9 @@ import java.util.List;
 /**
  * This is send Garbage collection statistic to DAS for every 100 millisecond
  */
-public class GCPublisher extends DASPublisher implements Runnable {
+public class GarbageCollectionPublisher extends DASPublisher implements Runnable {
 
-    private final static Logger logger = Logger.getLogger(GCPublisher.class);
+    private final static Logger logger = Logger.getLogger(GarbageCollectionPublisher.class);
 
     /**
      * Set default Garbage collection log Stream
@@ -83,7 +83,7 @@ public class GCPublisher extends DASPublisher implements Runnable {
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public GCPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
+    public GarbageCollectionPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
             TransportException {
 
@@ -91,12 +91,12 @@ public class GCPublisher extends DASPublisher implements Runnable {
         setDataStream(streamName, streamVersion);
 
         logger.info("Starting GC Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
-                + dasConfigurations.getThriftPort() + "\tStreamName: " + streamName + ":" + streamVersion);
+                + dasConfigurations.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
 
     /**
-     * Need to set GC statistic data before publish data to DAS
+     * Need to set Garbage collection statistic data before publish data to DAS
      *
      * @param garbageCollectionStatistics
      * @param applicationId
@@ -147,28 +147,60 @@ public class GCPublisher extends DASPublisher implements Runnable {
 
                 dataPublisher.publish(event);
 
-                logger.info("publish GC data : " + gcStat.getStartTime() + " , " + applicationId
-                        + " , " + gcStat.getGcType()
-                        + " , " + gcStat.getGcCause()
-                        + " , " + gcStat.getDuration()
-                        + " , " + gcStat.getEdenUsedMemoryAfterGC()
-                        + " , " + gcStat.getEdenUsedMemoryBeforeGC()
-                        + " , " + gcStat.getSurvivorUsedMemoryAfterGC()
-                        + " , " + gcStat.getSurvivorUsedMemoryBeforeGC()
-                        + " , " + gcStat.getOldGenUsedMemoryAfterGC()
-                        + " , " + gcStat.getOldGenUsedMemoryBeforeGC()
-                        + " , " + gcStat.getEdenCommittedMemoryAfterGC()
-                        + " , " + gcStat.getEdenCommittedMemoryBeforeGC()
-                        + " , " + gcStat.getSurvivorCommittedMemoryAfterGC()
-                        + " , " + gcStat.getSurvivorCommittedMemoryBeforeGC()
-                        + " , " + gcStat.getOldGenCommittedMemoryAfterGC()
-                        + " , " + gcStat.getOldGenCommittedMemoryBeforeGC()
-                        + " , " + gcStat.getEdenMaxMemoryAfterGC()
-                        + " , " + gcStat.getEdenMaxMemoryBeforeGC()
-                        + " , " + gcStat.getSurvivorMaxMemoryAfterGC()
-                        + " , " + gcStat.getSurvivorMaxMemoryBeforeGC()
-                        + " , " + gcStat.getOldGenMaxMemoryAfterGC()
-                        + " , " + gcStat.getOldGenMaxMemoryBeforeGC());
+                //check is debug enable
+                if (logger.isDebugEnabled()) {
+
+                    StringBuilder gcEvent = new StringBuilder();
+                    gcEvent.append("publish GC data : ");
+                    gcEvent.append(gcStat.getStartTime());
+                    gcEvent.append(" , ");
+                    gcEvent.append(applicationId);
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getGcType());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getGcCause());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getDuration());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getEdenUsedMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getEdenUsedMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getSurvivorUsedMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getSurvivorUsedMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getOldGenUsedMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getOldGenUsedMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getEdenCommittedMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getEdenCommittedMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getSurvivorCommittedMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getSurvivorCommittedMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getOldGenCommittedMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getOldGenCommittedMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getEdenMaxMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getEdenMaxMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getSurvivorMaxMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getSurvivorMaxMemoryBeforeGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getOldGenMaxMemoryAfterGC());
+                    gcEvent.append(" , ");
+                    gcEvent.append(gcStat.getOldGenMaxMemoryBeforeGC());
+
+                    logger.debug(gcEvent.toString());
+                }
+
             }
         }
 

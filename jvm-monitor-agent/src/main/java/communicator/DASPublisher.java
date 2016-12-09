@@ -102,9 +102,9 @@ public abstract class DASPublisher {
         }
         if (!dataAgentFilePath.exists()) {
             logger.error("data-agent-conf.xml File not found in : " + dataAgentFilePath.getAbsolutePath());
+        } else {
+            AgentHolder.setConfigPath(dataAgentFilePath.getAbsolutePath());
         }
-        AgentHolder.setConfigPath(dataAgentFilePath.getAbsolutePath());
-
 
         //Set the client-truststore.jks file located path and trustStorePassword
         File trustStoreFilePath = new File(trustStorePath + File.separator + "client-truststore.jks");
@@ -117,14 +117,14 @@ public abstract class DASPublisher {
         }
         if (!trustStoreFilePath.exists()) {
             logger.error("client-truststore.jks File not found in : " + trustStoreFilePath.getAbsolutePath());
+        } else {
+            try {
+                System.setProperty("javax.net.ssl.trustStore", trustStoreFilePath.getAbsolutePath());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+            System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
         }
-
-        try {
-            System.setProperty("javax.net.ssl.trustStore", trustStoreFilePath.getAbsolutePath());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
 
     }
 

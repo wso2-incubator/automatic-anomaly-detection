@@ -75,7 +75,7 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
         setDataStream(streamName, streamVersion);
 
         logger.info("Starting Memory Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
-                + dasConfigurations.getThriftPort() + "\tStreamName: " + streamName + ":" + streamVersion);
+                + dasConfigurations.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
 
@@ -116,11 +116,32 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
 
             dataPublisher.publish(event);
 
-            logger.info("publish Memory data : " + timestamp + " , " + applicationId + " , "
-                    + memoryStat.getMaxHeapMemory() + " , " + memoryStat.getAllocatedHeapMemory()
-                    + " , " + memoryStat.getUsedHeapMemory() + " , " + memoryStat.getMaxNonHeapMemory()
-                    + " , " + memoryStat.getAllocatedNonHeapMemory() + " , " + memoryStat.getUsedNonHeapMemory()
-                    + " , " + memoryStat.getPendingFinalizations());
+            //check is debug enable
+            if (logger.isDebugEnabled()) {
+
+                StringBuilder MemoryEvent = new StringBuilder();
+                MemoryEvent.append("publish Memory data : ");
+                MemoryEvent.append(timestamp);
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(applicationId);
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getMaxHeapMemory());
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getAllocatedHeapMemory());
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getUsedHeapMemory());
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getMaxNonHeapMemory());
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getAllocatedNonHeapMemory());
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getUsedNonHeapMemory());
+                MemoryEvent.append(" , ");
+                MemoryEvent.append(memoryStat.getPendingFinalizations());
+
+                logger.debug(MemoryEvent.toString());
+            }
+
         }
 
     }
