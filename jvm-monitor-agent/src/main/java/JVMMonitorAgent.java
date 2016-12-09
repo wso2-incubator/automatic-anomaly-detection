@@ -85,7 +85,7 @@ public class JVMMonitorAgent {
         }
 
         //Initialize usage monitor agent according to the mode in jma.properties
-        usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitor(PropertyLoader.mode);
+        usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitorAgent(PropertyLoader.mode);
         //Get generated targeted app_id
         targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
 
