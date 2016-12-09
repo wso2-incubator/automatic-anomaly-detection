@@ -35,7 +35,7 @@ public class UsageMonitorAgentFatory {
      * @throws MonitorAgentInitializationFailed
      * @throws UnknownMonitorAgentTypeException
      */
-    public static UsageMonitorAgent getUsageMonitor(String monitorAgentType)
+    public static UsageMonitorAgent getUsageMonitorAgent(String monitorAgentType)
             throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException {
         MonitorAgentType type = MonitorAgentType.getMonitorType(monitorAgentType);
 
