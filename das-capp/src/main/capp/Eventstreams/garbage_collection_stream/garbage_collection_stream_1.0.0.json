@@ -1,0 +1,100 @@
+{
+  "name": "garbage_collection_stream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "GC log events",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "gc_type",
+      "type": "STRING"
+    },
+    {
+      "name": "gc_cause",
+      "type": "STRING"
+    },
+    {
+      "name": "gc_duration",
+      "type": "LONG"
+    },
+    {
+      "name": "eden_used_after",
+      "type": "LONG"
+    },
+    {
+      "name": "eden_used_before",
+      "type": "LONG"
+    },
+    {
+      "name": "survivor_used_after",
+      "type": "LONG"
+    },
+    {
+      "name": "survivor_used_before",
+      "type": "LONG"
+    },
+    {
+      "name": "old_used_after",
+      "type": "LONG"
+    },
+    {
+      "name": "old_used_before",
+      "type": "LONG"
+    },
+    {
+      "name": "eden_committed_after",
+      "type": "LONG"
+    },
+    {
+      "name": "eden_committed_before",
+      "type": "LONG"
+    },
+    {
+      "name": "survivor_committed_after",
+      "type": "LONG"
+    },
+    {
+      "name": "survivor_committed_before",
+      "type": "LONG"
+    },
+    {
+      "name": "old_committed_after",
+      "type": "LONG"
+    },
+    {
+      "name": "old_committed_before",
+      "type": "LONG"
+    },
+    {
+      "name": "eden_max_after",
+      "type": "LONG"
+    },
+    {
+      "name": "eden_max_before",
+      "type": "LONG"
+    },
+    {
+      "name": "survivor_max_after",
+      "type": "LONG"
+    },
+    {
+      "name": "survivor_max_before",
+      "type": "LONG"
+    },
+    {
+      "name": "old_max_after",
+      "type": "LONG"
+    },
+    {
+      "name": "old_max_before",
+      "type": "LONG"
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+<!--
+  ~ Copyright (c)  2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<domain name="AnomalyPredictionEnsemblePredictor">
+    <description>Ensemble and Publisher of JVM anomaly predictions</description>
+    <scenarios>
+        <scenario type="EnsemblePredictorWithoutDashboard">
+            <description>To configure the ensemble</description>
+            <templates>
+                <template type="eventstream">
+                    {
+                    "name": "PredictionResultStream",
+                    "version": "1.0.0",
+                    "nickName": "",
+                    "description": "",
+                    "payloadData": [
+                    {
+                    "name": "time_stamp",
+                    "type": "LONG"
+                    },
+                    {
+                    "name": "app_id",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "prediction",
+                    "type": "STRING"
+                    }
+                    ]
+                    }
+                </template>
+                <template type="realtime">
+                    <![CDATA[
+@Plan:name('AnomalyPredictionAlertExecutionPlan')
+
+@Import('PredictionResultStream:1.0.0')
+define stream PredictionResultStream (time_stamp long, app_id string, prediction string);
+
+@Export('PredictionPublishStream:1.0.0')
+define stream PredictionPublishStream (time_stamp long, app_id string, prediction string);
+
+define table CountTable(app_id string, count int);
+
+from PredictionResultStream
+select 
+  time_stamp, 
+  app_id,
+  ifThenElse(prediction == 'anomaly' , 1 , 0 ) as anomaly,
+  ifThenElse(prediction == 'normal' , 1 , 0) as normal			
+insert into PredictionStream;
+
+Partition with (app_id of PredictionStream)
+begin
+  --ensemble of models
+  from every e1=PredictionStream 
+    -> e2=PredictionStream[e1.time_stamp == e2.time_stamp] 
+    -> e3=PredictionStream[e2.time_stamp == e3.time_stamp] 
+    -> e4=PredictionStream[e3.time_stamp == e4.time_stamp] 
+    -> e5=PredictionStream[e4.time_stamp == e5.time_stamp] within 5 sec
+  select 
+    e1.time_stamp,
+    e1.app_id,
+    (e1.anomaly + e2.anomaly + e3.anomaly + e4.anomaly + e5.anomaly) as anomaly,
+    (e1.normal + e2.normal + e3.normal + e4.normal + e5.normal) as normal
+  insert into #PredictionVotingStream;
+
+  from #PredictionVotingStream
+  select 
+    time_stamp,
+    app_id,
+    ifThenElse (anomaly > $count , 'anomaly', 'normal') as prediction
+  insert into #EnsembleResultStream;
+
+
+  --series of prediction counting
+  from #EnsembleResultStream as e left outer join CountTable as c on e.app_id == c.app_id
+  select
+    e.time_stamp,
+    e.app_id,
+    ifThenElse( e.prediction == 'anomaly', ifThenElse( c.app_id is null, 1, c.count+1), 0) as count
+  insert into #AnomalyPredictionCountStream;
+
+  from #AnomalyPredictionCountStream
+  select
+    app_id,
+    count
+  insert overwrite CountTable
+    on CountTable.app_id == app_id;
+
+  from #AnomalyPredictionCountStream
+  select 
+    time_stamp,
+    app_id,
+    ifThenElse(count>=$seriesCount , 'anomaly', 'normal') as prediction
+  insert into #AnomalyPredictionStream;
+
+  from #AnomalyPredictionStream#window.timeBatch($timeInterval sec)
+  select 
+    max(time_stamp) as time_stamp,
+    app_id,
+    prediction
+  insert into PredictionPublishStream;
+end;
+				  ]]>
+                </template>
+            </templates>
+            <streamMappings>
+                <streamMapping to="PredictionResultStream:1.0.0"/>
+            </streamMappings>
+            <parameters>
+                <parameter name="count" type="int">
+                    <displayName>Voting Threshold</displayName>
+                    <description>Number of anomaly votes that produce anomaly output from the
+                        ensemble
+                    </description>
+                    <defaultValue>3</defaultValue>
+                    <options>1, 2, 3, 4, 5</options>
+                </parameter>
+                <parameter name="seriesCount" type="int">
+                    <displayName>Anomaly Count</displayName>
+                    <description>Number of consequence anomaly predictions from the ensemble before
+                        an alert
+                    </description>
+                    <defaultValue>2</defaultValue>
+                </parameter>
+                <parameter name="timeInterval" type="int">
+                    <displayName>Interval(Secs)</displayName>
+                    <description>Time interval between two anomaly predictions</description>
+                    <defaultValue>30</defaultValue>
+                </parameter>
+            </parameters>
+        </scenario>
+    </scenarios>
+    <commonArtifacts>
+        <artifact type="eventstream">
+            {
+            "name": "PredictionPublishStream",
+            "version": "1.0.0",
+            "nickName": "",
+            "description": "",
+            "metaData": [],
+            "correlationData": [],
+            "payloadData": [
+            {
+            "name": "time_stamp",
+            "type": "LONG"
+            },
+            {
+            "name": "app_id",
+            "type": "STRING"
+            },
+            {
+            "name": "prediction",
+            "type": "STRING"
+            }
+            ]
+            }
+        </artifact>
+    </commonArtifacts>
+</domain>
