@@ -18,12 +18,6 @@
 
 package org.wso2.carbon.ml.core.spark.algorithms;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.math3.ml.distance.EuclideanDistance;
@@ -31,6 +25,12 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.mllib.clustering.*;
 import org.apache.spark.mllib.linalg.Vector;
 import org.wso2.carbon.ml.core.spark.models.ext.AnomalyDetectionModel;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AnomalyDetection implements Serializable {
 
@@ -40,16 +40,16 @@ public class AnomalyDetection implements Serializable {
     /**
      * This methods trains Anomaly detection models
      *
-     * @param trainData Training data as a JavaRDD of Vectors
-     * @param noOfClusters Number of clusters
+     * @param trainData      Training data as a JavaRDD of Vectors
+     * @param noOfClusters   Number of clusters
      * @param noOfIterations Number of iterations to run
      * @return
      */
     public AnomalyDetectionModel train(JavaRDD<Vector> trainData, int noOfClusters, int noOfIterations,
-            String newNormalLabel, String newAnomalyLabel) {
+                                       String newNormalLabel, String newAnomalyLabel) {
 
         // split data training dataset
-        double[] weights = {0.95,0.05};
+        double[] weights = {0.95, 0.05};
         JavaRDD<Vector>[] dataSets = trainData.randomSplit(weights);
         JavaRDD<Vector> trainDataSet = dataSets[0];
         JavaRDD<Vector> testDataSet = dataSets[1];
@@ -104,8 +104,8 @@ public class AnomalyDetection implements Serializable {
      * This method applies a anomaly detection models to a given dataset
      *
      * @param anomalyDetectionModel anomaly detection models
-     * @param data a single data point as a Vector
-     * @param percentile percentile value to identify the cluster boundaries
+     * @param data                  a single data point as a Vector
+     * @param percentile            percentile value to identify the cluster boundaries
      * @return prediction label as a String
      */
     public String test(AnomalyDetectionModel anomalyDetectionModel, Vector data, int percentile) {
@@ -117,8 +117,8 @@ public class AnomalyDetection implements Serializable {
      * This method applies a anomaly detection models to a given dataset
      *
      * @param anomalyDetectionModel anomaly detection models
-     * @param data JavaRDD containing feature vectors
-     * @param percentile percentile value to identify the cluster boundaries
+     * @param data                  JavaRDD containing feature vectors
+     * @param percentile            percentile value to identify the cluster boundaries
      * @return prediction labels as a List of Strings
      */
     public List<String> test(AnomalyDetectionModel anomalyDetectionModel, JavaRDD<Vector> data, int percentile) {
@@ -130,13 +130,13 @@ public class AnomalyDetection implements Serializable {
      * This method applies a anomaly detection models to a given dataset for a range of percentile values
      *
      * @param anomalyDetectionModel anomaly detection models
-     * @param data a single data point as a Vector
-     * @param minPercentile min percentile value of the range
-     * @param maxPercentile max percentile value of the range
+     * @param data                  a single data point as a Vector
+     * @param minPercentile         min percentile value of the range
+     * @param maxPercentile         max percentile value of the range
      * @return Map<Integer, String> key:percentile value:prediction label
      */
     public Map<Integer, String> test(AnomalyDetectionModel anomalyDetectionModel, Vector data, int minPercentile,
-            int maxPercentile) {
+                                     int maxPercentile) {
 
         return anomalyDetectionModel.predict(data, minPercentile, maxPercentile);
     }
@@ -145,13 +145,13 @@ public class AnomalyDetection implements Serializable {
      * This method applies a anomaly detection models to a given dataset for a range of percentile values
      *
      * @param anomalyDetectionModel anomaly detection models
-     * @param data JavaRDD containing feature vectors
-     * @param minPercentile min percentile value of the range
-     * @param maxPercentile max percentile value of the range
+     * @param data                  JavaRDD containing feature vectors
+     * @param minPercentile         min percentile value of the range
+     * @param maxPercentile         max percentile value of the range
      * @return Map<Integer, List<String>> key:percentile value:prediction labels as a List of Strings
      */
     public Map<Integer, List<String>> test(AnomalyDetectionModel anomalyDetectionModel, JavaRDD<Vector> data,
-            int minPercentile, int maxPercentile) {
+                                           int minPercentile, int maxPercentile) {
 
         return anomalyDetectionModel.predict(data, minPercentile, maxPercentile);
     }

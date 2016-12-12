@@ -32,7 +32,7 @@ public class MLConstants {
 
     public static final String MACHINE_LEARNER_XML = "repository/conf/machine-learner.xml";
 
-    public static final String ML_UI_CONTEXT= "/ml";
+    public static final String ML_UI_CONTEXT = "/ml";
 
     // Data-set upload configurations    
     public static final String UPLOAD_SETTINGS = "dataUploadSettings";
@@ -55,8 +55,8 @@ public class MLConstants {
     public static final String MAX_PERCENTILE_CONF = "maxPercentile";
     public static final String ML_UI_URL = "ml.ui.url";
 
-    public static final String USER_HOME= "USER_HOME";
-    public static final String DATABASE= "database";
+    public static final String USER_HOME = "USER_HOME";
+    public static final String DATABASE = "database";
     public static final String ML_PROJECTS = "MLProjects";
 
     // Spark context disabling JVM option
@@ -67,13 +67,13 @@ public class MLConstants {
     public static final String SPARK_DRIVER_CLASSPATH = "spark.driver.extraClassPath";
 
     // Character Encodings
-    public static final String UTF_8= "UTF-8";
-    public static final String ISO_8859_1= "ISO-8859-1";
+    public static final String UTF_8 = "UTF-8";
+    public static final String ISO_8859_1 = "ISO-8859-1";
 
     public static final String TARGET_HOME_PROP = "target.home";
 
     // I/O Adapter configs
-    public static final String BAM_SERVER_URL= "BAMServerURL";
+    public static final String BAM_SERVER_URL = "BAMServerURL";
     public static final String BAM_DATA_VALUES = "values";
 
     // user response
@@ -262,6 +262,7 @@ public class MLConstants {
         EMPTY(""), NA("NA"), QUESTION("?");
 
         private final String value;
+
         private MISSING_VALUES(final String str) {
             this.value = str;
         }
@@ -288,6 +289,7 @@ public class MLConstants {
         IN_PROGRESS("Processing"), COMPLETE("Processed"), FAILED("Failed");
 
         private String value;
+
         private DatasetVersionStatus(String value) {
             this.value = value;
         }
@@ -306,6 +308,7 @@ public class MLConstants {
         AVAILABLE("Available"), BUSY("Busy"), FAILED("Failed");
 
         private String value;
+
         private DatasetStatus(String value) {
             this.value = value;
         }

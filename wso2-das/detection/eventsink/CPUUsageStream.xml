@@ -1,1 +1,42 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><EventStoreConfiguration><TableSchema><ColumnDefinition><Name>time_stamp</Name><IsFacet>false</IsFacet><EnableIndexing>false</EnableIndexing><IsPrimaryKey>true</IsPrimaryKey><EnableScoreParam>false</EnableScoreParam><Type>LONG</Type></ColumnDefinition><ColumnDefinition><Name>app_id</Name><IsFacet>false</IsFacet><EnableIndexing>false</EnableIndexing><IsPrimaryKey>false</IsPrimaryKey><EnableScoreParam>false</EnableScoreParam><Type>STRING</Type></ColumnDefinition><ColumnDefinition><Name>process_cpu_load</Name><IsFacet>false</IsFacet><EnableIndexing>false</EnableIndexing><IsPrimaryKey>false</IsPrimaryKey><EnableScoreParam>false</EnableScoreParam><Type>DOUBLE</Type></ColumnDefinition><ColumnDefinition><Name>system_cpu_load</Name><IsFacet>false</IsFacet><EnableIndexing>false</EnableIndexing><IsPrimaryKey>false</IsPrimaryKey><EnableScoreParam>false</EnableScoreParam><Type>DOUBLE</Type></ColumnDefinition></TableSchema><Source><StreamId>CPUUsageStream:1.0.0</StreamId></Source><MergeSchema>false</MergeSchema><RecordStoreName>EVENT_STORE</RecordStoreName></EventStoreConfiguration>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EventStoreConfiguration>
+    <TableSchema>
+        <ColumnDefinition>
+            <Name>time_stamp</Name>
+            <IsFacet>false</IsFacet>
+            <EnableIndexing>false</EnableIndexing>
+            <IsPrimaryKey>true</IsPrimaryKey>
+            <EnableScoreParam>false</EnableScoreParam>
+            <Type>LONG</Type>
+        </ColumnDefinition>
+        <ColumnDefinition>
+            <Name>app_id</Name>
+            <IsFacet>false</IsFacet>
+            <EnableIndexing>false</EnableIndexing>
+            <IsPrimaryKey>false</IsPrimaryKey>
+            <EnableScoreParam>false</EnableScoreParam>
+            <Type>STRING</Type>
+        </ColumnDefinition>
+        <ColumnDefinition>
+            <Name>process_cpu_load</Name>
+            <IsFacet>false</IsFacet>
+            <EnableIndexing>false</EnableIndexing>
+            <IsPrimaryKey>false</IsPrimaryKey>
+            <EnableScoreParam>false</EnableScoreParam>
+            <Type>DOUBLE</Type>
+        </ColumnDefinition>
+        <ColumnDefinition>
+            <Name>system_cpu_load</Name>
+            <IsFacet>false</IsFacet>
+            <EnableIndexing>false</EnableIndexing>
+            <IsPrimaryKey>false</IsPrimaryKey>
+            <EnableScoreParam>false</EnableScoreParam>
+            <Type>DOUBLE</Type>
+        </ColumnDefinition>
+    </TableSchema>
+    <Source>
+        <StreamId>CPUUsageStream:1.0.0</StreamId>
+    </Source>
+    <MergeSchema>false</MergeSchema>
+    <RecordStoreName>EVENT_STORE</RecordStoreName>
+</EventStoreConfiguration>
