@@ -28,6 +28,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>jvm-monitor-agent</module>
+        <module>das-capp</module>
     </modules>
 
     <repositories>
