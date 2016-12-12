@@ -1,0 +1,124 @@
+{
+  "name": "FeaturesModel1Stream",
+  "version": "1.0.0",
+  "nickName": "Ffeatures_model1_stream",
+  "description": "Features Model1 Stream",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "p_process_cpu_load",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_system_cpu_load",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_allocated_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_used_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_allocated_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_used_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_allocated_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_used_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_gc_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_eden_used_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_survivor_used_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_survivor_used_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_old_used_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_old_used_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_eden_committed_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_eden_committed_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_survivor_committed_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_survivor_committed_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_survivor_max_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_survivor_max_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_gc_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_survivor_used_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_survivor_used_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_old_used_before",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_survivor_committed_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_eden_max_after",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_eden_max_before",
+      "type": "DOUBLE"
+    }
+  ]
+}

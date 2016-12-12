@@ -1,0 +1,85 @@
+@Plan:name('prediction1')
+
+@Plan:statistics('true')
+
+@Plan:trace('true')
+
+define trigger PredictionResultTrigger at every 1 sec ;
+
+
+@Import('FeaturesModel4Stream:1.0.0')
+define stream FeaturesModel4Stream (time_stamp long, app_id string, 
+									z_used_heap double, 
+									p_allocated_heap double, 
+									p_used_heap double, 
+									dif_eden_used double, 
+									dif_old_used double, 
+									ratio_survivor double, 
+									dif_survivor_used double, 
+									sd_dif_eden_used double, 
+									sd_dif_old_used double, 
+									sd_ratio_survivor double, 
+									sd_dif_survivor_used double, 
+									z_dif_eden_used double, 
+									z_dif_old_used double, 
+									z_ratio_survivor double, 
+									z_dif_survivor_used double, 
+									p_dif_eden_used double, 
+									p_dif_old_used double, 
+									p_ratio_survivor double, 
+									p_dif_survivor_used double);
+
+@Export('PredictionResultStream:1.0.0')
+define stream PredictionResultStream (time_stamp long, app_id string, model_id string, prediction string);
+
+@IndexBy('app_id')
+define table PredictionResultStreamTable (time_stamp long, app_id string, model_id string, prediction string);
+
+from FeaturesModel4Stream#ml:predict('/home/buddhi/Documents/tem8b6/wso2das-3.1.0/models/pro8bm4a2c4.Model.2016-11-22_09-16-29','string',99.5,
+									 z_used_heap,
+									 p_allocated_heap,
+									 p_used_heap,
+									 --dif_eden_used,
+									 --dif_old_used,
+									 --ratio_survivor,
+									 --dif_survivor_used,
+									 --sd_dif_eden_used,
+									 --sd_dif_old_used,
+									 sd_ratio_survivor,
+									 --sd_dif_survivor_used,
+									 z_dif_eden_used,
+									 z_dif_old_used,
+									 z_ratio_survivor,
+									 z_dif_survivor_used
+									 --p_dif_eden_used,
+									 --p_dif_old_used,
+									 --p_ratio_survivor,
+									 --p_dif_survivor_used
+									)
+select 
+	time_stamp,
+	app_id,
+	'model 4' as model_id,
+	prediction
+insert into PredictionResultStreamTem;
+
+
+from PredictionResultTrigger join PredictionResultStreamTable#window.length(1)
+select
+	time_stamp+1000l as time_stamp,
+	app_id,
+	model_id,
+	prediction
+insert into PredictionResultStreamTable;
+
+from PredictionResultStreamTem#window.time(100)
+insert expired events into PredictionResultStreamTable;
+
+
+from PredictionResultTrigger#window.time(100) join PredictionResultStreamTable#window.length(1)
+select
+	time_stamp,
+	app_id,
+	model_id,
+	prediction
+insert into PredictionResultStream;
