@@ -1,5 +1,5 @@
 {
-  "name": "garbage_collection_stream",
+  "name": "GarbageCollectionStream",
   "version": "1.0.0",
   "nickName": "",
   "description": "GC log events",

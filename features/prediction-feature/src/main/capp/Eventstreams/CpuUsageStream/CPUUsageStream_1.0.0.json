@@ -1,5 +1,5 @@
 {
-  "name": "cpu_usage_stream",
+  "name": "CPUUsageStream",
   "version": "1.0.0",
   "nickName": "",
   "description": "CPU usage events",
