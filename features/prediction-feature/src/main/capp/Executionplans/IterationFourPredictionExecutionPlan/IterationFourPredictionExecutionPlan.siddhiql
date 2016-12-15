@@ -1,22 +1,18 @@
-@Plan:name('IterationThreePredictionExecutionPlan')
+@Plan:name('IterationFourPredictionExecutionPlan')
 
 @Plan:description('Anomaly Prediction - Iteration three features process plan for prediction')
-
-@Plan:trace('true')
-@Plan:statistics('true')
-
 
 --==========================================================================================================--
 --////////////////////////////////////////////// IMPORTS ///////////////////////////////////////////////////--
 --==========================================================================================================--
-@Import('memory_usage_stream:1.0.0')
+@Import('MemoryUsageStream:1.0.0')
 define stream MemoryUsageStream (time_stamp long, app_id string, 
 								 max_heap long, allocated_heap long, used_heap long, 
 								 max_non_heap long, allocated_non_heap long, used_non_heap long, 
 								 pending_finalizations long
 								);
 
-@Import('garbage_collection_stream:1.0.0')
+@Import('GarbageCollectionStream:1.0.0')
 define stream GarbageCollectionStream (time_stamp long, app_id string, gc_type string, gc_cause string, gc_duration long, 
 									   eden_used_after long, eden_used_before long, survivor_used_after long, survivor_used_before long, old_used_after long, old_used_before long, 
 									   eden_committed_after long, eden_committed_before long, survivor_committed_after long, survivor_committed_before long, old_committed_after long, old_committed_before long, 
@@ -26,45 +22,28 @@ define stream GarbageCollectionStream (time_stamp long, app_id string, gc_type s
 --/////////////////////////////////////////// END OF IMPORTS ///////////////////////////////////////////////--
 --==========================================================================================================--
 
-
 --==========================================================================================================--
 --////////////////////////////////////////////// EXPORTS ///////////////////////////////////////////////////--
 --==========================================================================================================--
-
-/**
-@Export('PredictionUsageStream:1.0.0')
-define stream PredictionUsageStream (app_id string, time_stamp long, heap_free string, heap_growing_rate string, heap_used_free_proportion string, heap_range_5sec string, heap_avg_3sec string, heap_avg_5sec string, heap_avg_10sec string, heap_avg_30sec string, heap_std_3sec string, heap_std_5sec string, heap_std_10sec string, heap_std_30sec string, heap_growing_rate_avg_3sec string, heap_growing_rate_avg_5sec string, heap_growing_rate_avg_10sec string, heap_growing_rate_avg_30sec string, heap_growing_rate_std_3sec string, heap_growing_rate_std_5sec string, heap_growing_rate_std_10sec string, heap_growing_rate_std_30sec string, heap_used_free_proportion_avg_3sec string, heap_used_free_proportion_avg_5sec string, heap_used_free_proportion_avg_10sec string, heap_used_free_proportion_avg_30sec string, heap_used_free_proportion_std_3sec string, heap_used_free_proportion_std_5sec string, heap_used_free_proportion_std_10sec string, heap_used_free_proportion_std_30sec string, minor_freq double, major_freq double, total_minor_duration double, total_major_duration double, avg_minor_duration double, avg_major_duration double, total_old_clearing_rate double, total_old_growing_rate_with_time double, avg_old_growing_rate_with_free double, avg_old_growing_with_free_plus_time double, young_gen_cleared double, old_gen_cleared double, old_free double);
-
-@Export('IterationThreePredictionResultsStream:1.0.0')
-define stream PredictionResultsStream (time_stamp long, app_id string, prediction string);
-
-
-@Export('PredictionResults:1.0.0')
-define stream PredictionResults (time_stamp long, app_id string, model_id string, prediction string);
-
-*/
-
+@Export('PredictionPublisher:1.0.0')
+define stream PredictionResultStream (time_stamp long, app_id string, model_id string, prediction string);
 --==========================================================================================================--
 --/////////////////////////////////////////// END OF EXPORTS ///////////////////////////////////////////////--
 --==========================================================================================================--
 
-
 --==========================================================================================================--
 --////////////////////////////////////////// INTERNAL DEFINES //////////////////////////////////////////////--
 --==========================================================================================================--
-define table GCCache (time_stamp long , app_id string , old_free double);
 define table TimeStampCache ( time_stamp long , app_id string);
 define trigger OneSecTrigger at every 1 sec;
 --==========================================================================================================--
 --//////////////////////////////////////// END OF INTERNAL DEFINES /////////////////////////////////////////--
 --==========================================================================================================--
 
-
 --==========================================================================================================--
 --//////////////////////////////////////// PROCESS GC EVENTS DATA///////////////////////////////////////////--
 --==========================================================================================================--
 --partion by app_id. used a sequence to collect 2 consecutive GC events with same app_id
-
 partition with (app_id of GarbageCollectionStream)
 begin
   from GarbageCollectionStream
@@ -77,50 +56,35 @@ begin
 
 	  (eden_used_before + survivor_used_before) as young_used_before,
 	  (eden_used_after + survivor_used_after) as young_used_after,
-	  (eden_max_after + survivor_max_after) as young_max_after,
 	  (old_used_before - old_used_after) as old_used_changed,
-	  (old_max_after - old_used_after) as old_free_after,
-
+	 
 	  old_used_before,
 	  old_used_after,
-	  old_max_after
+	  old_max_before
 
   insert into #GCStream;
-
-		
+	
   from g1 = #GCStream, g2 = #GCStream
-	  select 
-		  g2.app_id,
-		  g2.time_stamp,
+  select 
+	  g2.app_id,
+	  g2.time_stamp,
 
-		  g2.gc_type,
-		  g2.gc_duration,
+	  g2.gc_type,
+      g2.gc_duration,
 
-		  --calculate heap generation parameters--
-		  --young gen cleared with respect to gc duration and young used before
-		  ifThenElse(g2.young_used_before > 0 and g2.gc_duration > 0 ,(convert(g2.young_used_before - g2.young_used_after + g2.old_used_changed, 'double')/g2.young_used_before)/g2.gc_duration , 0.0) as young_gen_cleared,
+	  --calculate heap generation parameters--
+	  --heap changing
+	  (g2.young_used_after + g2.old_used_after) - (g1.young_used_after + g1.old_used_after) as heap_changing,
+		  
+	  --old gen growing 
+	  ifThenElse(g2.old_used_changed < 0, (convert(g2.old_used_changed*-1, 'double')/(g2.old_max_before - g2.old_used_before)), 0.0 ) as old_growing,
 
-		  --old gen growing with respect to time(used max old gen to normalized)
-		  ifThenElse(g1.old_used_after < g2.old_used_after and g2.old_max_after > 0, (convert(g2.old_used_after-g1.old_used_after, 'double')/g2.old_max_after) / (g2.time_stamp-g1.time_stamp), 0.0 ) as old_growing_rate_with_time,
-
-		  --old gen growing with respect to old gen free memory (no normalize is needed)
-		  ifThenElse(g1.old_used_after < g2.old_used_after and g1.old_free_after > 0, convert(g2.old_used_after-g1.old_used_after, 'double')/g1.old_free_after , 0.0 ) as old_growing_rate_with_free,
-
-		  --old gen growing with respect to time and old gen free memory 
-		  ifThenElse(g1.old_used_after < g2.old_used_after and g1.old_free_after > 0, (convert(g2.old_used_after-g1.old_used_after, 'double')/g1.old_free_after) / (g2.time_stamp-g1.time_stamp), 0.0 ) as old_growing_with_free_plus_time,
-
-		  --old gen memory clearing with respect to time
-		  ifThenElse(g1.old_used_after > g2.old_used_after and g2.old_max_after > 0, (convert(g1.old_used_after-g2.old_used_after, 'double')/g2.old_max_after)/(g2.time_stamp-g1.time_stamp), 0.0 ) as old_clearing_rate,
-
-		  --old gen clearing with respect to gc guration and old used before
-		  ifThenElse(g2.old_used_changed > 0 , (convert(g2.old_used_changed, 'double')/g2.old_used_before)/g2.gc_duration , 0.0 ) as old_gen_cleared,
-
-		  --old free with respect to max
-		  ifThenElse(g2.old_max_after > 0, (convert(g2.old_free_after, 'double')/g2.old_max_after) , 0.0 ) as old_free
-
+	  --old gen clearing with respect to gc guration and old used before
+	  ifThenElse(g2.old_used_changed > 0 , (convert(g2.old_used_changed, 'double')/g2.old_used_before)/g2.gc_duration , 0.0 ) as old_clearing
+  
   insert into GCProcessedUsageStream;
-end;	
-			
+end;
+
 --catogerized events into major and minor
 from GCProcessedUsageStream[not(gc_type is null)]
 select 
@@ -133,46 +97,31 @@ select
 	ifThenElse(gc_type == "minor", ifThenElse(gc_duration is null , 0L, gc_duration), 0L) as minor_gc_duration, 
 	ifThenElse(gc_type == "major", ifThenElse(gc_duration is null , 0L, gc_duration), 0L) as major_gc_duration,
 	
-	young_gen_cleared,
-	
-	old_gen_cleared,
-	old_clearing_rate,
-	old_growing_rate_with_time,
-	old_growing_rate_with_free,
-	old_growing_with_free_plus_time,
-	old_free
+	heap_changing,
+	old_growing,
+	old_clearing
 	
 insert into GCValidatedStream;
 
-
 --process garbage collection data to take a summery for collecting period(default 1 sec)
-from GCValidatedStream#window.externalTimeBatch(time_stamp, 1 sec, time_stamp, 1200)
+from GCValidatedStream#window.externalTimeBatch(time_stamp, 1 sec, time_stamp, 1 sec)
 select
 	
 	app_id,
 	
 	--time parameters
 	max(time_stamp) as time_stamp,
-	sum(minor_gc_duration) as total_minor_duration,
-	sum(major_gc_duration) as total_major_duration,
 	avg(minor_gc_duration) as avg_minor_duration,
 	avg(major_gc_duration) as avg_major_duration,
 
 	--take count major and minor gc frequencies 
-	sum(minor) as minor_freq,
-	sum(major) as major_freq,
+	ifThenElse(sum(minor) > 0 , 1.0 , 0.5) as minor_happened,
+	ifThenElse(sum(major) > 0 , 1.0 , 0.5) as major_happened,
 	
 	--take summeries of memory parameters
-		
-	sum(old_clearing_rate) as total_old_clearing_rate, --can exceed 1 (need further normalization)
-	sum(old_growing_rate_with_time) as total_old_growing_rate_with_time, --can exceed 1 (need further normalization)
-	
-	avg(old_growing_rate_with_free) as avg_old_growing_rate_with_free, 
-	avg(old_growing_with_free_plus_time) as avg_old_growing_with_free_plus_time,
-	
-	avg(young_gen_cleared) as avg_young_gen_cleared,
-	avg(old_gen_cleared) as avg_old_gen_cleared,
-	old_free
+	ifThenElse(sum(heap_changing) > 0 , 1.0 ,0.5 ) as heap_growing_with_gc,
+	avg(old_growing) as old_growing,
+	avg(old_clearing) as old_clearing
 	
   	group by app_id
 	
@@ -181,11 +130,9 @@ insert into GCBatchProcessedStream;
 --////////////////////////////////// END OF PROCESSING GC EVENTS DATA //////////////////////////////////////--
 --==========================================================================================================--
 
-
 --==========================================================================================================--
 --//////////////////////////////////// PROCESS MEMORY USAGE DATA ///////////////////////////////////////////--
 --==========================================================================================================--
-
 from MemoryUsageStream
 select 
 	time_stamp,
@@ -195,11 +142,9 @@ select
 	max_heap
 insert into PreProcessedMemoryStream;
 
-
 partition with (app_id of PreProcessedMemoryStream)
 begin
 
-	
 	--connect last two consecutive memory events
 	from m1 = PreProcessedMemoryStream, m2 = PreProcessedMemoryStream
 		select 
@@ -217,7 +162,6 @@ begin
 	
 end;
 	
-	
 --correct the time stamps of missing events 
 from PeriodicMemoryStream as M unidirectional left outer join TimeStampCache as T on M.app_id == T.app_id
 select 
@@ -233,12 +177,6 @@ select time_stamp, app_id
 insert overwrite TimeStampCache
 	on TimeStampCache.app_id == app_id;
 	
-	
-from PeriodicMemoryUsageStream
-select 
-app_id, time_stamp
-insert into T1;
-
 --process memory usage into summery using 3 seconds values
 from PeriodicMemoryUsageStream#window.time(3 sec)
 select 
@@ -317,7 +255,6 @@ select
 	group by app_id
 insert into ThirtySecMemorySummery;
 
-
 --==========================================================================================================--
 --/////////////////////////////////// END OF PROCESS MEMORY USAGE DATA /////////////////////////////////////--
 --==========================================================================================================--
@@ -353,7 +290,6 @@ select
 	
 insert into ThreeSecFiveSecMemoryStream;
 
-
 from TenSecMemorySummery#window.length(1) as A join ThirtySecMemorySummery#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
 select 
 	A.time_stamp,
@@ -375,7 +311,6 @@ select
 	B.heap_used_free_proportion_std_30sec
 	
 insert into TenSecThirtySecMemoryStream;
-
 
 from ThreeSecFiveSecMemoryStream#window.length(1) as A join TenSecThirtySecMemoryStream#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
 select 
@@ -403,7 +338,6 @@ select
 	
 	A.heap_range_5sec,
 	
-	
 	B.heap_avg_10sec,
 	B.heap_avg_30sec,
 	B.heap_std_10sec,
@@ -424,33 +358,82 @@ insert into ProcessedMemoryUsageStream;
 --//////////////////////////////// END OF JOINING MEMORY USAGE SUMMERY DATA/////////////////////////////////--
 --==========================================================================================================--
 
-
 --==========================================================================================================--
 --//////////////////////////////////// PROCESSING TWO JOINING STREAMS //////////////////////////////////////--
 --==========================================================================================================--	
-from ProcessedMemoryUsageStream#window.time(1200)
-select *
-insert expired events into DelayedMemoryStream;
 
+partition with ( app_id of  ProcessedMemoryUsageStream)
+begin
+
+  from p1 = ProcessedMemoryUsageStream, p2 = ProcessedMemoryUsageStream
+  select 
+  	p2.app_id,
+	p2.time_stamp,
+	
+	p2.heap_free,
+	p2.heap_growing_rate,
+	p2.heap_used_free_proportion,
+	
+	p2.heap_avg_3sec,
+	p2.heap_avg_5sec,
+	p2.heap_std_3sec,
+	p2.heap_std_5sec,
+	
+	p2.heap_growing_rate_avg_3sec,
+	p2.heap_growing_rate_avg_5sec,
+	p2.heap_growing_rate_std_3sec,
+	p2.heap_growing_rate_std_5sec,
+	
+	p2.heap_used_free_proportion_avg_3sec,
+	p2.heap_used_free_proportion_avg_5sec,
+	p2.heap_used_free_proportion_std_3sec,
+	p2.heap_used_free_proportion_std_5sec,
+	
+	p2.heap_range_5sec,
+	
+	p2.heap_avg_10sec,
+	p2.heap_avg_30sec,
+	p2.heap_std_10sec,
+	p2.heap_std_30sec,
+	
+	p2.heap_growing_rate_avg_10sec,
+	p2.heap_growing_rate_avg_30sec,
+	p2.heap_growing_rate_std_10sec,
+	p2.heap_growing_rate_std_30sec,
+	
+	p2.heap_used_free_proportion_avg_10sec,
+	p2.heap_used_free_proportion_avg_30sec,
+	p2.heap_used_free_proportion_std_10sec,
+	p2.heap_used_free_proportion_std_30sec,
+	
+	ifThenElse(p2.heap_avg_3sec > p1.heap_avg_3sec , 1.0 , 0.0 ) as heap_avg_3_increasing,
+	ifThenElse(p2.heap_avg_5sec > p1.heap_avg_5sec , 1.0 , 0.0 ) as heap_avg_5_increasing,
+	ifThenElse(p2.heap_avg_10sec > p1.heap_avg_10sec , 1.0 , 0.0 ) as heap_avg_10_increasing,
+	ifThenElse(p2.heap_avg_30sec > p1.heap_avg_30sec , 1.0 , 0.0 ) as heap_avg_30_increasing,
+	
+	ifThenElse(p2.heap_growing_rate_std_3sec > p1.heap_growing_rate_std_3sec , 1.0 , 0.0 ) as heap_growing_3_increasing,
+	ifThenElse(p2.heap_growing_rate_std_5sec > p1.heap_growing_rate_std_5sec , 1.0 , 0.0 ) as heap_growing_5_increasing,
+	ifThenElse(p2.heap_growing_rate_std_10sec > p1.heap_growing_rate_std_10sec , 1.0 , 0.0 ) as heap_growing_10_increasing,
+	ifThenElse(p2.heap_growing_rate_std_30sec > p1.heap_growing_rate_std_30sec , 1.0 , 0.0 ) as heap_growing_30_increasing
+	
+  insert into UsageFeatureStream;
+  
+end;
 
 --==========================================================================================================--
 --//////////////////////////////////// END OF TWO JOINING STREAMS //////////////////////////////////////////--
 --==========================================================================================================--	
 
-
-from DelayedMemoryStream
-select app_id,time_stamp, "usage" as type
-insert into T2;
-
-from GCBatchProcessedStream
-select app_id,time_stamp, "gc" as type
-insert into T2;
-
 --==========================================================================================================--
 --/////////////////////////////////// JOINING ALL USAGE DATA (INCLUDED GC) /////////////////////////////////--
 --==========================================================================================================--
+--add 1 sec delay to the usage stream 
+from UsageFeatureStream#window.time(1 sec)
+select *
+insert expired events into DelayedMemoryStream;
+
 --join the common usage data to GC processed data
-from  DelayedMemoryStream#window.length(20) as U unidirectional full outer join GCBatchProcessedStream#window.length(10)  as G on ( U.time_stamp-1000 <= G.time_stamp and U.time_stamp >= G.time_stamp and U.app_id == G.app_id)
+from  DelayedMemoryStream#window.length(20) as U unidirectional left outer join GCBatchProcessedStream#window.length(10)  as G on ( U.time_stamp-1000 <= G.time_stamp and U.time_stamp >= G.time_stamp and U.app_id == G.app_id)
 select 
 
 	-------------General details----------------
@@ -493,46 +476,41 @@ select
 	U.heap_used_free_proportion_std_10sec,
 	U.heap_used_free_proportion_std_30sec,
 
-	------------------GC logs--------------------
-
 	
+	U.heap_avg_3_increasing,
+	U.heap_avg_5_increasing,
+	U.heap_avg_10_increasing,
+	U.heap_avg_30_increasing,
+	
+	U.heap_growing_3_increasing,
+	U.heap_growing_5_increasing,
+	U.heap_growing_10_increasing,
+	U. heap_growing_30_increasing,
+	
+	------------------GC logs--------------------
 	--GC frequencies 
-	G.major_freq,
-	G.minor_freq,
+	G.major_happened,
+	G.minor_happened,
 
 	--GC duration parameters
-	G.total_minor_duration,
-	G.total_major_duration,
 	G.avg_minor_duration,
 	G.avg_major_duration,
 
 	--summeries of GC memory parameters
-	G.total_old_clearing_rate,
-	G.total_old_growing_rate_with_time,
-	
-	G.avg_old_growing_rate_with_free,
-	G.avg_old_growing_with_free_plus_time,
-	
-	G.avg_young_gen_cleared,
-	G.avg_old_gen_cleared,
-	G.old_free
+	G.heap_growing_with_gc,
+	G.old_growing,
+	G.old_clearing
 	
 insert into JoinedFeatureStream;
-
 --==========================================================================================================--
 --//////////////////////////////////// END OF JOINING ALL USAGE DATA ///////////////////////////////////////--
 --==========================================================================================================--
 
-from JoinedFeatureStream[not(old_free is null)]
-select time_stamp, app_id, old_free
-insert overwrite GCCache
-	on GCCache.app_id == app_id;
 --==========================================================================================================--
 --//////////////////////////////////////// VALIDATE ALL FEATURES ///////////////////////////////////////////--
 --==========================================================================================================--
-from JoinedFeatureStream as J unidirectional left outer join GCCache as G on J.app_id == G.app_id
+from JoinedFeatureStream 
 select 
-
 	J.app_id,
 	J.time_stamp,
 	
@@ -572,104 +550,146 @@ select
 	ifThenElse(heap_used_free_proportion_std_10sec is null , '?', convert(heap_used_free_proportion_std_10sec, 'string')) as heap_used_free_proportion_std_10sec,
 	ifThenElse(heap_used_free_proportion_std_30sec is null , '?', convert(heap_used_free_proportion_std_30sec, 'string')) as heap_used_free_proportion_std_30sec,	
 	
-	--normalize gc frequencies
-	ifThenElse( not(minor_freq is null) and minor_freq > 0 , ifThenElse(minor_freq < 10 , convert(minor_freq, 'double')/10 , 1.0 ), 0.0 ) as minor_freq, --maximum minor gc frequency is taken as 10
-	ifThenElse( not(major_freq is null) and major_freq > 0 , ifThenElse(major_freq < 10 , convert(major_freq, 'double')/10 , 1.0 ), 0.0 ) as major_freq, --maximum major gc frequency is taken as 10
 
+	ifThenElse(heap_avg_3_increasing is null, '?' , convert(heap_avg_3_increasing, 'string')) as heap_avg_3_increasing,
+	ifThenElse(heap_avg_5_increasing is null, '?' , convert(heap_avg_5_increasing, 'string')) as heap_avg_5_increasing,
+	ifThenElse(heap_avg_10_increasing is null, '?' , convert(heap_avg_10_increasing, 'string')) as heap_avg_10_increasing,
+	ifThenElse(heap_avg_30_increasing is null , '?' , convert(heap_avg_30_increasing, 'string')) as heap_avg_30_increasing,
+	
+	ifThenElse(heap_growing_3_increasing is null, '?' , convert(heap_growing_3_increasing, 'string')) as heap_growing_3_increasing,
+	ifThenElse(heap_growing_5_increasing is null, '?' , convert(heap_growing_5_increasing, 'string')) as heap_growing_5_increasing,
+	ifThenElse(heap_growing_10_increasing is null, '?' , convert(heap_growing_10_increasing, 'string')) as heap_growing_10_increasing,
+	ifThenElse(heap_growing_30_increasing is null, '?' , convert(heap_growing_30_increasing, 'string')) as heap_growing_30_increasing,
+	
+	
+	ifThenElse(major_happened is null, 0.0 , major_happened) as major_happened,
+	ifThenElse(minor_happened is null, 0.0 , minor_happened) as minor_happened,
+	
 	--normalize GC durations
-	ifThenElse( not(total_minor_duration is null) and total_minor_duration > 0 , ifThenElse(total_minor_duration<1000 , convert(total_minor_duration, 'double')/1000 , 1.0), 0.0 )as total_minor_duration, --maximum minor gc durations is taken as 1000
-	ifThenElse( not(total_major_duration is null) and total_major_duration > 0 , ifThenElse(total_major_duration<10000 , convert(total_major_duration, 'double')/10000 , 1.0), 0.0 )as total_major_duration, --maximum major gc durations is taken as 10000
 	ifThenElse( not(avg_minor_duration is null) and avg_minor_duration > 0 , ifThenElse(avg_minor_duration<500 , avg_minor_duration/500 , 1.0), 0.0 )as avg_minor_duration, --maximum minor gc durations is taken as 500
 	ifThenElse( not(avg_major_duration is null) and avg_major_duration > 0 , ifThenElse(avg_major_duration<5000 , avg_major_duration/5000 , 1.0), 0.0 )as avg_major_duration, --maximum major gc durations is taken as 5000
 
 	--validate GC memory parameters
-	ifThenElse(total_old_clearing_rate is null , 0.0 , total_old_clearing_rate) as total_old_clearing_rate, 
-	ifThenElse(total_old_growing_rate_with_time is null , 0.0 , total_old_growing_rate_with_time) as total_old_growing_rate_with_time, 
-	ifThenElse(avg_old_growing_rate_with_free is null , 0.0 , avg_old_growing_rate_with_free) as avg_old_growing_rate_with_free, 
-	ifThenElse(avg_old_growing_with_free_plus_time is null , 0.0 , avg_old_growing_with_free_plus_time) as avg_old_growing_with_free_plus_time, 
-
-	
-	ifThenElse(avg_young_gen_cleared is null, 0.0, avg_young_gen_cleared) as young_gen_cleared, 
-	ifThenElse(avg_old_gen_cleared is null, 0.0, avg_old_gen_cleared) as old_gen_cleared, 
-	coalesce(J.old_free, G.old_free, 0.0) as old_free	
+	ifThenElse( heap_growing_with_gc is null , 0.0 , heap_growing_with_gc) as heap_growing_with_gc,
+	ifThenElse( old_growing is null , 0.0 , old_growing ) as old_growing,
+	ifThenElse( old_clearing is null , 0.0 , old_clearing ) as old_clearing
 
 insert into PredictionUsageStream;
- 
---==========================================================================================================--
+ --==========================================================================================================--
 --///////////////////////////////////// END OF FEATURE VALIDATION //////////////////////////////////////////--
---==========================================================================================================--
-
-from JoinedFeatureStream 
-select 
-	
-	time_stamp,
-	app_id,
-	
-	ifThenElse(heap_avg_5sec is null , '?', convert(heap_avg_5sec, 'string')) as heap_avg_5sec,
-	ifThenElse(heap_avg_10sec is null , '?', convert(heap_avg_10sec, 'string')) as heap_avg_10sec,
-	ifThenElse(heap_avg_30sec is null , '?', convert(heap_avg_30sec, 'string')) as heap_avg_30sec,
-
-	ifThenElse(heap_growing_rate_avg_5sec is null , '?', convert(heap_growing_rate_avg_5sec, 'string')) as heap_growing_rate_avg_5sec,
-	ifThenElse(heap_growing_rate_avg_10sec is null , '?', convert(heap_growing_rate_avg_10sec, 'string')) as heap_growing_rate_avg_10sec,
-	ifThenElse(heap_growing_rate_avg_30sec is null , '?', convert(heap_growing_rate_avg_30sec, 'string')) as heap_growing_rate_avg_30sec,
-
-	ifThenElse(heap_used_free_proportion_avg_5sec is null , '?', convert(heap_used_free_proportion_avg_5sec, 'string')) as heap_used_free_proportion_avg_5sec,
-	ifThenElse(heap_used_free_proportion_avg_10sec is null , '?', convert(heap_used_free_proportion_avg_10sec, 'string')) as heap_used_free_proportion_avg_10sec,
-	ifThenElse(heap_used_free_proportion_avg_30sec is null , '?', convert(heap_used_free_proportion_avg_30sec, 'string')) as heap_used_free_proportion_avg_30sec,
-	
-	
-	--normalize gc frequencies
-	ifThenElse( minor_freq is null , 0.0, ifThenElse( minor_freq > 0 , 1.0, 0.0)) as minor_freq,
-	ifThenElse( major_freq is null , 0.0 , ifThenElse( major_freq > 0 , 1.0, 0.0)) as major_freq,
-
-	
-	--validate GC memory parameters
-	ifThenElse(total_old_growing_rate_with_time is null , 0.0 , total_old_growing_rate_with_time) as total_old_growing_rate_with_time, 
-	ifThenElse(avg_old_growing_rate_with_free is null , 0.0 , avg_old_growing_rate_with_free) as avg_old_growing_rate_with_free, 
-	ifThenElse(avg_old_growing_with_free_plus_time is null , 0.0 , avg_old_growing_with_free_plus_time) as avg_old_growing_with_free_plus_time, 
-
-	
-	ifThenElse(avg_young_gen_cleared is null, 0.0, avg_young_gen_cleared) as young_gen_cleared, 
-	ifThenElse(avg_old_gen_cleared is null, 0.0, avg_old_gen_cleared) as old_gen_cleared 
-	
-
-insert into ForPredictionOne;
-
---==========================================================================================================--
---//////////////////////////////////////////// END OF OUTPUT ///////////////////////////////////////////////--
 --==========================================================================================================--
 
 --==========================================================================================================--
 --/////////////////////////////////// PREDICTION USING ML EXTENSION ////////////////////////////////////////--
 --==========================================================================================================--
-
-
-
-from ForPredictionOne#ml:predict('registry:/_system/governance/mlmodels/Analysis1.Model' , 'string', 99.0 ,
-	heap_avg_5sec,
-	heap_avg_10sec,
-	heap_avg_30sec,
-	heap_growing_rate_avg_5sec,
-	heap_growing_rate_avg_10sec,
-	heap_growing_rate_avg_30sec,
-	heap_used_free_proportion_avg_5sec,
-	heap_used_free_proportion_avg_10sec,
-	heap_used_free_proportion_avg_30sec,
-	minor_freq,
-	major_freq,
-	total_old_growing_rate_with_time,
-	avg_old_growing_rate_with_free,
-	avg_old_growing_with_free_plus_time,
-	young_gen_cleared,
-	old_gen_cleared
- )
+from PredictionUsageStream#ml:predict('/home/nadheesh/install/wso2_products/DAS/Versions/Iteration3.0/wso2das-3.1.0/models/Model_3.Model.2016-11-10_13-35-05' , 'string', 99.0 ,	
+									  heap_avg_10sec,
+									  heap_avg_30sec,							 
+									  heap_used_free_proportion_avg_30sec,
+									  heap_avg_10_increasing,
+									  heap_avg_30_increasing,
+									  heap_growing_10_increasing,
+									  heap_growing_30_increasing,
+									  major_happened,
+									  minor_happened,
+									  heap_growing_with_gc,
+									  old_growing,
+									  old_clearing
+									 )
  select 
  	time_stamp,
 	app_id,
+	'model_1' as model_id,
+	prediction
+insert into PredictionResultStream;
+
+from PredictionUsageStream#ml:predict('/home/nadheesh/install/wso2_products/DAS/Versions/Iteration3.0/wso2das-3.1.0/models/IterationFour.Model.2016-11-10_09-48-34' , 'string', 99.0 ,	
+									  heap_avg_10sec,
+									  heap_avg_30sec,	
+									  heap_std_10sec,	
+									  heap_std_30sec,							  
+									  heap_growing_rate_avg_10sec,
+									  heap_growing_rate_avg_30sec,
+									  heap_used_free_proportion_avg_10sec,								 
+									  heap_used_free_proportion_avg_30sec,
+									  heap_avg_10_increasing,
+									  heap_avg_30_increasing,
+									  heap_growing_10_increasing,
+									  heap_growing_30_increasing,
+									  major_happened,
+									  minor_happened,
+									  heap_growing_with_gc,
+									  old_growing,
+									  old_clearing
+									  )
+ select 
+ 	time_stamp as time_stamp,
+	app_id,
+	'model_2' as model_id,
+	prediction
+insert into PredictionResultStream ;
+
+from PredictionUsageStream#ml:predict('/home/nadheesh/install/wso2_products/DAS/Versions/Iteration3.0/wso2das-3.1.0/models/IterationFour_new.Model.2016-12-05_14-45-37' , 'string', 99.0 ,	
+									  heap_avg_3sec,
+									  heap_avg_5sec,
+									  heap_avg_10sec,
+									  heap_avg_30sec,	
+									  heap_std_10sec,	
+									  heap_std_30sec,							  
+									  heap_growing_rate_avg_3sec,
+									  heap_growing_rate_avg_5sec,
+									  heap_growing_rate_avg_10sec,
+									  heap_growing_rate_avg_30sec,
+									  heap_growing_rate_std_10sec,
+									  heap_growing_rate_std_30sec,
+									  heap_used_free_proportion_avg_3sec,								 
+									  heap_used_free_proportion_avg_5sec,
+									  heap_used_free_proportion_avg_10sec,								 
+									  heap_used_free_proportion_avg_30sec,
+									  heap_avg_3_increasing,
+									  heap_avg_5_increasing,
+									  heap_avg_10_increasing,
+									  heap_avg_30_increasing,
+									  heap_growing_3_increasing,
+									  heap_growing_5_increasing,
+									  heap_growing_10_increasing,
+									  heap_growing_30_increasing,
+									  major_happened,
+									  minor_happened,
+									  heap_growing_with_gc,
+									  old_growing,
+									  old_clearing
+									  )
+ select 
+ 	time_stamp as time_stamp,
+	app_id,
 	'model_3' as model_id,
 	prediction
-insert into PredictionResults;
+insert into PredictionResultStream ;
 
+from PredictionUsageStream#ml:predict('/home/nadheesh/install/wso2_products/DAS/Versions/Iteration3.0/wso2das-3.1.0/models/IterationFour_new1.Model.2016-12-07_12-27-35' , 'string', 99.0 ,	
+								
+									  heap_growing_rate_avg_5sec,
+									  heap_growing_rate_avg_10sec,
+									  heap_growing_rate_avg_30sec,
+									  heap_avg_5_increasing,
+									  heap_avg_10_increasing,
+									  heap_avg_30_increasing,
+									  heap_growing_5_increasing,
+									  heap_growing_10_increasing,
+									  heap_growing_30_increasing,
+									  major_happened,
+									  minor_happened,
+									  heap_growing_with_gc,
+									  old_growing,
+									  old_clearing
+									  )
+ select 
+ 	time_stamp as time_stamp,
+	app_id,
+	'model_4' as model_id,
+	prediction
+insert into PredictionResultStream;
 
 --==========================================================================================================--
 --//////////////////////////////// END OF PREDICTION USING ML EXTENSION ////////////////////////////////////--
