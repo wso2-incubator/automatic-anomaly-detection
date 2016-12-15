@@ -1,0 +1,188 @@
+{
+  "name": "IterationFourProcessedUsageStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "heap_free",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_range_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_3_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_5_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_10_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_30_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_3_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_5_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_10_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_30_increasing",
+      "type": "STRING"
+    },
+    {
+      "name": "major_happened",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "minor_happened",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avg_minor_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avg_major_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_growing_with_gc",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_clearing",
+      "type": "DOUBLE"
+    }
+  ]
+}
