@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="anomaly-prediction-capp" default="zip" basedir=".">
+<project name="anomaly-prediction-capp" default="zip" basedir="../../prediction-feature">
 
     <property name="project-name" value="${ant.project.name}"/>
-    <property name="res-dir" value="src/main/resources"/>
+    <property name="res-dir" value="../../prediction-feature/src/main/resources"/>
     <property name="target-dir" value="target"/>
 
-    <property name="AUTOMATIC_ANOMALY_PREDICTION_dir" value="src/main/capp"/>
+    <property name="AUTOMATIC_ANOMALY_PREDICTION_dir" value="../../prediction-feature/src/main/capp"/>
     <property name="AUTOMATIC_ANOMALY_PREDICTION_capp_name" value="anomaly-prediction-capp"/>
     <property name="AUTOMATIC_ANOMALY_PREDICTION_capp_version" value="1.0.0"/>
     <!--<property name="EVENT_RECEIVER_dir" value="Eventreceivers" />-->
