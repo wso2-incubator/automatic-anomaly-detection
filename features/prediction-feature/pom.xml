@@ -1,19 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>anomaly-prediction-features</artifactId>
-        <groupId>org.wso2.anomalyDetection</groupId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.wso2.anomalyDetection</groupId>
+        <artifactId>anomaly-prediction-features</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <name>WSO2 ML Prediction Feature</name>
     <artifactId>prediction-feature</artifactId>
     <packaging>pom</packaging>
 
     <build>
         <plugins>
+
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.4.1</version>
@@ -27,6 +48,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
@@ -44,6 +66,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -57,9 +80,10 @@
                             <outputDirectory>src/main/resources</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>resources</directory>
+                                    <!--**********************************-->
+                                    <directory>src/main/resources</directory>
                                     <includes>
-                                        <include>anomaly_prediction_capp-1.0.0.car</include>
+                                        <include>anomaly-prediction-predictor-capp-1.0.0.car</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -67,6 +91,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
