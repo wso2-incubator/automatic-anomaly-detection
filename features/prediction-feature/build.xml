@@ -7,9 +7,10 @@
 
     <property name="AUTOMATIC_ANOMALY_PREDICTION_dir"
               value="../prediction-feature/src/main/capp"/>
-    <property name="AUTOMATIC_ANOMALY_PREDICTION_capp_name" value="anomaly-prediction-predictor-capp"/>
+    <property name="AUTOMATIC_ANOMALY_PREDICTION_capp_name"
+              value="anomaly-prediction-predictor-capp"/>
     <property name="AUTOMATIC_ANOMALY_PREDICTION_capp_version" value="1.0.0"/>
-    <property name="EVENT_RECEIVER_dir" value="Eventreceivers" />
+    <property name="EVENT_RECEIVER_dir" value="Eventreceivers"/>
     <property name="EXECUTION_PLAN_dir" value="Executionplans"/>
     <property name="EVENT_STREAM_dir" value="Eventstreams"/>
     <property name="EVENT_STORE_dir" value="Eventstores"/>
@@ -17,7 +18,7 @@
 
     <target name="clean">
         <delete dir="${target-dir}"/>
-            <delete file="${res-dir}/${AUTOMATIC_ANOMALY_PREDICTION_capp_name}-${AUTOMATIC_ANOMALY_PREDICTION_capp_version}.car"/>
+        <delete file="${res-dir}/${AUTOMATIC_ANOMALY_PREDICTION_capp_name}-${AUTOMATIC_ANOMALY_PREDICTION_capp_version}.car"/>
     </target>
 
     <target name="pre-configure">
@@ -26,8 +27,8 @@
 
     <target name="zip" depends="clean,pre-configure">
         <zip destfile="${res-dir}/${AUTOMATIC_ANOMALY_PREDICTION_capp_name}-${AUTOMATIC_ANOMALY_PREDICTION_capp_version}.car">
-            <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${EVENT_RECEIVER_dir}" />
-            <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${EVENT_STORE_dir}" />
+            <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${EVENT_RECEIVER_dir}"/>
+            <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${EVENT_STORE_dir}"/>
             <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${EVENT_STREAM_dir}"/>
             <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${EXECUTION_PLAN_dir}"/>
             <zipfileset dir="${AUTOMATIC_ANOMALY_PREDICTION_dir}/${RESOURCE_dir}"/>
