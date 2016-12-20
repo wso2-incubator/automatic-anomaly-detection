@@ -228,7 +228,7 @@ select
 	group by app_id
 insert into FeaturesSet3Stream;
 
-from FeaturesSet3Stream#ml:predict('/home/buddhi/Documents/tem8b8/wso2dasEsbEdit/models/features_set3_model4.Model','string',99.8,
+from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model4.Model','string',99.8,
 	gc_duration_3sec,
 	diff_eden_3sec,
 	eden_increased_3sec,
@@ -254,8 +254,8 @@ from FeaturesSet3Stream#ml:predict('/home/buddhi/Documents/tem8b8/wso2dasEsbEdit
 select
 	time_stamp,
 	app_id,
-	'model 4 44444444' as model_id,
-	ifThenElse(prediction == 'anomaly','anomaly 4444444444444444444444444444444444444444444444444444444' , prediction) as prediction
+	'model_6' as model_id,
+	prediction
 insert into PredictionResultStreamTem;
 
 
