@@ -28,13 +28,6 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <licenses>
-        <license>
-            <name>Apache License Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-
     <name>WSO2 ML Prediction Feature</name>
     <artifactId>prediction-feature</artifactId>
     <packaging>pom</packaging>
