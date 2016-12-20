@@ -32,13 +32,6 @@
     <artifactId>anomaly-prediction-features</artifactId>
     <packaging>pom</packaging>
 
-    <licenses>
-        <license>
-            <name>Apache License Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-        </license>
-    </licenses>
-
     <modules>
         <module>training-feature</module>
         <module>prediction-feature</module>

@@ -34,7 +34,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.4.1</version>
@@ -48,7 +47,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
@@ -66,7 +64,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -80,7 +77,6 @@
                             <outputDirectory>src/main/resources</outputDirectory>
                             <resources>
                                 <resource>
-                                    <!--**********************************-->
                                     <directory>src/main/resources</directory>
                                     <includes>
                                         <include>anomaly-prediction-predictor-capp-1.0.0.car
@@ -94,7 +90,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
@@ -117,14 +112,10 @@
                                     </propertyDef>
                                 </properties>
                             </adviceFile>
-                            <bundles>
-                                <!--<bundleDef>org.wso2.anomalyDetection:automatic-anomaly-detection</bundleDef>-->
-                            </bundles>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 
