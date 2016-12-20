@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifact name="FeaturesSet3Stream" version="1.0.0" type="event/stream"
+          serverRole="DataAnalyticsServer">
+    <file>FeaturesSet3Stream_1.0.0.json</file>
+</artifact>
