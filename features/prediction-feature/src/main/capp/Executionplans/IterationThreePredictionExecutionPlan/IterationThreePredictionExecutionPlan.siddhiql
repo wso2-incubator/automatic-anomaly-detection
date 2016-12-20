@@ -521,7 +521,7 @@ insert into ForPredictionOne;
 --==========================================================================================================--
 --/////////////////////////////////// PREDICTION USING ML EXTENSION ////////////////////////////////////////--
 --==========================================================================================================--
-from ForPredictionOne#ml:predict('/home/buddhi/work/New/features/automatic-anomaly-detection/features/prediction-feature/src/main/capp/Resources/models/resources/model_5.Model' , 'string', 99.0 ,
+from ForPredictionOne#ml:predict('registry:/_system/governance/mlmodels/model_5.Model' , 'string', 99.0 ,
 	heap_avg_5sec,
 	heap_avg_10sec,
 	heap_avg_30sec,
