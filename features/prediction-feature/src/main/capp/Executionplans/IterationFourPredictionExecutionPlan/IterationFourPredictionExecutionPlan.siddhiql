@@ -582,7 +582,7 @@ insert into PredictionUsageStream;
 --==========================================================================================================--
 --/////////////////////////////////// PREDICTION USING ML EXTENSION ////////////////////////////////////////--
 --==========================================================================================================--
-from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/model_1.Model' , 'string', 99.0 ,
+from PredictionUsageStream#ml:predict('/home/buddhi/work/New/features/automatic-anomaly-detection/features/prediction-feature/src/main/capp/Resources/models/resources/model_1.Model' , 'string', 99.0 ,
 									  heap_avg_10sec,
 									  heap_avg_30sec,							 
 									  heap_used_free_proportion_avg_30sec,
@@ -603,7 +603,7 @@ from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/mod
 	prediction
 insert into PredictionResultsStream;
 
-from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/model_2.Model' , 'string', 99.0 ,
+from PredictionUsageStream#ml:predict('/home/buddhi/work/New/features/automatic-anomaly-detection/features/prediction-feature/src/main/capp/Resources/models/resources/model_2.Model' , 'string', 99.0 ,
 									  heap_avg_10sec,
 									  heap_avg_30sec,	
 									  heap_std_10sec,	
@@ -629,7 +629,7 @@ from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/mod
 	prediction
 insert into PredictionResultsStream;
 
-from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/model_3.Model' , 'string', 99.0 ,
+from PredictionUsageStream#ml:predict('/home/buddhi/work/New/features/automatic-anomaly-detection/features/prediction-feature/src/main/capp/Resources/models/resources/model_3.Model' , 'string', 99.0 ,
 									  heap_avg_3sec,
 									  heap_avg_5sec,
 									  heap_avg_10sec,
@@ -667,7 +667,7 @@ from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/mod
 	prediction
 insert into PredictionResultsStream;
 
-from PredictionUsageStream#ml:predict('registry:/_system/governance/mlmodels/model_4.Model' , 'string', 99.0 ,
+from PredictionUsageStream#ml:predict('/home/buddhi/work/New/features/automatic-anomaly-detection/features/prediction-feature/src/main/capp/Resources/models/resources/model_4.Model' , 'string', 99.0 ,
 								
 									  heap_growing_rate_avg_5sec,
 									  heap_growing_rate_avg_10sec,
