@@ -20,4 +20,12 @@
         <file>model_5.Model</file>
         <path>/_system/governance/mlmodels</path>
     </item>
+    <item>
+        <file>features_set3_model6.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>features_set3_model7.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
 </resources>

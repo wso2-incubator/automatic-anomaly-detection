@@ -83,7 +83,8 @@
                                     <!--**********************************-->
                                     <directory>src/main/resources</directory>
                                     <includes>
-                                        <include>anomaly-prediction-predictor-capp-1.0.0.car</include>
+                                        <include>anomaly-prediction-predictor-capp-1.0.0.car
+                                        </include>
                                         <include>p2.inf</include>
                                         <include>build.properties</include>
                                     </includes>
@@ -110,8 +111,10 @@
                             <propertiesFile>../feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
-                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:true</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server
+                                    </propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:true
+                                    </propertyDef>
                                 </properties>
                             </adviceFile>
                             <bundles>
