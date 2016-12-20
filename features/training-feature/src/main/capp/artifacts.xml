@@ -21,6 +21,11 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="IterationFourProcessedUsageStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3Stream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesWithoutValidation" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+
 
         <!--Event stores-->
         <dependency artifact="CpuUsageEventStore" version="1.0.0" include="true"
@@ -34,10 +39,14 @@
         <dependency artifact="IterationFourProcessedUsageEventStore" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
 
-        <!--Event stores-->
+        <!--Executionplan-->
         <dependency artifact="IterationThreeProcessExecutionPlan" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="IterationFourProcessExecutionPlan" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3TimeSeries1" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
 
     </artifact>
