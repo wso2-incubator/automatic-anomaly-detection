@@ -19,6 +19,10 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="PredictionResultsStream" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3Stream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesWithoutValidation" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
 
         <!--Event stores-->
         <dependency artifact="CpuUsageEventStore" version="1.0.0" include="true"
@@ -28,10 +32,16 @@
         <dependency artifact="MemoryUsageEventStore" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
 
-        <!--Event stores-->
+        <!--Executionplans-->
         <dependency artifact="IterationFourPredictionExecutionPlan" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="IterationThreePredictionExecutionPlan" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3TimeSeries1" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3TimeSeries2" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
 
         <!--models-->
