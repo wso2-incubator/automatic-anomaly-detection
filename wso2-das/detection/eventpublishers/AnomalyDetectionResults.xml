@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<eventPublisher name="AnomalyDetectionResults" statistics="disable"
-  trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
-  <from streamName="PredictionResultsStream" version="1.0.0"/>
-  <mapping customMapping="disable" type="text"/>
-  <to eventAdapterType="logger">
-    <property name="uniqueId">AD-Result</property>
-  </to>
-</eventPublisher>
