@@ -31,8 +31,8 @@ define stream FeaturesSet3Stream (time_stamp long, app_id string, gc_duration_3s
 --================================================= End of Imports ===================================================--
 
 --===================================================== Exports ======================================================--
-@Export('PredictionResultStream:1.0.0')
-define stream PredictionResultStream (time_stamp long, app_id string, model_id string, prediction string);
+@Export('PredictionResultsStream:1.0.0')
+define stream PredictionResultsStream (time_stamp long, app_id string, model_id string, prediction string);
 --================================================= End of Exports ===================================================--
 
 from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model5.Model','string',99.8,
@@ -73,8 +73,8 @@ select
 	f.app_id,
 	f.model_id,
 	f.prediction
-insert into PredictionResultStream;
+insert into PredictionResultsStream;
 
-from PredictionResultStream
+from PredictionResultsStream
 select time_stamp, app_id
 insert overwrite TimeStampCache on TimeStampCache.app_id == app_id;
