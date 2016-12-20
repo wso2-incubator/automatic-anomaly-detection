@@ -2,15 +2,8 @@ instructions.configure = \
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/carbonapps/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/training-feature/src/main/resources/anomaly-prediction-trainer-capp-1.0.0.car,target:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-trainer-capp-1.0.0.car,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/template-manager);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/template-manager/domain-template);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/training-feature/src/main/resources/conf/template-manager/domain-template/EnsemblePredictor.xml,target:${installFolder}/../../conf/template-manager/domain-template/EnsemblePredictor.xml,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../resources/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/executionplans/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/training-feature/src/main/capp/Executionplans/,target:${installFolder}/../../deployment/server/executionplans/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:/home/buddhi/work/New/features/automatic-anomaly-detection/features/prediction-feature/src/main/resources/anomaly-prediction-trainer-capp-1.0.0.car,target:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-trainer-capp-1.0.0.car,overwrite:true);\
 
 
 instructions.uninstall = \
 org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-trainer-capp-1.0.0.car,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/domain-template/EnsemblePredictor.xml,overwrite:true);\
