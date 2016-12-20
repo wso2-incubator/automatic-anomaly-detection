@@ -228,7 +228,7 @@ select
 	group by app_id
 insert into FeaturesSet3Stream;
 
-from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model4.Model','string',99.8,
+from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model6.Model','string',99.8,
 	gc_duration_3sec,
 	diff_eden_3sec,
 	eden_increased_3sec,

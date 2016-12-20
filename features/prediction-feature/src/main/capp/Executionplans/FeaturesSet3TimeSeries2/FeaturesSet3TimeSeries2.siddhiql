@@ -35,7 +35,7 @@ define stream FeaturesSet3Stream (time_stamp long, app_id string, gc_duration_3s
 define stream PredictionResultsStream (time_stamp long, app_id string, model_id string, prediction string);
 --================================================= End of Exports ===================================================--
 
-from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model5.Model','string',99.8,
+from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model7.Model','string',99.8,
 eden_increased_3sec,
 used_heap_pre_3sec,
 allocated_heap_pre_3sec,
