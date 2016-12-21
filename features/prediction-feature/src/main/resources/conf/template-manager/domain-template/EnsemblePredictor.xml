@@ -19,40 +19,14 @@
 <domain name="AnomalyPredictionEnsemblePredictor">
     <description>Ensemble and Publisher of JVM anomaly predictions</description>
     <scenarios>
-        <scenario type="EnsemblePredictorWithoutDashboard">
+        <scenario type="EnsemblePredictor">
             <description>To configure the ensemble</description>
             <templates>
-                <template type="eventstream">
-                    {
-                    "name": "org.wso2.anomaly-prediction.ensemble.PredictionResultStream",
-                    "version": "1.0.0",
-                    "nickName": "",
-                    "description": "",
-                    "payloadData": [
-                    {
-                    "name": "time_stamp",
-                    "type": "LONG"
-                    },
-                    {
-                    "name": "model_id",
-                    "type": "STRING"
-                    },
-                    {
-                    "name": "app_id",
-                    "type": "STRING"
-                    },
-                    {
-                    "name": "prediction",
-                    "type": "STRING"
-                    }
-                    ]
-                    }
-                </template>
                 <template type="realtime">
                     <![CDATA[
 @Plan:name('AnomalyPredictionAlertExecutionPlan')
 
-@Import('org.wso2.anomaly-prediction.ensemble.PredictionResultStream:1.0.0')
+@Import('PredictionResultsStream:1.0.0')
 define stream PredictionResultStream (time_stamp long, app_id string, model_id string, prediction string);
 
 @Export('org.wso2.anomaly-prediction.ensemble.EnsemblePredictionStream:1.0.0')
@@ -72,15 +46,15 @@ insert into PredictionStream;
 Partition with (app_id of PredictionStream)
 begin
   --ensemble of models
-  from every e1=PredictionStream 
-    -> e2=PredictionStream[e1.time_stamp == e2.time_stamp] 
+  from every e1=PredictionStream
+    -> e2=PredictionStream[e1.time_stamp == e2.time_stamp]
     -> e3=PredictionStream[e1.time_stamp == e3.time_stamp]
     -> e4=PredictionStream[e1.time_stamp == e4.time_stamp]
     -> e5=PredictionStream[e1.time_stamp == e5.time_stamp]
     -> e6=PredictionStream[e1.time_stamp == e6.time_stamp]
     -> e7=PredictionStream[e1.time_stamp == e7.time_stamp]
      within 5 sec
-  select 
+  select
     e1.time_stamp,
     e1.app_id,
     (e1.anomaly + e2.anomaly + e3.anomaly + e4.anomaly + e5.anomaly+ e6.anomaly+ e7.anomaly) as anomaly,
@@ -89,7 +63,7 @@ begin
   insert into #PredictionVotingStream;
 
   from #PredictionVotingStream
-  select 
+  select
     time_stamp,
     app_id,
     ifThenElse (anomaly > $count , 'anomaly', 'normal') as prediction,
@@ -126,7 +100,7 @@ begin
     on CountTable.app_id == app_id;
 
   from #AnomalyPredictionCountStream
-  select 
+  select
     time_stamp,
     app_id,
     ifThenElse(count>=$seriesCount , 'anomaly', 'normal') as prediction,
@@ -140,7 +114,7 @@ begin
   insert into #AnomalyPredictionStream;
 
   from #AnomalyPredictionStream#window.timeBatch($timeInterval sec)
-  select 
+  select
     max(time_stamp) as time_stamp,
     app_id,
     prediction,
@@ -156,9 +130,6 @@ end;
 				  ]]>
                 </template>
             </templates>
-            <streamMappings>
-                <streamMapping to="org.wso2.anomaly-prediction.ensemble.PredictionResultStream:1.0.0"/>
-            </streamMappings>
             <parameters>
                 <parameter name="count" type="int">
                     <displayName>Voting Threshold</displayName>
@@ -166,7 +137,7 @@ end;
                         ensemble
                     </description>
                     <defaultValue>3</defaultValue>
-                    <options>1, 2, 3, 4, 5</options>
+                    <options>4,5,6,7</options>
                 </parameter>
                 <parameter name="seriesCount" type="int">
                     <displayName>Anomaly Count</displayName>
