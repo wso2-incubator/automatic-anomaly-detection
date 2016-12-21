@@ -140,7 +140,7 @@
                     @Import('GarbageCollectionStream:1.0.0')
                     define stream GarbageCollectionStream (time_stamp long, app_id string, gc_type string, gc_cause string, gc_duration long, eden_used_after long, eden_used_before long, survivor_used_after long, survivor_used_before long, old_used_after long, old_used_before long, eden_committed_after long, eden_committed_before long, survivor_committed_after long, survivor_committed_before long, old_committed_after long, old_committed_before long, eden_max_after long, eden_max_before long, survivor_max_after long, survivor_max_before long, old_max_after long, old_max_before long);
 
-                    @Import('EnsemblePredictionStream:1.0.0')
+                    @Import('org.wso2.anomaly-prediction.ensemble.EnsemblePredictionStream:1.0.0')
                     define stream EnsemblePredictionStream (time_stamp long, app_id string, prediction string, model1 string, model2 string, model3 string, model4 string, model5 string, model6 string, model7 string);
 
                     @Export('org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream:1.0.0')
