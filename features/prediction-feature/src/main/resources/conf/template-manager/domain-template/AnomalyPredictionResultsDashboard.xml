@@ -195,8 +195,8 @@
                       model3 as Model_3,
                       model4 as Model_4,
                       model5 as Model_5,
-                      model4 as Model_6,
-                      model5 as Model_7
+                      model6 as Model_6,
+                      model7 as Model_7
                     insert into PredictionUIStream;
                   ]]>
                 </template>
