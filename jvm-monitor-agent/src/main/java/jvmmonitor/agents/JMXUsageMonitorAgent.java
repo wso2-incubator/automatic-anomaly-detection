@@ -145,7 +145,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                     .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
-            targetedApplicationId = hostname.trim() + "_" + rmiServerPort.trim();
+            targetedApplicationId = hostname.trim() + rmiServerPort.trim();
             getMXBeans(connection); //get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
@@ -174,7 +174,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                     .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
-            targetedApplicationId = hostname.trim() + "_" + rmiServerPort.trim();
+            targetedApplicationId = hostname.trim() + rmiServerPort.trim();
             getMXBeans(connection); //get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
@@ -333,7 +333,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                 break;
             }
         }
-        appName = appName.trim() + "_" + pid.trim();
+        appName = appName.trim() + pid.trim();
         return appName;
     }
 
