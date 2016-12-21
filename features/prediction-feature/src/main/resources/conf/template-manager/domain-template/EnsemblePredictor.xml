@@ -74,12 +74,12 @@ begin
 	ifThenElse(str:contains(model_seq, 'model_5'),'anomaly', 'normal') as model5,
 	ifThenElse(str:contains(model_seq, 'model_6'),'anomaly', 'normal') as model6,
 	ifThenElse(str:contains(model_seq, 'model_7'),'anomaly', 'normal') as model7
-  insert into #EnsembleResultStream;
+  insert into EnsembleResultStream;
+end;
 
-
-  --series of prediction counting
-  from #EnsembleResultStream as e left outer join CountTable as c on e.app_id == c.app_id
-  select
+--series of prediction counting
+from EnsembleResultStream as e left outer join CountTable as c on e.app_id == c.app_id
+select
     e.time_stamp,
     e.app_id,
     ifThenElse( e.prediction == 'anomaly', ifThenElse( c.app_id is null, 1, c.count+1), 0) as count,
@@ -90,17 +90,17 @@ begin
     model5,
     model6,
     model7
-  insert into #AnomalyPredictionCountStream;
+insert into AnomalyPredictionCountStream;
 
-  from #AnomalyPredictionCountStream
-  select
+from AnomalyPredictionCountStream
+select
     app_id,
     count
-  insert overwrite CountTable
+insert overwrite CountTable
     on CountTable.app_id == app_id;
 
-  from #AnomalyPredictionCountStream
-  select
+from AnomalyPredictionCountStream
+select
     time_stamp,
     app_id,
     ifThenElse(count>=$seriesCount , 'anomaly', 'normal') as prediction,
@@ -111,10 +111,10 @@ begin
     model5,
     model6,
     model7
-  insert into #AnomalyPredictionStream;
+insert into AnomalyPredictionStream;
 
-  from #AnomalyPredictionStream#window.timeBatch($timeInterval sec)
-  select
+from AnomalyPredictionStream#window.timeBatch($timeInterval sec)
+select
     max(time_stamp) as time_stamp,
     app_id,
     prediction,
@@ -125,9 +125,9 @@ begin
     model5,
     model6,
     model7
-  insert into EnsemblePredictionStream;
-end;
-				  ]]>
+group by app_id
+insert into EnsemblePredictionStream;
+                 ]]>
                 </template>
             </templates>
             <parameters>
