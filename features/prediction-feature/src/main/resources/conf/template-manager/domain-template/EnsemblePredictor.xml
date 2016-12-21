@@ -24,7 +24,7 @@
             <templates>
                 <template type="eventstream">
                     {
-                    "name": "PredictionResultStream",
+                    "name": "org.wso2.anomaly-prediction.ensemble.PredictionResultStream",
                     "version": "1.0.0",
                     "nickName": "",
                     "description": "",
@@ -32,6 +32,10 @@
                     {
                     "name": "time_stamp",
                     "type": "LONG"
+                    },
+                    {
+                    "name": "model_id",
+                    "type": "STRING"
                     },
                     {
                     "name": "app_id",
@@ -48,20 +52,21 @@
                     <![CDATA[
 @Plan:name('AnomalyPredictionAlertExecutionPlan')
 
-@Import('PredictionResultStream:1.0.0')
-define stream PredictionResultStream (time_stamp long, app_id string, prediction string);
+@Import('org.wso2.anomaly-prediction.ensemble.PredictionResultStream:1.0.0')
+define stream PredictionResultStream (time_stamp long, app_id string, model_id string, prediction string);
 
-@Export('PredictionPublishStream:1.0.0')
-define stream PredictionPublishStream (time_stamp long, app_id string, prediction string);
+@Export('org.wso2.anomaly-prediction.ensemble.EnsemblePredictionStream:1.0.0')
+define stream EnsemblePredictionStream (time_stamp long, app_id string, prediction string, model1 string, model2 string, model3 string, model4 string, model5 string, model6 string, model7 string);
 
 define table CountTable(app_id string, count int);
 
 from PredictionResultStream
-select 
-  time_stamp, 
-  app_id,
-  ifThenElse(prediction == 'anomaly' , 1 , 0 ) as anomaly,
-  ifThenElse(prediction == 'normal' , 1 , 0) as normal			
+select
+	time_stamp,
+	app_id,
+	ifThenElse(prediction == 'anomaly' , 1 , 0 ) as anomaly,
+	ifThenElse(prediction == 'normal' , 1 , 0) as normal,
+	ifThenElse(prediction == 'anomaly' , model_id, '') as model_id
 insert into PredictionStream;
 
 Partition with (app_id of PredictionStream)
@@ -69,21 +74,32 @@ begin
   --ensemble of models
   from every e1=PredictionStream 
     -> e2=PredictionStream[e1.time_stamp == e2.time_stamp] 
-    -> e3=PredictionStream[e2.time_stamp == e3.time_stamp] 
-    -> e4=PredictionStream[e3.time_stamp == e4.time_stamp] 
-    -> e5=PredictionStream[e4.time_stamp == e5.time_stamp] within 5 sec
+    -> e3=PredictionStream[e1.time_stamp == e3.time_stamp]
+    -> e4=PredictionStream[e1.time_stamp == e4.time_stamp]
+    -> e5=PredictionStream[e1.time_stamp == e5.time_stamp]
+    -> e6=PredictionStream[e1.time_stamp == e6.time_stamp]
+    -> e7=PredictionStream[e1.time_stamp == e7.time_stamp]
+     within 5 sec
   select 
     e1.time_stamp,
     e1.app_id,
-    (e1.anomaly + e2.anomaly + e3.anomaly + e4.anomaly + e5.anomaly) as anomaly,
-    (e1.normal + e2.normal + e3.normal + e4.normal + e5.normal) as normal
+    (e1.anomaly + e2.anomaly + e3.anomaly + e4.anomaly + e5.anomaly+ e6.anomaly+ e7.anomaly) as anomaly,
+    (e1.normal + e2.normal + e3.normal + e4.normal + e5.normal+ e6.normal+ e7.normal) as normal,
+    str:concat(e1.model_id,' ' ,e2.model_id,' ' ,e3.model_id,' ' ,e4.model_id,' ' ,e5.model_id,' ',e6.model_id,' ',e7.model_id) as model_seq
   insert into #PredictionVotingStream;
 
   from #PredictionVotingStream
   select 
     time_stamp,
     app_id,
-    ifThenElse (anomaly > $count , 'anomaly', 'normal') as prediction
+    ifThenElse (anomaly > $count , 'anomaly', 'normal') as prediction,
+    ifThenElse(str:contains(model_seq, 'model_1'),'anomaly', 'normal') as model1,
+	ifThenElse(str:contains(model_seq, 'model_2'),'anomaly', 'normal') as model2,
+	ifThenElse(str:contains(model_seq, 'model_3'),'anomaly', 'normal') as model3,
+	ifThenElse(str:contains(model_seq, 'model_4'),'anomaly', 'normal') as model4,
+	ifThenElse(str:contains(model_seq, 'model_5'),'anomaly', 'normal') as model5,
+	ifThenElse(str:contains(model_seq, 'model_6'),'anomaly', 'normal') as model6,
+	ifThenElse(str:contains(model_seq, 'model_7'),'anomaly', 'normal') as model7
   insert into #EnsembleResultStream;
 
 
@@ -92,7 +108,14 @@ begin
   select
     e.time_stamp,
     e.app_id,
-    ifThenElse( e.prediction == 'anomaly', ifThenElse( c.app_id is null, 1, c.count+1), 0) as count
+    ifThenElse( e.prediction == 'anomaly', ifThenElse( c.app_id is null, 1, c.count+1), 0) as count,
+    model1,
+    model2,
+    model3,
+    model4,
+    model5,
+    model6,
+    model7
   insert into #AnomalyPredictionCountStream;
 
   from #AnomalyPredictionCountStream
@@ -106,21 +129,35 @@ begin
   select 
     time_stamp,
     app_id,
-    ifThenElse(count>=$seriesCount , 'anomaly', 'normal') as prediction
+    ifThenElse(count>=$seriesCount , 'anomaly', 'normal') as prediction,
+    model1,
+    model2,
+    model3,
+    model4,
+    model5,
+    model6,
+    model7
   insert into #AnomalyPredictionStream;
 
   from #AnomalyPredictionStream#window.timeBatch($timeInterval sec)
   select 
     max(time_stamp) as time_stamp,
     app_id,
-    prediction
-  insert into PredictionPublishStream;
+    prediction,
+    model1,
+    model2,
+    model3,
+    model4,
+    model5,
+    model6,
+    model7
+  insert into EnsemblePredictionStream;
 end;
 				  ]]>
                 </template>
             </templates>
             <streamMappings>
-                <streamMapping to="PredictionResultStream:1.0.0"/>
+                <streamMapping to="org.wso2.anomaly-prediction.ensemble.PredictionResultStream:1.0.0"/>
             </streamMappings>
             <parameters>
                 <parameter name="count" type="int">
@@ -149,12 +186,10 @@ end;
     <commonArtifacts>
         <artifact type="eventstream">
             {
-            "name": "PredictionPublishStream",
+            "name": "org.wso2.anomaly-prediction.ensemble.EnsemblePredictionStream",
             "version": "1.0.0",
             "nickName": "",
             "description": "",
-            "metaData": [],
-            "correlationData": [],
             "payloadData": [
             {
             "name": "time_stamp",
@@ -166,6 +201,34 @@ end;
             },
             {
             "name": "prediction",
+            "type": "STRING"
+            },
+            {
+            "name": "model1",
+            "type": "STRING"
+            },
+            {
+            "name": "model2",
+            "type": "STRING"
+            },
+            {
+            "name": "model3",
+            "type": "STRING"
+            },
+            {
+            "name": "model4",
+            "type": "STRING"
+            },
+            {
+            "name": "model5",
+            "type": "STRING"
+            },
+            {
+            "name": "model6",
+            "type": "STRING"
+            },
+            {
+            "name": "model7",
             "type": "STRING"
             }
             ]
