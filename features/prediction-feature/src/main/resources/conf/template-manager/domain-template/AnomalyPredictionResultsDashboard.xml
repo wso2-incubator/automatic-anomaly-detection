@@ -1,0 +1,802 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied. See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<domain name="AnomalyPredictionResultsDashboard">
+    <description>Anomaly prediction results viewer</description>
+    <scenarios>
+        <scenario type="DashboardView">
+            <description>configure anomaly prediction dashboard view for an application
+            </description>
+            <templates>
+                <!-- Input Event Streams-->
+
+                <!-- UI Event Streams-->
+                <template type="eventstream">
+                    {
+                    "name": "org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream",
+                    "version": "1.0.0",
+                    "nickName": "",
+                    "description": "",
+                    "payloadData": [
+                    {
+                    "name": "Time",
+                    "type": "LONG"
+                    },
+                    {
+                    "name": "Used_Heap",
+                    "type": "LONG"
+                    },
+                    {
+                    "name": "Max_Heap",
+                    "type": "LONG"
+                    }
+                    ]
+                    }
+                </template>
+                <template type="eventstream">
+                    {
+                    "name":
+                    "org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionUIStream",
+                    "version": "1.0.0",
+                    "nickName": "",
+                    "description": "",
+                    "payloadData": [
+                    {
+                    "name": "Time",
+                    "type": "LONG"
+                    },
+                    {
+                    "name": "GC_Type",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "GC_Duration",
+                    "type": "LONG"
+                    },
+                    {
+                    "name": "Size",
+                    "type": "INT"
+                    }
+                    ]
+                    }
+                </template>
+                <template type="eventstream">
+                    {
+                    "name": "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream",
+                    "version": "1.0.0",
+                    "nickName": "",
+                    "description": "",
+                    "payloadData": [
+                    {
+                    "name": "Time",
+                    "type": "LONG"
+                    },
+                    {
+                    "name": "app_id",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Prediction",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_1",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_2",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_3",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_4",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_5",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_6",
+                    "type": "STRING"
+                    },
+                    {
+                    "name": "Model_7",
+                    "type": "STRING"
+                    }
+                    ]
+                    }
+                </template>
+
+                <!-- Realtime Execution Plan-->
+                <template type="realtime">
+                    <![CDATA[
+                           
+                    @Plan:name('$appIdPredictionDashboard')
+                    @Plan:description('ExecutionPlan to generate $appId prediction results dashboard ')
+
+                    @Import('MemoryUsageStream:1.0.0')
+                    define stream MemoryUsageStream (time_stamp long, app_id string, max_heap long, allocated_heap long, used_heap long, max_non_heap long, allocated_non_heap long, used_non_heap long, pending_finalizations long);
+
+                    @Import('GarbageCollectionStream:1.0.0')
+                    define stream GarbageCollectionStream (time_stamp long, app_id string, gc_type string, gc_cause string, gc_duration long, eden_used_after long, eden_used_before long, survivor_used_after long, survivor_used_before long, old_used_after long, old_used_before long, eden_committed_after long, eden_committed_before long, survivor_committed_after long, survivor_committed_before long, old_committed_after long, old_committed_before long, eden_max_after long, eden_max_before long, survivor_max_after long, survivor_max_before long, old_max_after long, old_max_before long);
+
+                    @Import('EnsemblePredictionStream:1.0.0')
+                    define stream EnsemblePredictionStream (time_stamp long, app_id string, prediction string, model1 string, model2 string, model3 string, model4 string, model5 string, model6 string, model7 string);
+
+                    @Export('org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream:1.0.0')
+                    define stream MemoryUsageUIStream (Time long, Used_Heap long, Max_Heap long);
+
+                    @Export('org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionUIStream:1.0.0')
+                    define stream GarbageCollectionUIStream (Time long, GC_Type string, GC_Duration long, Size int);
+
+                    @Export('org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0')
+                    define stream PredictionUIStream (Time long, app_id string, Prediction string, Model_1 string, Model_2 string, Model_3 string, Model_4 string, Model_5 string, Model_6 string, Model_7 string);
+
+                    --extract gc data
+                    from GarbageCollectionStream[app_id == '$appId']
+                    select 
+                      time_stamp,
+                      gc_type,
+                      gc_duration
+                    insert into $appIdGarbageCollectionStream;
+
+                     --extract memory statistics
+                    from MemoryUsageStream[app_id == '$appId']
+                    select 
+                      time_stamp as Time,
+                      used_heap/1000000 as Used_Heap,
+                      max_heap as Max_Heap
+                    insert into MemoryUsageUIStream;
+
+                    from $appIdGarbageCollectionStream as G full outer join MemoryUsageUIStream as M
+                    select 
+                      ifThenElse(G.time_stamp is null , M.Time, G.time_stamp) as Time,
+                      ifThenElse(G.gc_type is null, 'Minor GC', ifThenElse(G.gc_type == 'minor' , 'Minor GC' , 'Major GC')) as GC_Type,
+                      ifThenElse(G.gc_duration is null , 0L, G.gc_duration) as GC_Duration,
+                      ifThenElse(G.gc_duration is null , 0 , 1) as Size
+                    insert into GarbageCollectionUIStream;
+
+                    --extract memory statistics
+                    from MemoryUsageStream[app_id == '$appId']
+                    select 
+                      time_stamp as Time,
+                      used_heap/1000000 as Used_Heap,
+                      max_heap as Max_Heap
+                    insert into MemoryUsageUIStream;
+
+                    --extract ensemble results
+                    from EnsemblePredictionStream[app_id == '$appId']
+                    select 
+                      time_stamp as Time,
+                      app_id,
+                      ifThenElse(prediction == 'anomaly', 'Anomaly', 'Normal') as Prediction,
+                      model1 as Model_1,
+                      model2 as Model_2,
+                      model3 as Model_3,
+                      model4 as Model_4,
+                      model5 as Model_5,
+                      model4 as Model_6,
+                      model5 as Model_7
+                    insert into PredictionUIStream;
+                  ]]>
+                </template>
+                <!-- Event Publisher-->
+                <template type="eventpublisher">
+                    <![CDATA[
+                          <eventPublisher name="org.wso2.anomaly-prediction.$appId.dashboard.MemoryStatisticsUIPublisher" statistics="disable"
+                            trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
+                            <from streamName="org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream" version="1.0.0"/>
+                            <mapping customMapping="disable" type="wso2event"/>
+                            <to eventAdapterType="ui"/>
+                          </eventPublisher>
+                        ]]>
+                </template>
+                <template type="eventpublisher">
+                    <![CDATA[
+                         <eventPublisher name="org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionEventsUIPublisher"
+                            statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
+                            <from streamName="org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionUIStream" version="1.0.0"/>
+                            <mapping customMapping="disable" type="wso2event"/>
+                            <to eventAdapterType="ui"/>
+                          </eventPublisher>
+                        ]]>
+                </template>
+                <template type="eventpublisher">
+                    <![CDATA[
+                         <eventPublisher name="org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIpublisher" statistics="disable"
+                            trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
+                            <from streamName="org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream" version="1.0.0"/>
+                            <mapping customMapping="disable" type="wso2event"/>
+                            <to eventAdapterType="ui"/>
+                          </eventPublisher>
+                        ]]>
+                </template>
+
+                <!-- Gadget Memory Statistics -->
+                <template type="gadget">
+                    <config>
+                        <properties>
+                            <property name="directoryName">$appId_Memory_Usage_Statistics</property>
+                            <property name="templateDirectory">Memory_Usage_Statistics</property>
+                        </properties>
+                        <artifacts>
+                            <artifact file="gadget.json">
+                                <![CDATA[
+                                    {
+                                        "id": "$appId_Memory_Usage_Statistics",
+                                        "title": "Memory Usage Statistics",
+                                        "type": "gadget",
+                                        "thumbnail": "gadget/$appId_Memory_Usage_Statistics/thumbnail.png",
+                                        "data": {
+                                            "url": "gadget/$appId_Memory_Usage_Statistics/gadget.xml"
+                                        }
+                                    }
+                                 ]]>
+                            </artifact>
+                            <artifact file="conf.json">
+                                <![CDATA[
+                                    {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"x" : "Time", "xType" : "time", "y" : "Used_Heap", "yType" : "number", "color" : "None", "maxLength" : "30", "gadget-name" : "Memory Usage Statistics", "chart-name" : "line-chart"}}
+                                ]]>
+                            </artifact>
+                            <artifact file="js/core/gadget-util.js">
+                                <![CDATA[
+                                var getGadgetLocation = function (callback) {
+                                var gadgetLocation = "/portal/store/carbon.super/fs/gadget/$appId_Memory_Usage_Statistics";
+                                var PATH_SEPERATOR = "/";
+                                  if (gadgetLocation.search("store") != -1) {
+                                      wso2.gadgets.identity.getTenantDomain(function (tenantDomain) {
+                                          var gadgetPath = gadgetLocation.split(PATH_SEPERATOR);
+                                          var modifiedPath = '';
+                                          for (var i = 1; i < gadgetPath.length; i++) {
+                                              if (i === 3) {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, tenantDomain);
+                                              } else {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, gadgetPath[i])
+                                              }
+                                          }
+                                          callback(modifiedPath);
+                                      });
+                                  } else {
+                                      callback(gadgetLocation);
+                                  }
+                                }
+                              ]]>
+                            </artifact>
+                        </artifacts>
+                    </config>
+                </template>
+
+                <!-- Gadget Garbage Collection events Statistics -->
+                <template type="gadget">
+                    <config>
+                        <properties>
+                            <property name="directoryName">
+                                $appId_Garbage_Collection_Event_Statistics
+                            </property>
+                            <property name="templateDirectory">Garbage_Collection_Event_Statistics
+                            </property>
+                        </properties>
+                        <artifacts>
+                            <artifact file="gadget.json">
+                                <![CDATA[
+                                    {
+                                        "id": "$appId_Garbage_Collection_Event_Statistics",
+                                        "title": "Garbage Collection Event Statistics",
+                                        "type": "gadget",
+                                        "thumbnail": "gadget/$appId_Garbage_Collection_Event_Statistics/thumbnail.png",
+                                        "data": {
+                                            "url": "gadget/$appId_Garbage_Collection_Event_Statistics/gadget.xml"
+                                        }
+                                    }
+                                 ]]>
+                            </artifact>
+                            <artifact file="conf.json">
+                                <![CDATA[
+                                    {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"x" : "Time", "xType" : "time", "y" : "GC_Duration", "yType" : "number", "color" : "GC_Type", "size" : "Size", "maxLength" : "30", "gadget-name" : "Garbage Collection Event Statistics", "chart-name" : "scatter-chart"}}
+                                ]]>
+                            </artifact>
+                            <artifact file="js/core/gadget-util.js">
+                                <![CDATA[
+                                var getGadgetLocation = function (callback) {
+                                var gadgetLocation = "/portal/store/carbon.super/fs/gadget/$appId_Garbage_Collection_Event_Statistics";
+                                var PATH_SEPERATOR = "/";
+                                  if (gadgetLocation.search("store") != -1) {
+                                      wso2.gadgets.identity.getTenantDomain(function (tenantDomain) {
+                                          var gadgetPath = gadgetLocation.split(PATH_SEPERATOR);
+                                          var modifiedPath = '';
+                                          for (var i = 1; i < gadgetPath.length; i++) {
+                                              if (i === 3) {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, tenantDomain);
+                                              } else {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, gadgetPath[i])
+                                              }
+                                          }
+                                          callback(modifiedPath);
+                                      });
+                                  } else {
+                                      callback(gadgetLocation);
+                                  }
+                              }
+                              ]]>
+                            </artifact>
+                        </artifacts>
+                    </config>
+                </template>
+
+                <!-- Gadget Ensemble Prediction -->
+                <template type="gadget">
+                    <config>
+                        <properties>
+                            <property name="directoryName">$appId_Ensemble_Prediction</property>
+                            <property name="templateDirectory">Ensemble_Prediction</property>
+                        </properties>
+                        <artifacts>
+                            <artifact file="gadget.json">
+                                <![CDATA[
+                                    {
+                                        "id": "$appId_Ensemble_Prediction",
+                                        "title": "Ensemble Prediction",
+                                        "type": "gadget",
+                                        "thumbnail": "gadget/$appId_Ensemble_Prediction/thumbnail.png",
+                                        "data": {
+                                            "url": "gadget/$appId_Ensemble_Prediction/gadget.xml"
+                                        }
+                                    }
+                                 ]]>
+                            </artifact>
+                            <artifact file="conf.json">
+                                <![CDATA[
+                                    {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"x" : "Time", "xType" : "time", "y" : "Prediction", "yType" : "string", "color" : "None", "maxLength" : "30", "gadget-name" : "Ensemble Prediction", "chart-name" : "line-chart"}}
+                                ]]>
+                            </artifact>
+                            <artifact file="js/core/gadget-util.js">
+                                <![CDATA[
+                                var getGadgetLocation = function (callback) {
+                                var gadgetLocation = "/portal/store/carbon.super/fs/gadget/$appId_Ensemble_Prediction";
+                                var PATH_SEPERATOR = "/";
+                                  if (gadgetLocation.search("store") != -1) {
+                                      wso2.gadgets.identity.getTenantDomain(function (tenantDomain) {
+                                          var gadgetPath = gadgetLocation.split(PATH_SEPERATOR);
+                                          var modifiedPath = '';
+                                          for (var i = 1; i < gadgetPath.length; i++) {
+                                              if (i === 3) {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, tenantDomain);
+                                              } else {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, gadgetPath[i])
+                                              }
+                                          }
+                                          callback(modifiedPath);
+                                      });
+                                  } else {
+                                      callback(gadgetLocation);
+                                  }
+                              }
+                              ]]>
+                            </artifact>
+                        </artifacts>
+                    </config>
+                </template>
+
+                <!-- Gadget Prediction Table -->
+                <template type="gadget">
+                    <config>
+                        <properties>
+                            <property name="directoryName">$appId_Prediction_Table</property>
+                            <property name="templateDirectory">Prediction_Table</property>
+                        </properties>
+                        <artifacts>
+                            <artifact file="gadget.json">
+                                <![CDATA[
+                                    {
+                                        "id": "$appId_Prediction_Table",
+                                        "title": "Prediction Table",
+                                        "type": "gadget",
+                                        "thumbnail": "gadget/$appId_Prediction_Table/thumbnail.png",
+                                        "data": {
+                                            "url": "gadget/$appId_Prediction_Table/gadget.xml"
+                                        }
+                                    }
+                                 ]]>
+                            </artifact>
+                            <artifact file="conf.json">
+                                <![CDATA[
+                                  {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"key" : "Time", "color" : "All", "maxLength" : "12", "gadget-name" : "Prediction Table", "chart-name" : "table-chart"}}
+                                ]]>
+                            </artifact>
+                            <artifact file="js/core/gadget-util.js">
+                                <![CDATA[
+                                var getGadgetLocation = function (callback) {
+                                var gadgetLocation = "/portal/store/carbon.super/fs/gadget/$appId_Prediction_Table";
+                                var PATH_SEPERATOR = "/";
+                                  if (gadgetLocation.search("store") != -1) {
+                                      wso2.gadgets.identity.getTenantDomain(function (tenantDomain) {
+                                          var gadgetPath = gadgetLocation.split(PATH_SEPERATOR);
+                                          var modifiedPath = '';
+                                          for (var i = 1; i < gadgetPath.length; i++) {
+                                              if (i === 3) {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, tenantDomain);
+                                              } else {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, gadgetPath[i])
+                                              }
+                                          }
+                                          callback(modifiedPath);
+                                      });
+                                  } else {
+                                      callback(gadgetLocation);
+                                  }
+                              }
+                              ]]>
+                            </artifact>
+                        </artifacts>
+                    </config>
+                </template>
+
+                <!-- Gadget Model predictions table -->
+                <template type="gadget">
+                    <config>
+                        <properties>
+                            <property name="directoryName">$appId_Model_Predictions</property>
+                            <property name="templateDirectory">Model_Predictions</property>
+                        </properties>
+                        <artifacts>
+                            <artifact file="gadget.json">
+                                <![CDATA[
+                                    {
+                                        "id": "$appId_Model_Predictions",
+                                        "title": "Model Predictions",
+                                        "type": "gadget",
+                                        "thumbnail": "gadget/$appId_Model_Predictions/thumbnail.png",
+                                        "data": {
+                                            "url": "gadget/$appId_Model_Predictions/gadget.xml"
+                                        }
+                                    }
+                                 ]]>
+                            </artifact>
+                            <artifact file="conf.json">
+                                <![CDATA[
+                                {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"key" : "Time", "color" : "None", "maxLength" : "22", "gadget-name" : "Model Predictions", "chart-name" : "table-chart"}}
+                                ]]>
+                            </artifact>
+                            <artifact file="js/core/gadget-util.js">
+                                <![CDATA[
+                                var getGadgetLocation = function (callback) {
+                                var gadgetLocation = "/portal/store/carbon.super/fs/gadget/$appId_Model_Predictions";
+                                var PATH_SEPERATOR = "/";
+                                  if (gadgetLocation.search("store") != -1) {
+                                      wso2.gadgets.identity.getTenantDomain(function (tenantDomain) {
+                                          var gadgetPath = gadgetLocation.split(PATH_SEPERATOR);
+                                          var modifiedPath = '';
+                                          for (var i = 1; i < gadgetPath.length; i++) {
+                                              if (i === 3) {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, tenantDomain);
+                                              } else {
+                                                  modifiedPath = modifiedPath.concat(PATH_SEPERATOR, gadgetPath[i])
+                                              }
+                                          }
+                                          callback(modifiedPath);
+                                      });
+                                  } else {
+                                      callback(gadgetLocation);
+                                  }
+                              }
+                              ]]>
+                            </artifact>
+                        </artifacts>
+                    </config>
+                </template>
+
+                <!-- Dashboard -->
+                <template type="dashboard">
+                    <config>
+                        <properties>
+                            <property name="dashboardId">$appId-perfomanceanomalypredictionresults
+                            </property>
+                        </properties>
+                        <content>
+                            <![CDATA[           
+                                {
+                                  "id": "$appId-perfomanceanomalypredictionresults",
+                                  "title": "$appId-PerfomanceAnomalyPredictionResults",
+                                  "description": "",
+                                  "permissions": {
+                                    "viewers": [
+                                      "Internal/$appId-perfomanceanomalypredictionresults-viewer"
+                                    ],
+                                    "editors": [
+                                      "Internal/$appId-perfomanceanomalypredictionresults-editor"
+                                    ],
+                                    "owners": [
+                                      "Internal/$appId-perfomanceanomalypredictionresults-owner"
+                                    ]
+                                  },
+                                  "pages": [
+                                    {
+                                      "id": "ensemble-prediction",
+                                      "title": "Home",
+                                      "layout": {
+                                        "content": {
+                                          "loggedIn": {
+                                            "blocks": [
+                                              {
+                                                "id": "a",
+                                                "x": 0,
+                                                "y": 7,
+                                                "width": 9,
+                                                "height": 3,
+                                                "banner": false
+                                              },
+                                              {
+                                                "id": "b",
+                                                "x": 0,
+                                                "y": 4,
+                                                "width": 9,
+                                                "height": 3,
+                                                "banner": false
+                                              },
+                                              {
+                                                "id": "c",
+                                                "x": 9,
+                                                "y": 0,
+                                                "width": 3,
+                                                "height": 6,
+                                                "banner": false
+                                              },
+                                              {
+                                                "id": "d",
+                                                "x": 0,
+                                                "y": 0,
+                                                "width": 9,
+                                                "height": 4,
+                                                "banner": false
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "fluidLayout": false
+                                      },
+                                      "isanon": false,
+                                      "content": {
+                                        "default": {
+                                            "a": [
+                                              {
+                                                "id": "$appId_Ensemble_Prediction-0",
+                                                "content": {
+                                                  "id": "$appId_Ensemble_Prediction",
+                                                  "title": "Ensemble Prediction",
+                                                  "type": "gadget",
+                                                  "thumbnail": "fs://gadget/$appId_Ensemble_Prediction/thumbnail.png",
+                                                  "data": {
+                                                    "url": "fs://gadget/$appId_Ensemble_Prediction/gadget.xml"
+                                                  },
+                                                  "styles": {
+                                                    "title": "Ensemble Prediction",
+                                                    "borders": true
+                                                  },
+                                                  "options": {
+                                                    "windowSize": {
+                                                      "type": "STRING",
+                                                      "title": "Window Size",
+                                                      "value": "10",
+                                                      "options": [],
+                                                      "required": false
+                                                    }
+                                                  },
+                                                  "locale_titles": {}
+                                                }
+                                              }
+                                            ],
+                                          "b": [
+                                            {
+                                              "id": "$appId_Garbage_Collection_Event_Statistics-0",
+                                              "content": {
+                                                "id": "$appId_Garbage_Collection_Event_Statistics",
+                                                "title": "Garbage Collection Event Statistics",
+                                                "type": "gadget",
+                                                "thumbnail": "fs://gadget/$appId_Garbage_Collection_Event_Statistics/thumbnail.png",
+                                                "data": {
+                                                  "url": "fs://gadget/$appId_Garbage_Collection_Event_Statistics/gadget.xml"
+                                                },
+                                                "styles": {
+                                                  "title": "Garbage Collection Event Statistics",
+                                                  "borders": true
+                                                },
+                                                "options": {
+                                                  "windowSize": {
+                                                    "type": "STRING",
+                                                    "title": "Window Size",
+                                                    "value": "10",
+                                                    "options": [],
+                                                    "required": false
+                                                  }
+                                                },
+                                                "locale_titles": {}
+                                              }
+                                            }
+                                          ],
+                                          "c": [
+                                            {
+                                              "id": "$appId_Prediction_Table-0",
+                                              "content": {
+                                                "id": "$appId_Prediction_Table",
+                                                "title": "Prediction Table",
+                                                "type": "gadget",
+                                                "thumbnail": "fs://gadget/$appId_Prediction_Table/thumbnail.png",
+                                                "data": {
+                                                  "url": "fs://gadget/$appId_Prediction_Table/gadget.xml"
+                                                },
+                                                "styles": {
+                                                  "title": "Prediction Table",
+                                                  "borders": true
+                                                },
+                                                "options": {
+                                                  "windowSize": {
+                                                    "type": "STRING",
+                                                    "title": "Window Size",
+                                                    "value": "10",
+                                                    "options": [],
+                                                    "required": false
+                                                  }
+                                                },
+                                                "locale_titles": {}
+                                              }
+                                            }
+                                          ],
+                                         
+                                          "d": [
+                                            {
+                                              "id": "$appId_Memory_Usage_Statistics-0",
+                                              "content": {
+                                                "id": "$appId_Memory_Usage_Statistics",
+                                                "title": "Memory Usage Statistics",
+                                                "type": "gadget",
+                                                "thumbnail": "fs://gadget/$appId_Memory_Usage_Statistics/thumbnail.png",
+                                                "data": {
+                                                  "url": "fs://gadget/$appId_Memory_Usage_Statistics/gadget.xml"
+                                                },
+                                                "styles": {
+                                                  "title": "Memory Usage Statistics",
+                                                  "borders": true
+                                                },
+                                                "options": {
+                                                  "windowSize": {
+                                                    "type": "STRING",
+                                                    "title": "Window Size",
+                                                    "value": "10",
+                                                    "options": [],
+                                                    "required": false
+                                                  }
+                                                },
+                                                "locale_titles": {}
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        "anon": {}
+                                      }
+                                    },
+                                    {
+                                      "id": "model-predictions",
+                                      "title": "Model Statistics",
+                                      "layout": {
+                                        "content": {
+                                          "loggedIn": {
+                                            "blocks": [
+                                              {
+                                                "id": "e",
+                                                "x": 0,
+                                                "y": 0,
+                                                "width": 12,
+                                                "height": 8,
+                                                "banner": false
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "fluidLayout": false
+                                      },
+                                      "isanon": false,
+                                      "content": {
+                                        "default": {
+                                          "e": [
+                                            {
+                                              "id": "$appId_Model_Predictions-0",
+                                              "content": {
+                                                "id": "$appId_Model_Predictions",
+                                                "title": "Model Predictions",
+                                                "type": "gadget",
+                                                "thumbnail": "fs://gadget/$appId_Model_Predictions/thumbnail.png",
+                                                "data": {
+                                                  "url": "fs://gadget/$appId_Model_Predictions/gadget.xml"
+                                                },
+                                                "styles": {
+                                                  "title": "Model Predictions",
+                                                  "borders": true
+                                                },
+                                                "options": {
+                                                  "windowSize": {
+                                                    "type": "STRING",
+                                                    "title": "Window Size",
+                                                    "value": "10",
+                                                    "options": [],
+                                                    "required": false
+                                                  }
+                                                },
+                                                "locale_titles": {}
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        "anon": {}
+                                      }
+                                    }
+                                  ],
+                                  "menu": [
+                                    {
+                                      "id": "ensemble-prediction",
+                                      "isanon": false,
+                                      "ishidden": false,
+                                      "title": "Home",
+                                      "subordinates": []
+                                    },
+                                    {
+                                      "id": "model-predictions",
+                                      "isanon": false,
+                                      "ishidden": false,
+                                      "title": "Model Statistics",
+                                      "subordinates": []
+                                    }
+                                  ],
+                                  "hideAllMenuItems": false,
+                                  "identityServerUrl": "",
+                                  "accessTokenUrl": "",
+                                  "apiKey": "",
+                                  "apiSecret": "",
+                                  "theme": "Default Theme",
+                                  "shareDashboard": false,
+                                  "isUserCustom": false,
+                                  "isEditorEnable": true,
+                                  "banner": {
+                                    "globalBannerExists": false,
+                                    "customBannerExists": false
+                                  },
+                                  "landing": "ensemble-prediction",
+                                  "isanon": false,
+                                  "defaultPriority": "5"
+                                }
+                                    ]]>
+                        </content>
+                    </config>
+                </template>
+            </templates>
+            <parameters>
+                <parameter name="appId" type="string">
+                    <displayName>Application Id</displayName>
+                    <description>The name(id) of the application to be monitored. Hint: Application
+                        id can be found on logs from JVM Monitor Agent
+                    </description>
+                  <defaultValue>localhost:9999</defaultValue>
+                </parameter>
+            </parameters>
+        </scenario>
+    </scenarios>
+</domain>
