@@ -1,0 +1,280 @@
+@Plan:name('FeaturesSet3TimeSeries1')
+
+@Plan:description('Features process plan for Model_4 and Model_5')
+
+@Plan:statistics('true')
+@Plan:trace('true')
+
+define trigger PredictionResultTrigger at every 1 sec ;
+define table TimeStampCache ( time_stamp long , app_id string);
+
+--===================================================== Imports ======================================================--
+@Import('FeaturesWithoutValidation:1.0.0')
+define stream FeaturesWithoutValidation (mc_time_stamp long, app_id string, gc_duration double,
+										eden_used_after double, eden_used_before double, survivor_used_after double,
+										survivor_used_before double, old_used_after double,
+										old_used_before double, used_heap double, allocated_heap double,
+										max_heap double, sd_gc_frequency double, dif_eden_used double,
+										dif_old_used double, dif_survivor_used double, sd_ratio_survivor double,
+										gc_frequency double);
+--================================================= End of Imports ===================================================--
+
+--===================================================== Exports ======================================================--
+@Export('FeaturesSet3Stream:1.0.0')
+define stream FeaturesSet3Stream (time_stamp long, app_id string, gc_duration_3sec double,
+										 diff_eden_3sec double, eden_increased_3sec double,
+										 diff_survivor_3sec double, survivor_increased_3sec double,
+										 diff_old_3sec double, old_increased_3sec double,
+										 used_heap_per_allocated_3sec double, used_heap_pre_3sec double,
+										 allocated_heap_pre_3sec double, sd_gc_frequency_3sec double,
+										 dif_eden_used_3sec double, dif_old_used_3sec double,
+										 dif_survivor_used_3sec double, sd_ratio_survivor_3sec double,
+										 gc_frequency_3sec double, dif_survivor_used_5sec double,
+										 sd_gc_frequency_5sec double, gc_frequency_5sec double,
+										 gc_frequency_10sec double, dif_eden_used_10sec double,
+										 dif_old_used_10sec double, dif_survivor_used_10sec double,
+										 sd_ratio_survivor_10sec double, sd_gc_frequency_10sec double,
+										 gc_duration_10sec double, diff_eden_10sec double,
+										 eden_increased_10sec double, diff_survivor_10sec double,
+										 survivor_increased_10sec double, diff_old_10sec double,
+										 old_increased_10sec double, used_heap_per_allocated_10sec double,
+										 used_heap_pre_10sec double, allocated_heap_pre_10sec double);
+
+@Export('PredictionResultsStream:1.0.0')
+define stream PredictionResultsStream (time_stamp long, app_id string, model_id string, prediction string);
+--================================================= End of Exports ===================================================--
+
+define stream FeaturesModel5Stream (time_stamp long, app_id string, gc_duration double, diff_eden double,
+									eden_increased double, diff_survivor double, survivor_increased double,
+									diff_old double, old_increased double, used_heap_per_allocated double,
+									used_heap_pre double, allocated_heap_pre double, sd_gc_frequency double,
+									dif_eden_used double, dif_old_used double, dif_survivor_used double,
+									sd_ratio_survivor double, gc_frequency double);
+
+from FeaturesWithoutValidation#window.length(1)
+select
+	mc_time_stamp,
+	app_id,
+	gc_duration,
+	ifThenElse(eden_used_before >= eden_used_after, ifThenElse(eden_used_before == 0, 0d, (eden_used_before-eden_used_after)/eden_used_before), (eden_used_after-eden_used_before)/eden_used_before) as diff_eden,
+	ifThenElse(eden_used_before < eden_used_after , 1d, 0d ) as eden_increased,
+	ifThenElse(survivor_used_before >= survivor_used_after, ifThenElse(survivor_used_before == 0, 0d, (survivor_used_before-survivor_used_after)/survivor_used_before), (survivor_used_after-survivor_used_before)/survivor_used_before) as diff_survivor,
+	ifThenElse(survivor_used_before < survivor_used_after, 1d, 0d ) as survivor_increased,
+	ifThenElse(old_used_before >= old_used_after, ifThenElse(old_used_before == 0, 0d, (old_used_before-old_used_after)/old_used_before), (old_used_after-old_used_before)/old_used_after) as diff_old,
+	ifThenElse(old_used_before < old_used_after, 1d, 0d) as old_increased,
+	(used_heap/allocated_heap)*100 as used_heap_per_allocated,
+	(used_heap/max_heap)*100 as used_heap_pre,
+	(allocated_heap/max_heap)*100 as allocated_heap_pre,
+	sd_gc_frequency,
+	dif_eden_used,
+	dif_old_used,
+	dif_survivor_used,
+	sd_ratio_survivor,
+	gc_frequency
+insert into FeaturesModel5StreamTem;
+
+from FeaturesModel5StreamTem#window.length(1)
+select
+	mc_time_stamp as time_stamp,
+	app_id,
+	ifThenElse(gc_duration is null , 0d, gc_duration) as gc_duration,
+	ifThenElse(diff_eden is null , 0d, diff_eden) as diff_eden,
+	ifThenElse(eden_increased is null , 0d, eden_increased) as eden_increased,
+	ifThenElse(diff_survivor is null , 0d, diff_survivor) as diff_survivor,
+	ifThenElse(survivor_increased is null , 0d, survivor_increased) as survivor_increased,
+	ifThenElse(diff_old is null , 0d, diff_old) as diff_old,
+	ifThenElse(old_increased is null , 0d, old_increased) as old_increased,
+	ifThenElse(used_heap_per_allocated is null , 0d, used_heap_per_allocated) as used_heap_per_allocated,
+	ifThenElse(used_heap_pre is null , 0d, used_heap_pre) as used_heap_pre,
+	ifThenElse(allocated_heap_pre is null , 0d, allocated_heap_pre) as allocated_heap_pre,
+	ifThenElse(sd_gc_frequency is null , 0d, sd_gc_frequency) as sd_gc_frequency,
+	ifThenElse(dif_eden_used is null , 0d, dif_eden_used) as dif_eden_used,
+	ifThenElse(dif_old_used is null , 0d, dif_old_used) as dif_old_used,
+	ifThenElse(dif_survivor_used is null , 0d, dif_survivor_used) as dif_survivor_used,
+	ifThenElse(sd_ratio_survivor is null , 0d, sd_ratio_survivor) as sd_ratio_survivor,
+	ifThenElse(gc_frequency is null , 0d, gc_frequency) as gc_frequency
+	having not (app_id is null or time_stamp is null)
+insert into FeaturesModel5Stream;
+
+from FeaturesModel5Stream#window.time(10 sec)
+select
+	time_stamp,
+	app_id,
+	avg(gc_duration) as gc_duration_3sec,
+	avg(diff_eden) as diff_eden_3sec,
+	avg(eden_increased) as eden_increased_3sec,
+	avg(diff_survivor) as diff_survivor_3sec,
+	avg(survivor_increased) as survivor_increased_3sec,
+	avg(diff_old) as diff_old_3sec,
+	avg(old_increased) as old_increased_3sec,
+	avg(used_heap_per_allocated) as used_heap_per_allocated_3sec,
+	avg(used_heap_pre) as used_heap_pre_3sec,
+	avg(allocated_heap_pre) as allocated_heap_pre_3sec,
+	avg(sd_gc_frequency) as sd_gc_frequency_3sec,
+	avg(dif_eden_used) as dif_eden_used_3sec,
+	avg(dif_old_used) as dif_old_used_3sec,
+	avg(dif_survivor_used) as dif_survivor_used_3sec,
+	avg(sd_ratio_survivor) as sd_ratio_survivor_3sec,
+	avg(gc_frequency) as gc_frequency_3sec,
+
+	avg(dif_survivor_used) as dif_survivor_used_5sec,
+	avg(sd_gc_frequency) as sd_gc_frequency_5sec,
+	avg(gc_frequency) as gc_frequency_5sec,
+
+	avg(gc_frequency) as gc_frequency_10sec,
+	avg(dif_eden_used) as dif_eden_used_10sec,
+	avg(dif_old_used) as dif_old_used_10sec,
+	avg(dif_survivor_used) as dif_survivor_used_10sec,
+	avg(sd_ratio_survivor) as sd_ratio_survivor_10sec,
+	avg(sd_gc_frequency) as sd_gc_frequency_10sec,
+	avg(gc_duration) as gc_duration_10sec,
+	avg(diff_eden) as diff_eden_10sec,
+	avg(eden_increased) as eden_increased_10sec,
+	avg(diff_survivor) as diff_survivor_10sec,
+	avg(survivor_increased) as survivor_increased_10sec,
+	avg(diff_old) as diff_old_10sec,
+	avg(old_increased) as old_increased_10sec,
+	avg(used_heap_per_allocated) as used_heap_per_allocated_10sec,
+	avg(used_heap_pre) as used_heap_pre_10sec,
+	avg(allocated_heap_pre) as allocated_heap_pre_10sec
+	group by app_id
+insert into FeaturesModel5Stream3sec;
+
+from FeaturesModel5Stream3sec#window.time(5 sec)
+select
+	time_stamp,
+	app_id,
+	gc_duration_3sec,
+	diff_eden_3sec,
+	eden_increased_3sec,
+	diff_survivor_3sec,
+	survivor_increased_3sec,
+	diff_old_3sec,
+	old_increased_3sec,
+	used_heap_per_allocated_3sec,
+	used_heap_pre_3sec,
+	allocated_heap_pre_3sec,
+	sd_gc_frequency_3sec,
+	dif_eden_used_3sec,
+	dif_old_used_3sec,
+	dif_survivor_used_3sec,
+	sd_ratio_survivor_3sec,
+	gc_frequency_3sec,
+
+	avg(dif_survivor_used_5sec) as dif_survivor_used_5sec,
+	avg(sd_gc_frequency_5sec) as sd_gc_frequency_5sec,
+	avg(gc_frequency_5sec) as gc_frequency_5sec,
+
+	avg(gc_frequency_10sec) as gc_frequency_10sec,
+	avg(dif_eden_used_10sec) as dif_eden_used_10sec,
+	avg(dif_old_used_10sec) as dif_old_used_10sec,
+	avg(dif_survivor_used_10sec) as dif_survivor_used_10sec,
+	avg(sd_ratio_survivor_10sec) as sd_ratio_survivor_10sec,
+	avg(sd_gc_frequency_10sec) as sd_gc_frequency_10sec,
+	avg(gc_duration_10sec) as gc_duration_10sec,
+	avg(diff_eden_10sec) as diff_eden_10sec,
+	avg(eden_increased_10sec) as eden_increased_10sec,
+	avg(diff_survivor_10sec) as diff_survivor_10sec,
+	avg(survivor_increased_10sec) as survivor_increased_10sec,
+	avg(diff_old_10sec) as diff_old_10sec,
+	avg(old_increased_10sec) as old_increased_10sec,
+	avg(used_heap_per_allocated_10sec) as used_heap_per_allocated_10sec,
+	avg(used_heap_pre_10sec) as used_heap_pre_10sec,
+	avg(allocated_heap_pre_10sec) as allocated_heap_pre_10sec
+	group by app_id
+insert into FeaturesModel5Stream5sec;
+
+from FeaturesModel5Stream5sec#window.time(5 sec)
+select
+	time_stamp,
+	app_id,
+	gc_duration_3sec,
+	diff_eden_3sec,
+	eden_increased_3sec,
+	diff_survivor_3sec,
+	survivor_increased_3sec,
+	diff_old_3sec,
+	old_increased_3sec,
+	used_heap_per_allocated_3sec,
+	used_heap_pre_3sec,
+	allocated_heap_pre_3sec,
+	sd_gc_frequency_3sec,
+	dif_eden_used_3sec,
+	dif_old_used_3sec,
+	dif_survivor_used_3sec,
+	sd_ratio_survivor_3sec,
+	gc_frequency_3sec,
+
+	dif_survivor_used_5sec,
+	sd_gc_frequency_5sec,
+	gc_frequency_5sec,
+
+	avg(gc_frequency_10sec) as gc_frequency_10sec,
+	avg(dif_eden_used_10sec) as dif_eden_used_10sec,
+	avg(dif_old_used_10sec) as dif_old_used_10sec,
+	avg(dif_survivor_used_10sec) as dif_survivor_used_10sec,
+	avg(sd_ratio_survivor_10sec) as sd_ratio_survivor_10sec,
+	avg(sd_gc_frequency_10sec) as sd_gc_frequency_10sec,
+	avg(gc_duration_10sec) as gc_duration_10sec,
+	avg(diff_eden_10sec) as diff_eden_10sec,
+	avg(eden_increased_10sec) as eden_increased_10sec,
+	avg(diff_survivor_10sec) as diff_survivor_10sec,
+	avg(survivor_increased_10sec) as survivor_increased_10sec,
+	avg(diff_old_10sec) as diff_old_10sec,
+	avg(old_increased_10sec) as old_increased_10sec,
+	avg(used_heap_per_allocated_10sec) as used_heap_per_allocated_10sec,
+	avg(used_heap_pre_10sec) as used_heap_pre_10sec,
+	avg(allocated_heap_pre_10sec) as allocated_heap_pre_10sec
+	group by app_id
+insert into FeaturesSet3Stream;
+
+from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model6.Model','string',99.8,
+	gc_duration_3sec,
+	diff_eden_3sec,
+	eden_increased_3sec,
+	diff_survivor_3sec,
+	survivor_increased_3sec,
+	diff_old_3sec,
+	old_increased_3sec,
+	used_heap_per_allocated_3sec,
+	used_heap_pre_3sec,
+	allocated_heap_pre_3sec,
+	sd_gc_frequency_5sec,
+	sd_gc_frequency_10sec,
+	gc_duration_10sec,
+	diff_eden_10sec,
+	eden_increased_10sec,
+	diff_survivor_10sec,
+	survivor_increased_10sec,
+	diff_old_10sec,
+	old_increased_10sec,
+	used_heap_per_allocated_10sec,
+	used_heap_pre_10sec,
+	allocated_heap_pre_10sec)
+select
+	time_stamp,
+	app_id,
+	'model_6' as model_id,
+	prediction
+insert into PredictionResultStreamTem;
+
+
+
+partition with (app_id of PredictionResultStreamTem)
+begin
+  from PredictionResultTrigger#window.length(1) unidirectional join PredictionResultStreamTem#window.length(1)
+  select *
+  insert into PeriodicPredictionResult;
+end;
+
+from PeriodicPredictionResult as f unidirectional left outer join TimeStampCache as t on f.app_id == t.app_id
+select
+	ifThenElse(f.time_stamp <= t.time_stamp, t.time_stamp + 1000, f.time_stamp) as time_stamp,
+	f.app_id,
+	f.model_id,
+	f.prediction
+insert into PredictionResultsStream;
+
+from PredictionResultsStream
+select time_stamp, app_id
+insert overwrite TimeStampCache on TimeStampCache.app_id == app_id;

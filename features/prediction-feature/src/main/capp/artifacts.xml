@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<artifacts>
+    <artifact name="anomaly-prediction-predictor-capp" version="1.0.0" type="carbon/application">
+
+        <!--Event receivers-->
+        <dependency artifact="CpuUsageReceiver" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="GarbageCollectionLogReceiver" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="MemoryUsageReceiver" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+
+        <!--Event streams-->
+        <dependency artifact="CpuUsageStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="GarbageCollectionStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="MemoryUsageStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="PredictionResultsStream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3Stream" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesWithoutValidation" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+
+        <!--Event stores-->
+        <dependency artifact="CpuUsageEventStore" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="GarbageCollectionEventStore" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="MemoryUsageEventStore" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+
+        <!--Executionplans-->
+        <dependency artifact="IterationFourPredictionExecutionPlan" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="IterationThreePredictionExecutionPlan" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3TimeSeries1" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+        <dependency artifact="FeaturesSet3TimeSeries2" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+
+        <!--models-->
+        <dependency artifact="models" version="1.0.0" include="true"
+                    serverRole="DataAnalyticsServer"/>
+
+    </artifact>
+</artifacts>

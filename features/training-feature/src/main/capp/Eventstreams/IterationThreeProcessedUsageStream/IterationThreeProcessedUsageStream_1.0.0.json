@@ -1,0 +1,212 @@
+{
+  "name": "IterationThreeProcessedUsageStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "heap_free",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_range_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_growing_rate_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_3sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used_free_proportion_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_load",
+      "type": "STRING"
+    },
+    {
+      "name": "system_cpu_load",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_avg_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_avg_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_avg_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_std_5sec",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_std_10sec",
+      "type": "STRING"
+    },
+    {
+      "name": "process_cpu_std_30sec",
+      "type": "STRING"
+    },
+    {
+      "name": "minor_freq",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_freq",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "total_minor_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "total_major_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avg_minor_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avg_major_duration",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "total_old_clearing_rate",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "total_old_growing_rate_with_time",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avg_old_growing_rate_with_free",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "avg_old_growing_with_free_plus_time",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "young_gen_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_gen_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_free",
+      "type": "DOUBLE"
+    }
+  ]
+}

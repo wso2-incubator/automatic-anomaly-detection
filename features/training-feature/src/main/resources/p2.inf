@@ -1,0 +1,8 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/carbonapps/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/training-feature_${feature.version}/anomaly-prediction-trainer-capp-1.0.0.car,target:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-trainer-capp-1.0.0.car,overwrite:true);\
+
+instructions.uninstall = \
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-trainer-capp-1.0.0.car,overwrite:true);\

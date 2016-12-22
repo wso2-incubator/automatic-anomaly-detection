@@ -1,0 +1,548 @@
+@Plan:name('IterationFourProcessExecutionPlan')
+
+@Plan:description('Anomaly Prediction - Iteration four features process plan for trainning')
+
+
+--==========================================================================================================--
+--////////////////////////////////////////////// IMPORTS ///////////////////////////////////////////////////--
+--==========================================================================================================--
+@Import('CPUUsageStream:1.0.0')
+define stream CPUUsageStream (time_stamp long, app_id string, process_cpu_load double, system_cpu_load double);
+
+@Import('MemoryUsageStream:1.0.0')
+define stream MemoryUsageStream (time_stamp long, app_id string, 
+								 max_heap long, allocated_heap long, used_heap long, 
+								 max_non_heap long, allocated_non_heap long, used_non_heap long, 
+								 pending_finalizations long
+								);
+
+@Import('GarbageCollectionStream:1.0.0')
+define stream GarbageCollectionStream (time_stamp long, app_id string, gc_type string, gc_cause string, gc_duration long, 
+									   eden_used_after long, eden_used_before long, survivor_used_after long, survivor_used_before long, old_used_after long, old_used_before long, 
+									   eden_committed_after long, eden_committed_before long, survivor_committed_after long, survivor_committed_before long, old_committed_after long, old_committed_before long, 
+									   eden_max_after long, eden_max_before long, survivor_max_after long, survivor_max_before long, old_max_after long, old_max_before long);
+
+--==========================================================================================================--
+--/////////////////////////////////////////// END OF IMPORTS ///////////////////////////////////////////////--
+--==========================================================================================================--
+
+--==========================================================================================================--
+--////////////////////////////////////////////// EXPORTS ///////////////////////////////////////////////////--
+--==========================================================================================================--
+
+@Export('IterationFourProcessedUsageStream:1.0.0')
+define stream IterationFourProcessedUsageStream (app_id string, time_stamp long, heap_free string, heap_growing_rate string, heap_used_free_proportion string, heap_range_5sec string, heap_avg_3sec string, heap_avg_5sec string, heap_avg_10sec string, heap_avg_30sec string, heap_std_3sec string, heap_std_5sec string, heap_std_10sec string, heap_std_30sec string, heap_growing_rate_avg_3sec string, heap_growing_rate_avg_5sec string, heap_growing_rate_avg_10sec string, heap_growing_rate_avg_30sec string, heap_growing_rate_std_3sec string, heap_growing_rate_std_5sec string, heap_growing_rate_std_10sec string, heap_growing_rate_std_30sec string, heap_used_free_proportion_avg_3sec string, heap_used_free_proportion_avg_5sec string, heap_used_free_proportion_avg_10sec string, heap_used_free_proportion_avg_30sec string, heap_used_free_proportion_std_3sec string, heap_used_free_proportion_std_5sec string, heap_used_free_proportion_std_10sec string, heap_used_free_proportion_std_30sec string, heap_avg_3_increasing string, heap_avg_5_increasing string, heap_avg_10_increasing string, heap_avg_30_increasing string, heap_growing_3_increasing string, heap_growing_5_increasing string, heap_growing_10_increasing string, heap_growing_30_increasing string, major_happened double, minor_happened double, avg_minor_duration double, avg_major_duration double, heap_growing_with_gc double, old_growing double, old_clearing double);
+--==========================================================================================================--
+--/////////////////////////////////////////// END OF EXPORTS ///////////////////////////////////////////////--
+--==========================================================================================================--
+
+--==========================================================================================================--
+--//////////////////////////////////////// PROCESS GC EVENTS DATA///////////////////////////////////////////--
+--==========================================================================================================--
+--partion by app_id. used a sequence to collect 2 consecutive GC events with same app_id
+partition with (app_id of GarbageCollectionStream)
+begin
+  from GarbageCollectionStream
+  select 
+	  app_id,
+	  time_stamp,
+
+	  gc_type,
+	  gc_duration,
+
+	  (eden_used_before + survivor_used_before) as young_used_before,
+	  (eden_used_after + survivor_used_after) as young_used_after,
+	  (old_used_before - old_used_after) as old_used_changed,
+	 
+	  old_used_before,
+	  old_used_after,
+	  old_max_before
+
+  insert into #GCStream;
+
+  from g1 = #GCStream, g2 = #GCStream
+  select 
+	  g2.app_id,
+	  g2.time_stamp,
+
+	  g2.gc_type,
+      g2.gc_duration,
+
+	  --calculate heap generation parameters--
+	  --heap changing
+	  (g2.young_used_after + g2.old_used_after) - (g1.young_used_after + g1.old_used_after) as heap_changing,
+		  
+	  --old gen growing 
+	  ifThenElse(g2.old_used_changed < 0, (convert(g2.old_used_changed*-1, 'double')/(g2.old_max_before - g2.old_used_before)), 0.0 ) as old_growing,
+
+	  --old gen clearing with respect to gc guration and old used before
+	  ifThenElse(g2.old_used_changed > 0 , (convert(g2.old_used_changed, 'double')/g2.old_used_before)/g2.gc_duration , 0.0 ) as old_clearing
+  
+  insert into GCProcessedUsageStream;
+end;	
+			
+--catogerized events into major and minor
+from GCProcessedUsageStream[not(gc_type is null)]
+select 
+	app_id,
+	time_stamp,
+	
+	ifThenElse(gc_type == "minor",1,0)as minor, 
+	ifThenElse(gc_type == "major",1,0) as major,
+	
+	ifThenElse(gc_type == "minor", ifThenElse(gc_duration is null , 0L, gc_duration), 0L) as minor_gc_duration, 
+	ifThenElse(gc_type == "major", ifThenElse(gc_duration is null , 0L, gc_duration), 0L) as major_gc_duration,
+	
+	heap_changing,
+	old_growing,
+	old_clearing
+	
+insert into GCValidatedStream;
+
+--process garbage collection data to take a summery for collecting period(default 1 sec)
+from GCValidatedStream#window.externalTimeBatch(time_stamp, 1 sec, time_stamp, 1 sec)
+select
+	app_id,
+	
+	--time parameters
+	max(time_stamp) as time_stamp,
+	avg(minor_gc_duration) as avg_minor_duration,
+	avg(major_gc_duration) as avg_major_duration,
+
+	--take count major and minor gc frequencies 
+	ifThenElse(sum(minor) > 0 , 1.0 , 0.5) as minor_happened,
+	ifThenElse(sum(major) > 0 , 1.0 , 0.5) as major_happened,
+	
+	--take summeries of memory parameters
+	ifThenElse(sum(heap_changing) > 0 , 1.0 ,0.5 ) as heap_growing_with_gc,
+	avg(old_growing) as old_growing,
+	avg(old_clearing) as old_clearing
+	
+  	group by app_id
+	
+insert into GCBatchProcessedStream;
+--==========================================================================================================--
+--////////////////////////////////// END OF PROCESSING GC EVENTS DATA //////////////////////////////////////--
+--==========================================================================================================--
+
+--==========================================================================================================--
+--//////////////////////////////////// PROCESS MEMORY USAGE DATA ///////////////////////////////////////////--
+--==========================================================================================================--
+from MemoryUsageStream
+select 
+	time_stamp,
+	app_id,
+	ifThenElse(max_heap >= used_heap, max_heap-used_heap, 0L) as free_heap,
+	used_heap,
+	max_heap
+insert into PreProcessedMemoryStream;
+
+partition with (app_id of PreProcessedMemoryStream)
+begin
+	from m1 = PreProcessedMemoryStream, m2 = PreProcessedMemoryStream
+		select 
+			m2.time_stamp,
+			m2.app_id,
+			ifThenElse(m2.max_heap > 0, convert(m2.free_heap , 'double')/m2.max_heap , 0.0) as heap_free,
+			ifThenElse(m2.used_heap > m1.used_heap, convert(m2.used_heap - m1.used_heap, 'double')/m1.free_heap, 0.0) as heap_growing_rate,
+			ifThenElse(m2.free_heap > 0 and m2.max_heap > 0 , (convert(m2.used_heap, 'double')/m2.free_heap)/m2.max_heap , 1.0) as heap_used_free_proportion
+	insert into MemoryProcessedStream;
+end;
+		
+--process memory usage into summery using 3 seconds values
+from MemoryProcessedStream#window.time(3 sec)
+select 
+	time_stamp,
+	app_id,	
+			   
+	heap_free,
+	heap_growing_rate,
+	heap_used_free_proportion,
+			   
+	avg(heap_free) as heap_avg_3sec,
+	stddev(heap_free) as heap_std_3sec,
+
+	avg(heap_growing_rate) as heap_growing_rate_avg_3sec,
+	stddev(heap_growing_rate) as heap_growing_rate_std_3sec,
+					   
+	avg(heap_used_free_proportion) as heap_used_free_proportion_avg_3sec,
+	stddev(heap_used_free_proportion) as heap_used_free_proportion_std_3sec
+			   
+	group by app_id
+insert into ThreeSecMemorySummery;
+
+--process memory usage into summery using 5 seconds values
+from MemoryProcessedStream#window.time(5 sec)
+select 
+	time_stamp,
+	app_id,			   
+	
+	avg(heap_free) as heap_avg_5sec,
+	stddev(heap_free) as heap_std_5sec,
+
+	avg(heap_growing_rate) as heap_growing_rate_avg_5sec,
+	stddev(heap_growing_rate) as heap_growing_rate_std_5sec,
+					   
+	avg(heap_used_free_proportion) as heap_used_free_proportion_avg_5sec,
+	stddev(heap_used_free_proportion) as heap_used_free_proportion_std_5sec,
+	
+	(max(heap_free) - min(heap_free)) as heap_range_5sec
+	
+	group by app_id
+insert into FiveSecMemorySummery;
+			   
+--process memory usage into summery using 10 seconds values
+from MemoryProcessedStream#window.time(10 sec)
+select 
+	time_stamp,
+	app_id,			   
+
+	avg(heap_free) as heap_avg_10sec,
+	stddev(heap_free) as heap_std_10sec,
+
+	avg(heap_growing_rate) as heap_growing_rate_avg_10sec,
+	stddev(heap_growing_rate) as heap_growing_rate_std_10sec,
+					   
+	avg(heap_used_free_proportion) as heap_used_free_proportion_avg_10sec,
+	stddev(heap_used_free_proportion) as heap_used_free_proportion_std_10sec
+	
+	group by app_id
+insert into TenSecMemorySummery;
+			   
+--process memory usage into summery using 30 seconds values
+from MemoryProcessedStream#window.time(30 sec)
+select 
+	time_stamp,
+	app_id,			   
+	
+	avg(heap_free) as heap_avg_30sec,
+	stddev(heap_free) as heap_std_30sec,
+
+	avg(heap_growing_rate) as heap_growing_rate_avg_30sec,
+	stddev(heap_growing_rate) as heap_growing_rate_std_30sec,
+					   
+	avg(heap_used_free_proportion) as heap_used_free_proportion_avg_30sec,
+	stddev(heap_used_free_proportion) as heap_used_free_proportion_std_30sec
+	
+	group by app_id
+insert into ThirtySecMemorySummery;
+
+--==========================================================================================================--
+--/////////////////////////////////// END OF PROCESS MEMORY USAGE DATA /////////////////////////////////////--
+--==========================================================================================================--
+
+--==========================================================================================================--
+--//////////////////////////////////// JOIN MEMORY SUMMERY STREAMS /////////////////////////////////////////--
+--==========================================================================================================--
+-- join summeries of memory streams 
+from ThreeSecMemorySummery#window.length(1) as A join FiveSecMemorySummery#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
+select 
+	A.time_stamp,
+	A.app_id,
+	A.heap_free,
+	A.heap_growing_rate,
+	A.heap_used_free_proportion,
+	
+	A.heap_avg_3sec,
+	B.heap_avg_5sec,
+	A.heap_std_3sec,
+	B.heap_std_5sec,
+	
+	A.heap_growing_rate_avg_3sec,
+	B.heap_growing_rate_avg_5sec,
+	A.heap_growing_rate_std_3sec,
+	B.heap_growing_rate_std_5sec,
+	
+	A.heap_used_free_proportion_avg_3sec,
+	B.heap_used_free_proportion_avg_5sec,
+	A.heap_used_free_proportion_std_3sec,
+	B.heap_used_free_proportion_std_5sec,
+	
+	B.heap_range_5sec
+	
+insert into ThreeSecFiveSecMemoryStream;
+
+from TenSecMemorySummery#window.length(1) as A join ThirtySecMemorySummery#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
+select 
+	A.time_stamp,
+	A.app_id,
+
+	A.heap_avg_10sec,
+	B.heap_avg_30sec,
+	A.heap_std_10sec,
+	B.heap_std_30sec,
+	
+	A.heap_growing_rate_avg_10sec,
+	B.heap_growing_rate_avg_30sec,
+	A.heap_growing_rate_std_10sec,
+	B.heap_growing_rate_std_30sec,
+	
+	A.heap_used_free_proportion_avg_10sec,
+	B.heap_used_free_proportion_avg_30sec,
+	A.heap_used_free_proportion_std_10sec,
+	B.heap_used_free_proportion_std_30sec
+	
+insert into TenSecThirtySecMemoryStream;
+
+from ThreeSecFiveSecMemoryStream#window.length(1) as A join TenSecThirtySecMemoryStream#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
+select 
+	A.time_stamp,
+	A.app_id,
+
+	A.heap_free,
+	A.heap_growing_rate,
+	A.heap_used_free_proportion,
+	
+	A.heap_avg_3sec,
+	A.heap_avg_5sec,
+	A.heap_std_3sec,
+	A.heap_std_5sec,
+	
+	A.heap_growing_rate_avg_3sec,
+	A.heap_growing_rate_avg_5sec,
+	A.heap_growing_rate_std_3sec,
+	A.heap_growing_rate_std_5sec,
+	
+	A.heap_used_free_proportion_avg_3sec,
+	A.heap_used_free_proportion_avg_5sec,
+	A.heap_used_free_proportion_std_3sec,
+	A.heap_used_free_proportion_std_5sec,
+	
+	A.heap_range_5sec,
+	
+	B.heap_avg_10sec,
+	B.heap_avg_30sec,
+	B.heap_std_10sec,
+	B.heap_std_30sec,
+	
+	B.heap_growing_rate_avg_10sec,
+	B.heap_growing_rate_avg_30sec,
+	B.heap_growing_rate_std_10sec,
+	B.heap_growing_rate_std_30sec,
+	
+	B.heap_used_free_proportion_avg_10sec,
+	B.heap_used_free_proportion_avg_30sec,
+	B.heap_used_free_proportion_std_10sec,
+	B.heap_used_free_proportion_std_30sec
+	
+insert into ProcessedMemoryUsageStream;
+--==========================================================================================================--
+--//////////////////////////////// END OF JOINING MEMORY USAGE SUMMERY DATA/////////////////////////////////--
+--==========================================================================================================--
+from ProcessedMemoryUsageStream
+select app_id,time_stamp
+insert into T1;
+
+partition with ( app_id of  ProcessedMemoryUsageStream)
+begin
+
+  from p1 = ProcessedMemoryUsageStream, p2 = ProcessedMemoryUsageStream
+  select 
+  	p2.app_id,
+	p2.time_stamp,
+	
+	p2.heap_free,
+	p2.heap_growing_rate,
+	p2.heap_used_free_proportion,
+	
+	p2.heap_avg_3sec,
+	p2.heap_avg_5sec,
+	p2.heap_std_3sec,
+	p2.heap_std_5sec,
+	
+	p2.heap_growing_rate_avg_3sec,
+	p2.heap_growing_rate_avg_5sec,
+	p2.heap_growing_rate_std_3sec,
+	p2.heap_growing_rate_std_5sec,
+	
+	p2.heap_used_free_proportion_avg_3sec,
+	p2.heap_used_free_proportion_avg_5sec,
+	p2.heap_used_free_proportion_std_3sec,
+	p2.heap_used_free_proportion_std_5sec,
+	
+	p2.heap_range_5sec,
+	
+	p2.heap_avg_10sec,
+	p2.heap_avg_30sec,
+	p2.heap_std_10sec,
+	p2.heap_std_30sec,
+	
+	p2.heap_growing_rate_avg_10sec,
+	p2.heap_growing_rate_avg_30sec,
+	p2.heap_growing_rate_std_10sec,
+	p2.heap_growing_rate_std_30sec,
+	
+	p2.heap_used_free_proportion_avg_10sec,
+	p2.heap_used_free_proportion_avg_30sec,
+	p2.heap_used_free_proportion_std_10sec,
+	p2.heap_used_free_proportion_std_30sec,
+	
+	ifThenElse(p2.heap_avg_3sec > p1.heap_avg_3sec , 1.0 , 0.0 ) as heap_avg_3_increasing,
+	ifThenElse(p2.heap_avg_5sec > p1.heap_avg_5sec , 1.0 , 0.0 ) as heap_avg_5_increasing,
+	ifThenElse(p2.heap_avg_10sec > p1.heap_avg_10sec , 1.0 , 0.0 ) as heap_avg_10_increasing,
+	ifThenElse(p2.heap_avg_30sec > p1.heap_avg_30sec , 1.0 , 0.0 ) as heap_avg_30_increasing,
+	
+	ifThenElse(p2.heap_growing_rate_std_3sec > p1.heap_growing_rate_std_3sec , 1.0 , 0.0 ) as heap_growing_3_increasing,
+	ifThenElse(p2.heap_growing_rate_std_5sec > p1.heap_growing_rate_std_5sec , 1.0 , 0.0 ) as heap_growing_5_increasing,
+	ifThenElse(p2.heap_growing_rate_std_10sec > p1.heap_growing_rate_std_10sec , 1.0 , 0.0 ) as heap_growing_10_increasing,
+	ifThenElse(p2.heap_growing_rate_std_30sec > p1.heap_growing_rate_std_30sec , 1.0 , 0.0 ) as heap_growing_30_increasing
+	
+  insert into UsageFeatureStream;
+  
+end;
+--==========================================================================================================--
+--/////////////////////////////////// JOINING ALL USAGE DATA (INCLUDED GC) /////////////////////////////////--
+--==========================================================================================================--
+--delayed gc stream (assumed that events are store considering the time_stamp as the primary key
+from GCBatchProcessedStream#window.time(5 sec)
+select *
+insert expired events into GCDelayedStream;
+
+--join the common usage data to GC processed data
+from   UsageFeatureStream#window.length(20) as U full outer join GCDelayedStream#window.length(10)  as G on ( U.time_stamp-1000 <= G.time_stamp and U.time_stamp >= G.time_stamp and U.app_id == G.app_id)
+select 
+	-------------General details----------------
+	coalesce(U.time_stamp , G.time_stamp) as time_stamp,
+	coalesce(U.app_id , G.app_id) as app_id,
+	
+	----------------Memory usages----------------
+	U.heap_free,
+	U.heap_growing_rate,
+	U.heap_used_free_proportion,
+	U.heap_range_5sec,
+	
+	U.heap_avg_3sec,
+	U.heap_avg_5sec,
+	U.heap_avg_10sec,
+	U.heap_avg_30sec,
+	
+	U.heap_std_3sec,
+	U.heap_std_5sec,
+	U.heap_std_10sec,
+	U.heap_std_30sec,
+	
+	U.heap_growing_rate_avg_3sec,
+	U.heap_growing_rate_avg_5sec,
+	U.heap_growing_rate_avg_10sec,
+	U.heap_growing_rate_avg_30sec,
+	
+	U.heap_growing_rate_std_3sec,
+	U.heap_growing_rate_std_5sec,
+	U.heap_growing_rate_std_10sec,
+	U.heap_growing_rate_std_30sec,
+	
+	U.heap_used_free_proportion_avg_3sec,
+	U.heap_used_free_proportion_avg_5sec,
+	U.heap_used_free_proportion_avg_10sec,
+	U.heap_used_free_proportion_avg_30sec,
+	
+	U.heap_used_free_proportion_std_3sec,
+	U.heap_used_free_proportion_std_5sec,
+	U.heap_used_free_proportion_std_10sec,
+	U.heap_used_free_proportion_std_30sec,
+	
+	U.heap_avg_3_increasing,
+	U.heap_avg_5_increasing,
+	U.heap_avg_10_increasing,
+	U.heap_avg_30_increasing,
+	
+	U.heap_growing_3_increasing,
+	U.heap_growing_5_increasing,
+	U.heap_growing_10_increasing,
+	U. heap_growing_30_increasing,
+	
+	----------------GC logs--------------------
+	--GC frequencies 
+	G.major_happened,
+	G.minor_happened,
+
+	--GC duration parameters
+	G.avg_minor_duration,
+	G.avg_major_duration,
+
+	--summeries of GC memory parameters
+	G.heap_growing_with_gc,
+	G.old_growing,
+	G.old_clearing
+	
+insert into JoinedFeatureStream;
+
+--==========================================================================================================--
+--//////////////////////////////////// END OF JOINING ALL USAGE DATA ///////////////////////////////////////--
+--==========================================================================================================--
+
+--==========================================================================================================--
+--//////////////////////////////////////// VALIDATE ALL FEATURES ///////////////////////////////////////////--
+--==========================================================================================================--
+from JoinedFeatureStream 
+select 
+
+	app_id,
+	time_stamp,
+	
+	--validate memory
+	ifThenElse(heap_free is null , '?', convert(heap_free, 'string')) as heap_free, 
+	ifThenElse(heap_growing_rate is null , '?', convert(heap_growing_rate, 'string')) as heap_growing_rate, 
+	ifThenElse(heap_used_free_proportion is null , '?', convert(heap_used_free_proportion, 'string')) as heap_used_free_proportion, 
+	ifThenElse(heap_range_5sec is null , '?', convert(heap_range_5sec, 'string')) as heap_range_5sec,
+
+	ifThenElse(heap_avg_3sec is null , '?', convert(heap_avg_3sec, 'string')) as heap_avg_3sec,
+	ifThenElse(heap_avg_5sec is null , '?', convert(heap_avg_5sec, 'string')) as heap_avg_5sec,
+	ifThenElse(heap_avg_10sec is null , '?', convert(heap_avg_10sec, 'string')) as heap_avg_10sec,
+	ifThenElse(heap_avg_30sec is null , '?', convert(heap_avg_30sec, 'string')) as heap_avg_30sec,
+
+	ifThenElse(heap_std_3sec is null , '?', convert(heap_std_3sec, 'string')) as heap_std_3sec,
+	ifThenElse(heap_std_5sec is null , '?', convert(heap_std_5sec, 'string')) as heap_std_5sec,
+	ifThenElse(heap_std_10sec is null , '?', convert(heap_std_10sec, 'string')) as heap_std_10sec,
+	ifThenElse(heap_std_30sec is null , '?', convert(heap_std_30sec, 'string')) as heap_std_30sec,
+
+	ifThenElse(heap_growing_rate_avg_3sec is null , '?', convert(heap_growing_rate_avg_3sec, 'string')) as heap_growing_rate_avg_3sec,
+	ifThenElse(heap_growing_rate_avg_5sec is null , '?', convert(heap_growing_rate_avg_5sec, 'string')) as heap_growing_rate_avg_5sec,
+	ifThenElse(heap_growing_rate_avg_10sec is null , '?', convert(heap_growing_rate_avg_10sec, 'string')) as heap_growing_rate_avg_10sec,
+	ifThenElse(heap_growing_rate_avg_30sec is null , '?', convert(heap_growing_rate_avg_30sec, 'string')) as heap_growing_rate_avg_30sec,
+
+	ifThenElse(heap_growing_rate_std_3sec is null , '?', convert(heap_growing_rate_std_3sec, 'string')) as heap_growing_rate_std_3sec,
+	ifThenElse(heap_growing_rate_std_5sec is null , '?', convert(heap_growing_rate_std_5sec, 'string')) as heap_growing_rate_std_5sec,
+	ifThenElse(heap_growing_rate_std_10sec is null , '?', convert(heap_growing_rate_std_10sec, 'string')) as heap_growing_rate_std_10sec,
+	ifThenElse(heap_growing_rate_std_30sec is null , '?', convert(heap_growing_rate_std_30sec, 'string')) as heap_growing_rate_std_30sec,
+
+	ifThenElse(heap_used_free_proportion_avg_3sec is null , '?', convert(heap_used_free_proportion_avg_3sec, 'string')) as heap_used_free_proportion_avg_3sec,
+	ifThenElse(heap_used_free_proportion_avg_5sec is null , '?', convert(heap_used_free_proportion_avg_5sec, 'string')) as heap_used_free_proportion_avg_5sec,
+	ifThenElse(heap_used_free_proportion_avg_10sec is null , '?', convert(heap_used_free_proportion_avg_10sec, 'string')) as heap_used_free_proportion_avg_10sec,
+	ifThenElse(heap_used_free_proportion_avg_30sec is null , '?', convert(heap_used_free_proportion_avg_30sec, 'string')) as heap_used_free_proportion_avg_30sec,
+
+	ifThenElse(heap_used_free_proportion_std_3sec is null , '?', convert(heap_used_free_proportion_std_3sec, 'string')) as heap_used_free_proportion_std_3sec,
+	ifThenElse(heap_used_free_proportion_std_5sec is null , '?', convert(heap_used_free_proportion_std_5sec, 'string')) as heap_used_free_proportion_std_5sec,
+	ifThenElse(heap_used_free_proportion_std_10sec is null , '?', convert(heap_used_free_proportion_std_10sec, 'string')) as heap_used_free_proportion_std_10sec,
+	ifThenElse(heap_used_free_proportion_std_30sec is null , '?', convert(heap_used_free_proportion_std_30sec, 'string')) as heap_used_free_proportion_std_30sec,
+
+	
+	ifThenElse(heap_avg_3_increasing is null, '?' , convert(heap_avg_3_increasing, 'string')) as heap_avg_3_increasing,
+	ifThenElse(heap_avg_5_increasing is null, '?' , convert(heap_avg_5_increasing, 'string')) as heap_avg_5_increasing,
+	ifThenElse(heap_avg_10_increasing is null, '?' , convert(heap_avg_10_increasing, 'string')) as heap_avg_10_increasing,
+	ifThenElse(heap_avg_30_increasing is null , '?' , convert(heap_avg_30_increasing, 'string')) as heap_avg_30_increasing,
+	
+	ifThenElse(heap_growing_3_increasing is null, '?' , convert(heap_growing_3_increasing, 'string')) as heap_growing_3_increasing,
+	ifThenElse(heap_growing_5_increasing is null, '?' , convert(heap_growing_5_increasing, 'string')) as heap_growing_5_increasing,
+	ifThenElse(heap_growing_10_increasing is null, '?' , convert(heap_growing_10_increasing, 'string')) as heap_growing_10_increasing,
+	ifThenElse(heap_growing_30_increasing is null, '?' , convert(heap_growing_30_increasing, 'string')) as heap_growing_30_increasing,
+	
+	
+	ifThenElse(major_happened is null, 0.0 , major_happened) as major_happened,
+	ifThenElse(minor_happened is null, 0.0 , minor_happened) as minor_happened,
+	
+	--normalize GC durations
+	ifThenElse( not(avg_minor_duration is null) and avg_minor_duration > 0 , ifThenElse(avg_minor_duration<500 , avg_minor_duration/500 , 1.0), 0.0 )as avg_minor_duration, --maximum minor gc durations is taken as 500
+	ifThenElse( not(avg_major_duration is null) and avg_major_duration > 0 , ifThenElse(avg_major_duration<5000 , avg_major_duration/5000 , 1.0), 0.0 )as avg_major_duration, --maximum major gc durations is taken as 5000
+
+	--validate GC memory parameters
+	ifThenElse( heap_growing_with_gc is null , 0.0 , heap_growing_with_gc) as heap_growing_with_gc,
+	ifThenElse( old_growing is null , 0.0 , old_growing ) as old_growing,
+	ifThenElse( old_clearing is null , 0.0 , old_clearing ) as old_clearing
+
+	
+insert into IterationFourProcessedUsageStream;
+--==========================================================================================================--
+--////////////////////////////////////// END OF FEATURE VALIDATION//////////////////////////////////////////--
+--==========================================================================================================--
+

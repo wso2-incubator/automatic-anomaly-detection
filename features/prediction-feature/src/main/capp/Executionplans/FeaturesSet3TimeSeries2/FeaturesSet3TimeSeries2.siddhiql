@@ -1,0 +1,80 @@
+@Plan:name('FeaturesSet3TimeSeries2')
+
+@Plan:description('Execution plan for prediction of Model5')
+
+@Plan:trace('true')
+@Plan:statistics('true')
+
+define trigger PredictionResultTrigger at every 1 sec ;
+define table TimeStampCache ( time_stamp long , app_id string);
+
+--===================================================== Imports ======================================================--
+@Import('FeaturesSet3Stream:1.0.0')
+define stream FeaturesSet3Stream (time_stamp long, app_id string, gc_duration_3sec double,
+										 diff_eden_3sec double, eden_increased_3sec double,
+										 diff_survivor_3sec double, survivor_increased_3sec double,
+										 diff_old_3sec double, old_increased_3sec double,
+										 used_heap_per_allocated_3sec double, used_heap_pre_3sec double,
+										 allocated_heap_pre_3sec double, sd_gc_frequency_3sec double,
+										 dif_eden_used_3sec double, dif_old_used_3sec double,
+										 dif_survivor_used_3sec double, sd_ratio_survivor_3sec double,
+										 gc_frequency_3sec double, dif_survivor_used_5sec double,
+										 sd_gc_frequency_5sec double, gc_frequency_5sec double,
+										 gc_frequency_10sec double, dif_eden_used_10sec double,
+										 dif_old_used_10sec double, dif_survivor_used_10sec double,
+										 sd_ratio_survivor_10sec double, sd_gc_frequency_10sec double,
+										 gc_duration_10sec double, diff_eden_10sec double,
+										 eden_increased_10sec double, diff_survivor_10sec double,
+										 survivor_increased_10sec double, diff_old_10sec double,
+										 old_increased_10sec double, used_heap_per_allocated_10sec double,
+										 used_heap_pre_10sec double, allocated_heap_pre_10sec double);
+--================================================= End of Imports ===================================================--
+
+--===================================================== Exports ======================================================--
+@Export('PredictionResultsStream:1.0.0')
+define stream PredictionResultsStream (time_stamp long, app_id string, model_id string, prediction string);
+--================================================= End of Exports ===================================================--
+
+from FeaturesSet3Stream#ml:predict('registry:/_system/governance/mlmodels/features_set3_model7.Model','string',99.8,
+eden_increased_3sec,
+used_heap_pre_3sec,
+allocated_heap_pre_3sec,
+dif_eden_used_3sec,
+dif_old_used_3sec,
+sd_ratio_survivor_3sec,
+dif_survivor_used_5sec,
+sd_gc_frequency_5sec,
+dif_eden_used_10sec,
+dif_old_used_10sec,
+dif_survivor_used_10sec,
+sd_ratio_survivor_10sec,
+sd_gc_frequency_10sec,
+eden_increased_10sec,
+used_heap_pre_10sec,
+allocated_heap_pre_10sec)
+select
+	time_stamp,
+	app_id,
+	'model_7' as model_id,
+	prediction
+insert into PredictionResultStreamTem;
+
+
+partition with (app_id of PredictionResultStreamTem)
+begin
+  from PredictionResultTrigger#window.length(1) unidirectional join PredictionResultStreamTem#window.length(1)
+  select *
+  insert into PeriodicPredictionResult;
+end;
+
+from PeriodicPredictionResult as f unidirectional left outer join TimeStampCache as t on f.app_id == t.app_id
+select
+	ifThenElse(f.time_stamp <= t.time_stamp, t.time_stamp + 1000, f.time_stamp) as time_stamp,
+	f.app_id,
+	f.model_id,
+	f.prediction
+insert into PredictionResultsStream;
+
+from PredictionResultsStream
+select time_stamp, app_id
+insert overwrite TimeStampCache on TimeStampCache.app_id == app_id;

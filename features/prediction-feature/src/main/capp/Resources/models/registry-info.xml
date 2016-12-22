@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <item>
+        <file>model_1.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>model_2.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>model_3.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>model_4.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>model_5.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>features_set3_model6.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+    <item>
+        <file>features_set3_model7.Model</file>
+        <path>/_system/governance/mlmodels</path>
+    </item>
+</resources>
