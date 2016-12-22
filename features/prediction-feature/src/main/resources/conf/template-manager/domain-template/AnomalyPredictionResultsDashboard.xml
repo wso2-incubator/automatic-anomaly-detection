@@ -255,7 +255,22 @@
                             </artifact>
                             <artifact file="conf.json">
                                 <![CDATA[
-                                    {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"x" : "Time", "xType" : "time", "y" : "Used_Heap", "yType" : "number", "color" : "None", "maxLength" : "30", "gadget-name" : "Memory Usage Statistics", "chart-name" : "line-chart"}}
+                                {
+                                  "provider-conf": {
+                                    "streamName": "org.wso2.anomaly-prediction.$appId.dashboard.MemoryUsageUIStream:1.0.0",
+                                    "provider-name": "realtime"
+                                  },
+                                  "chart-conf": {
+                                    "x": "Time",
+                                    "xType": "time",
+                                    "y": "Used_Heap",
+                                    "yType": "number",
+                                    "color": "None",
+                                    "maxLength": "30",
+                                    "gadget-name": "Memory Usage Statistics",
+                                    "chart-name": "line-chart"
+                                  }
+                                }
                                 ]]>
                             </artifact>
                             <artifact file="js/core/gadget-util.js">
@@ -312,7 +327,23 @@
                             </artifact>
                             <artifact file="conf.json">
                                 <![CDATA[
-                                    {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"x" : "Time", "xType" : "time", "y" : "GC_Duration", "yType" : "number", "color" : "GC_Type", "size" : "Size", "maxLength" : "30", "gadget-name" : "Garbage Collection Event Statistics", "chart-name" : "scatter-chart"}}
+                                {
+                                  "provider-conf": {
+                                    "streamName": "org.wso2.anomaly-prediction.$appId.dashboard.GarbageCollectionUIStream:1.0.0",
+                                    "provider-name": "realtime"
+                                  },
+                                  "chart-conf": {
+                                    "x": "Time",
+                                    "xType": "time",
+                                    "y": "GC_Duration",
+                                    "yType": "number",
+                                    "color": "GC_Type",
+                                    "size": "Size",
+                                    "maxLength": "30",
+                                    "gadget-name": "Garbage Collection Event Statistics",
+                                    "chart-name": "scatter-chart"
+                                  }
+                                }
                                 ]]>
                             </artifact>
                             <artifact file="js/core/gadget-util.js">
@@ -366,7 +397,22 @@
                             </artifact>
                             <artifact file="conf.json">
                                 <![CDATA[
-                                    {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"x" : "Time", "xType" : "time", "y" : "Prediction", "yType" : "string", "color" : "None", "maxLength" : "30", "gadget-name" : "Ensemble Prediction", "chart-name" : "line-chart"}}
+                                {
+                                  "provider-conf": {
+                                    "streamName": "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0",
+                                    "provider-name": "realtime"
+                                  },
+                                  "chart-conf": {
+                                    "x": "Time",
+                                    "xType": "time",
+                                    "y": "Prediction",
+                                    "yType": "string",
+                                    "color": "None",
+                                    "maxLength": "30",
+                                    "gadget-name": "Ensemble Prediction",
+                                    "chart-name": "line-chart"
+                                  }
+                                }
                                 ]]>
                             </artifact>
                             <artifact file="js/core/gadget-util.js">
@@ -420,7 +466,19 @@
                             </artifact>
                             <artifact file="conf.json">
                                 <![CDATA[
-                                  {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"key" : "Time", "color" : "All", "maxLength" : "12", "gadget-name" : "Prediction Table", "chart-name" : "table-chart"}}
+                                {
+                                  "provider-conf": {
+                                    "streamName": "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0",
+                                    "provider-name": "realtime"
+                                  },
+                                  "chart-conf": {
+                                    "key": "Time",
+                                    "color": "All",
+                                    "maxLength": "12",
+                                    "gadget-name": "Prediction Table",
+                                    "chart-name": "table-chart"
+                                  }
+                                }
                                 ]]>
                             </artifact>
                             <artifact file="js/core/gadget-util.js">
@@ -474,7 +532,19 @@
                             </artifact>
                             <artifact file="conf.json">
                                 <![CDATA[
-                                {"provider-conf" : {"streamName" : "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0", "provider-name" : "realtime"}, "chart-conf" : {"key" : "Time", "color" : "None", "maxLength" : "22", "gadget-name" : "Model Predictions", "chart-name" : "table-chart"}}
+                                {
+                                  "provider-conf": {
+                                    "streamName": "org.wso2.anomaly-prediction.$appId.dashboard.PredictionUIStream:1.0.0",
+                                    "provider-name": "realtime"
+                                  },
+                                  "chart-conf": {
+                                    "key": "Time",
+                                    "color": "None",
+                                    "maxLength": "22",
+                                    "gadget-name": "Model Predictions",
+                                    "chart-name": "table-chart"
+                                  }
+                                }
                                 ]]>
                             </artifact>
                             <artifact file="js/core/gadget-util.js">
@@ -794,7 +864,7 @@
                     <description>The name(id) of the application to be monitored. Hint: Application
                         id can be found on logs from JVM Monitor Agent
                     </description>
-                  <defaultValue>localhost:9999</defaultValue>
+                    <defaultValue>localhost:9999</defaultValue>
                 </parameter>
             </parameters>
         </scenario>

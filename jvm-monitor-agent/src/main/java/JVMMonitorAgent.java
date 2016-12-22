@@ -93,6 +93,25 @@ public class JVMMonitorAgent {
 
     }
 
+    public static void main(String[] args) {
+
+        try {
+            PropertyLoader.loadProperties();
+            logger.info("Properties loaded successfully");
+
+            JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
+
+            jvmMonitor.startGarbageCollectionTimer(100);
+            jvmMonitor.startMemoryCpuTimer(1000);
+
+
+        } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
+                | UnknownMonitorAgentTypeException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+    }
+
     /**
      * To schedule the Garbage collection event
      *
@@ -163,26 +182,6 @@ public class JVMMonitorAgent {
             }
 
         }
-    }
-
-
-    public static void main(String[] args) {
-
-        try {
-            PropertyLoader.loadProperties();
-            logger.info("Properties loaded successfully");
-
-            JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
-
-            jvmMonitor.startGarbageCollectionTimer(100);
-            jvmMonitor.startMemoryCpuTimer(1000);
-
-
-        } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
-                | UnknownMonitorAgentTypeException e) {
-            logger.error(e.getMessage(), e);
-        }
-
     }
 
 }

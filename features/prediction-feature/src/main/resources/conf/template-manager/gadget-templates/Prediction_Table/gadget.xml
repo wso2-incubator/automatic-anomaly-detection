@@ -4,11 +4,11 @@
         <Require feature="dynamic-height"/>
         <Require feature="wso2-gadgets-identity"/>
     </ModulePrefs>
-    
+
     <UserPref name="windowSize"
               display_name="Window Size"
               default_value="10"/>
-    
+
     <Content type="html">
         <![CDATA[
         <head>
