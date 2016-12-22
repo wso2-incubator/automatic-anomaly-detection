@@ -144,27 +144,35 @@ class NumberGenerator {
 
     }
 
+
 }
 
 class GenerateOOME implements Runnable {
+
+    final static Logger logger = Logger.getLogger(String.valueOf(GenerateOOME.class));
 
     public static int threadSleepTime = 0;
     private List<Integer> numbers = new ArrayList<Integer>();
 
     private void addNumber() {
 
-        int i = 0;
-        while (true) {
-            int number = i;
-            number *= 3;
-            numbers.add(number);
-            i++;
+        try {
+            int i = 0;
+            while (true) {
+                int number = i;
+                number *= 3;
+                numbers.add(number);
+                i++;
 
-            try {
-                Thread.sleep(threadSleepTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                try {
+                    Thread.sleep(threadSleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+        } catch (OutOfMemoryError e) {
+            System.err.println(e);
+            System.exit(1);
         }
 
     }
