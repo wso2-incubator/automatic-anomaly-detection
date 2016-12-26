@@ -26,13 +26,13 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import java.io.File;
 
 /**
  * This is set data-agent-configurations, create DataPublisher instance
  */
-public abstract class DASPublisher {
+public abstract class DASPublisher implements Runnable {
 
     private final static Logger logger = Logger.getLogger(DASPublisher.class);
 
@@ -72,7 +72,9 @@ public abstract class DASPublisher {
      * @param streamName
      * @param streamVersion
      */
-    protected abstract void setDataStream(String streamName, String streamVersion);
+    protected void setDataStream(String streamName, String streamVersion) {
+        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
+    }
 
     /**
      * Publish data to DAS
@@ -126,6 +128,11 @@ public abstract class DASPublisher {
             System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
         }
 
+    }
+
+    @Override
+    public void run() {
+        publishEvents();
     }
 
 

@@ -26,14 +26,12 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-
 import java.util.List;
 
 /**
  * This is send Memory statistic to DAS for every 1 second
  */
-public class MemoryPublisher extends DASPublisher implements Runnable {
+public class MemoryPublisher extends DASPublisher {
 
     private final static Logger logger = Logger.getLogger(MemoryPublisher.class);
 
@@ -78,7 +76,6 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
                 + dasConfiguration.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
-
 
     /**
      * Need to set Memory statistic data before publish data to DAS
@@ -146,14 +143,5 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
 
     }
 
-    @Override
-    protected void setDataStream(String streamName, String streamVersion) {
-        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
-    }
-
-    @Override
-    public void run() {
-        publishEvents();
-    }
 
 }

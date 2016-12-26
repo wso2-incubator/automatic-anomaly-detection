@@ -26,14 +26,12 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-
 import java.util.List;
 
 /**
  * This is send Garbage collection statistic to DAS for every 100 millisecond
  */
-public class GarbageCollectionPublisher extends DASPublisher implements Runnable {
+public class GarbageCollectionPublisher extends DASPublisher {
 
     private final static Logger logger = Logger.getLogger(GarbageCollectionPublisher.class);
 
@@ -206,14 +204,5 @@ public class GarbageCollectionPublisher extends DASPublisher implements Runnable
 
     }
 
-    @Override
-    protected void setDataStream(String streamName, String streamVersion) {
-        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
-    }
-
-    @Override
-    public void run() {
-        publishEvents();
-    }
 
 }

@@ -26,14 +26,12 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-
 import java.util.List;
 
 /**
  * This is send CPU statistic to DAS for every 1 second
  */
-public class CPUPublisher extends DASPublisher implements Runnable {
+public class CPUPublisher extends DASPublisher {
 
     private final static Logger logger = Logger.getLogger(CPUPublisher.class);
 
@@ -125,14 +123,5 @@ public class CPUPublisher extends DASPublisher implements Runnable {
 
     }
 
-    @Override
-    protected void setDataStream(String streamName, String streamVersion) {
-        dataStream = DataBridgeCommonsUtils.generateStreamId(streamName, streamVersion);
-    }
-
-    @Override
-    public void run() {
-        publishEvents();
-    }
 
 }
