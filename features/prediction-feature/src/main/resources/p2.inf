@@ -3,6 +3,19 @@ org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../depl
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/carbonapps/);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/prediction-feature_${feature.version}/anomaly-prediction-predictor-capp-1.0.0.car,target:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-predictor-capp-1.0.0.car,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/template-manager/);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/template-manager/domain-template/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/prediction-feature_${feature.version}/conf/template-manager/domain-template/,target:${installFolder}/../../conf/template-manager/domain-template/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../conf/template-manager/gadget-templates/);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/prediction-feature_${feature.version}/conf/template-manager/gadget-templates/,target:${installFolder}/../../conf/template-manager/gadget-templates/,overwrite:true);\
 
 instructions.uninstall = \
 org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../deployment/server/carbonapps/anomaly-prediction-predictor-capp-1.0.0.car,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/domain-template/AnomalyPredictionResultsDashboard.xml,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/domain-template/EnsemblePredictor.xml,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/gadget-templates/Ensemble_Prediction/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/gadget-templates/Garbage_Collection_Event_Statistics/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/gadget-templates/Memory_Usage_Statistics/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/gadget-templates/Model_Predictions/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/../../conf/template-manager/gadget-templates/Prediction_Table/,overwrite:true);\
