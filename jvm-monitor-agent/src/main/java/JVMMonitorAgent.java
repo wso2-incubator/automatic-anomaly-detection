@@ -17,7 +17,7 @@
 */
 
 import communicator.CPUPublisher;
-import communicator.DASConfigurations;
+import communicator.DASConfiguration;
 import communicator.GarbageCollectionPublisher;
 import communicator.MemoryPublisher;
 import exceptions.PropertyCannotBeLoadedException;
@@ -61,23 +61,23 @@ public class JVMMonitorAgent {
     /**
      * Constructor
      * <p>
-     * Initialize DASConfigurations
+     * Initialize DASConfiguration
      * Initialize DAS publisher
      * Select between remote monitoring and local monitoring according to the configurations
      */
     private JVMMonitorAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
             PublisherInitializationException {
 
-        DASConfigurations dasConfigurations = new DASConfigurations(PropertyLoader.dasAddress,
+        DASConfiguration dasConfiguration = new DASConfiguration(PropertyLoader.dasAddress,
                 PropertyLoader.dasThriftPort, PropertyLoader.dasSecurePort, PropertyLoader.dasUsername,
                 PropertyLoader.dasPassword, PropertyLoader.dataAgentConfPath, PropertyLoader.trustStorePath,
                 PropertyLoader.trustStorePassword);
 
         try {
 
-            dasMemoryPublisher = new MemoryPublisher(dasConfigurations);
-            dasCPUPublisher = new CPUPublisher(dasConfigurations);
-            dasGCPublisher = new GarbageCollectionPublisher(dasConfigurations);
+            dasMemoryPublisher = new MemoryPublisher(dasConfiguration);
+            dasCPUPublisher = new CPUPublisher(dasConfiguration);
+            dasGCPublisher = new GarbageCollectionPublisher(dasConfiguration);
 
         } catch (DataEndpointException | TransportException | DataEndpointAuthenticationException
                 | DataEndpointAgentConfigurationException | DataEndpointConfigurationException e) {

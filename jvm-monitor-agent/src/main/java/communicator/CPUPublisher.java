@@ -55,22 +55,22 @@ public class CPUPublisher extends DASPublisher implements Runnable {
     /**
      * Constructor
      *
-     * @param dasConfigurations
+     * @param dasConfiguration
      * @throws DataEndpointAuthenticationException
      * @throws DataEndpointAgentConfigurationException
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public CPUPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
+    public CPUPublisher(DASConfiguration dasConfiguration) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
             TransportException {
 
-        super(dasConfigurations);
+        super(dasConfiguration);
         setDataStream(streamName, streamVersion);
 
-        logger.info("Starting CPU Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
-                + dasConfigurations.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
+        logger.info("Starting CPU Publisher; Host: " + dasConfiguration.getHost() + "\tThriftPort: "
+                + dasConfiguration.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
 

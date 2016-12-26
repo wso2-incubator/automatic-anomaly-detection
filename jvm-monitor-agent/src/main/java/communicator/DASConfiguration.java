@@ -31,9 +31,9 @@ import java.util.Enumeration;
 /**
  * This is contains configurations of DAS publisher
  */
-public class DASConfigurations {
+public class DASConfiguration {
 
-    private final static Logger logger = Logger.getLogger(DASConfigurations.class);
+    private final static Logger logger = Logger.getLogger(DASConfiguration.class);
 
     private final String host;
     private final int thriftPort;
@@ -56,7 +56,7 @@ public class DASConfigurations {
      * @param trustStorePath
      * @param trustStorePassword
      */
-    public DASConfigurations(String host, int thriftPort, int securePort, String username, String password
+    public DASConfiguration(String host, int thriftPort, int securePort, String username, String password
             , String dataAgentConfPath, String trustStorePath, String trustStorePassword) {
 
         if (host == "localhost") {

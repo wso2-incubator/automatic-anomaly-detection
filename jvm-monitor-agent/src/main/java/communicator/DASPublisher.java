@@ -43,26 +43,26 @@ public abstract class DASPublisher {
     /**
      * Constructor
      *
-     * @param dasConfigurations
+     * @param dasConfiguration
      * @throws DataEndpointAuthenticationException
      * @throws DataEndpointAgentConfigurationException
      * @throws TransportException
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      */
-    public DASPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
+    public DASPublisher(DASConfiguration dasConfiguration) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, TransportException, DataEndpointException,
             DataEndpointConfigurationException {
 
-        setDataAgentConfigurations(dasConfigurations.getDataAgentConfPath(), dasConfigurations.getTrustStorePath()
-                , dasConfigurations.getTrustStorePassword());
+        setDataAgentConfigurations(dasConfiguration.getDataAgentConfPath(), dasConfiguration.getTrustStorePath()
+                , dasConfiguration.getTrustStorePassword());
 
         String type = "Thrift";
-        String url = "tcp://" + dasConfigurations.getHost() + ":" + dasConfigurations.getThriftPort();
-        String authURL = "ssl://" + dasConfigurations.getHost() + ":" + dasConfigurations.getSecurePort();
+        String url = "tcp://" + dasConfiguration.getHost() + ":" + dasConfiguration.getThriftPort();
+        String authURL = "ssl://" + dasConfiguration.getHost() + ":" + dasConfiguration.getSecurePort();
 
-        dataPublisher = new DataPublisher(type, url, authURL, dasConfigurations.getUsername()
-                , dasConfigurations.getPassword());
+        dataPublisher = new DataPublisher(type, url, authURL, dasConfiguration.getUsername()
+                , dasConfiguration.getPassword());
 
     }
 

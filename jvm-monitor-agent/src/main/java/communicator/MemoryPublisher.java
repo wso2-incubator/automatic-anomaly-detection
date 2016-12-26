@@ -60,22 +60,22 @@ public class MemoryPublisher extends DASPublisher implements Runnable {
     /**
      * Constructor
      *
-     * @param dasConfigurations
+     * @param dasConfiguration
      * @throws DataEndpointAuthenticationException
      * @throws DataEndpointAgentConfigurationException
      * @throws DataEndpointException
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public MemoryPublisher(DASConfigurations dasConfigurations) throws DataEndpointAuthenticationException,
+    public MemoryPublisher(DASConfiguration dasConfiguration) throws DataEndpointAuthenticationException,
             DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
             TransportException {
 
-        super(dasConfigurations);
+        super(dasConfiguration);
         setDataStream(streamName, streamVersion);
 
-        logger.info("Starting Memory Publisher; Host: " + dasConfigurations.getHost() + "\tThriftPort: "
-                + dasConfigurations.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
+        logger.info("Starting Memory Publisher; Host: " + dasConfiguration.getHost() + "\tThriftPort: "
+                + dasConfiguration.getThriftPort() + "\tStreamID: " + streamName + ":" + streamVersion);
 
     }
 
