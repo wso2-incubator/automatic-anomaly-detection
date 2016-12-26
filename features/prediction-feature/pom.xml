@@ -31,6 +31,7 @@
     <name>WSO2 ML Prediction Feature</name>
     <artifactId>prediction-feature</artifactId>
     <packaging>pom</packaging>
+    <version>1.0.0-SNAPSHOT</version>
 
     <build>
         <plugins>
