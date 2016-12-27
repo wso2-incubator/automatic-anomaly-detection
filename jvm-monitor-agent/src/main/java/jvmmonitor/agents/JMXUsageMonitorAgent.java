@@ -46,22 +46,22 @@ import static java.lang.management.ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAM
 import static java.lang.management.ManagementFactory.newPlatformMXBeanProxy;
 
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /**
  * Implements JMX usage monitor agent which is capable of monitoring JVMs using JMX services or local Process
@@ -73,10 +73,10 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JMXUsageMonitorAgent.class);
     private final static String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
-    //store Garbage Collection events from JMX notifications
+    // store Garbage Collection events from JMX notifications
     private final LinkedList<GarbageCollectionStatistic> garbageCollectionStatistics;
     private final String targetedApplicationId;
-    //store mxBeans for reuse
+    // store mxBeans for reuse
     private MemoryMXBean memoryMXBean;
     private OperatingSystemMXBean operatingSystemMXBean;
     private List<GarbageCollectorMXBean> garbageCollectorMXBeans;
@@ -90,10 +90,10 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
      */
     public JMXUsageMonitorAgent(String pid) throws MonitorAgentInitializationFailed {
         try {
-            //attach VM using the pid given
+            // attach VM using the pid given
             VirtualMachine vm = VirtualMachine.attach(pid);
 
-            //getting the jmx connector address to the local JVM
+            // getting the jmx connector address to the local JVM
             String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
             if (connectorAddress == null) {
                 Properties props = vm.getSystemProperties();
@@ -112,7 +112,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                     }
                 }
             }
-            vm.detach(); //detach from the connected vm
+            vm.detach(); // detach from the connected vm
 
             logger.info("JMX Address for given PID :" + pid + " is :" + connectorAddress);
             MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(connectorAddress))
@@ -122,7 +122,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
             targetedApplicationId = getAppNameFromPID(pid);
             getMXBeans(connection);
 
-        } catch (AttachNotSupportedException | IOException | AgentLoadException | AgentInitializationException | MalformedObjectNameException e) {
+        } catch (AttachNotSupportedException | IOException | AgentLoadException | AgentInitializationException
+                | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
         }
 
@@ -131,8 +132,8 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
     /**
      * Creates JMX Connection using the JMX services without credentials
      *
-     * @param hostname        - Targeted JVM id address
-     * @param rmiServerPort   - Targeted JVM RMI server port
+     * @param hostname - Targeted JVM id address
+     * @param rmiServerPort - Targeted JVM RMI server port
      * @param rmiRegistryPort - Targeted JVM RMI registry port
      * @throws MonitorAgentInitializationFailed
      */
@@ -146,7 +147,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
             garbageCollectionStatistics = new LinkedList<>();
             targetedApplicationId = hostname.trim() + rmiServerPort.trim();
-            getMXBeans(connection); //get mxBeans using the server connection
+            getMXBeans(connection); // get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
         }
@@ -156,26 +157,26 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
     /**
      * Creates JMX Connection using the JMX services. Credentials are required for authentication to the JMX service
      *
-     * @param hostname        - Targeted JVM id address
-     * @param rmiServerPort   - Targeted JVM RMI server port
+     * @param hostname - Targeted JVM id address
+     * @param rmiServerPort - Targeted JVM RMI server port
      * @param rmiRegistryPort - Targeted JVM RMI registry port
-     * @param username        - Username to access the JMX service of the targeted JVM
-     * @param password        - Password to access the JMX service of the targeted JVM
+     * @param username - Username to access the JMX service of the targeted JVM
+     * @param password - Password to access the JMX service of the targeted JVM
      * @throws MonitorAgentInitializationFailed
      */
     public JMXUsageMonitorAgent(String hostname, String rmiServerPort, String rmiRegistryPort, String username,
-                                String password) throws MonitorAgentInitializationFailed {
+            String password) throws MonitorAgentInitializationFailed {
         String jmxURL = createJMXURL(hostname, rmiServerPort, rmiRegistryPort);
         logger.info("Trying to connect : " + jmxURL);
         try {
             Map<String, String[]> credential = new HashMap<String, String[]>();
-            credential.put(JMXConnector.CREDENTIALS, new String[]{username, password});
+            credential.put(JMXConnector.CREDENTIALS, new String[] { username, password });
             MBeanServerConnection connection = JMXConnectorFactory.connect(new JMXServiceURL(jmxURL), credential)
                     .getMBeanServerConnection();
 
             garbageCollectionStatistics = new LinkedList<>();
             targetedApplicationId = hostname.trim() + rmiServerPort.trim();
-            getMXBeans(connection); //get mxBeans using the server connection
+            getMXBeans(connection); // get mxBeans using the server connection
         } catch (IOException | MalformedObjectNameException e) {
             throw new MonitorAgentInitializationFailed(e.getMessage(), e);
         }
@@ -222,13 +223,13 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
 
             memoryStatistic = new MemoryStatistic();
 
-            //heap memory management data
+            // heap memory management data
             mu = memoryMXBean.getHeapMemoryUsage();
             memoryStatistic.setMaxHeapMemory(mu.getMax());
             memoryStatistic.setAllocatedHeapMemory(mu.getCommitted());
             memoryStatistic.setUsedHeapMemory(mu.getUsed());
 
-            //non heap memory management data
+            // non heap memory management data
             mu = memoryMXBean.getNonHeapMemoryUsage();
             memoryStatistic.setMaxNonHeapMemory(mu.getMax());
             memoryStatistic.setAllocatedNonHeapMemory(mu.getCommitted());
@@ -277,7 +278,7 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
         if (hostname != null) {
             String jmxURL, RMI_Server_Address, RMI_Registry_Address;
 
-            //create JMX URL
+            // create JMX URL
             RMI_Server_Address = hostname.concat(":").concat(rmiServerPort);
             RMI_Registry_Address = hostname.concat(":").concat(rmiRegistryPort);
 
@@ -295,14 +296,14 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                 OperatingSystemMXBean.class);
         memoryMXBean = newPlatformMXBeanProxy(connection, MEMORY_MXBEAN_NAME, MemoryMXBean.class);
 
-        //retrieving gcBeans
+        // retrieving gcBeans
         Set<ObjectName> gcNames = connection
                 .queryNames(new ObjectName(ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE + ",name=*"), null);
         garbageCollectorMXBeans = new ArrayList<>(gcNames.size());
 
         for (ObjectName gcName : gcNames) {
-            GarbageCollectorMXBean garbageCollectorMXBean = ManagementFactory
-                    .newPlatformMXBeanProxy(connection, gcName.toString(), GarbageCollectorMXBean.class);
+            GarbageCollectorMXBean garbageCollectorMXBean = ManagementFactory.newPlatformMXBeanProxy(connection,
+                    gcName.toString(), GarbageCollectorMXBean.class);
             garbageCollectorMXBeans.add(garbageCollectorMXBean);
 
             NotificationEmitter emitter = (NotificationEmitter) garbageCollectorMXBean;
@@ -354,16 +355,17 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
          * @param notification
          * @param handback
          */
+        @Override
         public void handleNotification(Notification notification, Object handback) {
 
-            //only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
+            // only handle GARBAGE_COLLECTION_NOTIFICATION notifications here
             if (notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
 
-                //get the information associated with this notification
+                // get the information associated with this notification
                 GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo
                         .from((CompositeData) notification.getUserData());
 
-                //get all the info
+                // get all the info
                 String gctype = info.getGcAction();
 
                 if ("end of minor GC".equals(gctype)) {
@@ -382,54 +384,54 @@ public class JMXUsageMonitorAgent extends UsageMonitorAgent {
                 logger.info("GC collected >> GC type :".concat(gctype).concat(" GC Start Time :")
                         .concat(String.valueOf(gcInfo.getStartTime())));
 
-                //=========memory Usage After GC==============================
+                // =========memory Usage After GC==============================
                 memoryUsageMap = gcInfo.getMemoryUsageAfterGc();
 
-                //eden space memory management
+                // eden space memory management
                 memoryUsage = memoryUsageMap.get(EDEN_SPACE);
                 gclog.setEdenCommittedMemoryAfterGC(memoryUsage.getCommitted());
                 gclog.setEdenMaxMemoryAfterGC(memoryUsage.getMax());
                 gclog.setEdenUsedMemoryAfterGC(memoryUsage.getUsed());
 
-                //survivor space memory management
+                // survivor space memory management
                 memoryUsage = memoryUsageMap.get(SURVIVOR_SPACE);
                 gclog.setSurvivorCommittedMemoryAfterGC(memoryUsage.getCommitted());
                 gclog.setSurvivorMaxMemoryAfterGC(memoryUsage.getMax());
                 gclog.setSurvivorUsedMemoryAfterGC(memoryUsage.getUsed());
 
-                //old gen space memory management
+                // old gen space memory management
                 memoryUsage = memoryUsageMap.get(OLD_GENERATION_SPACE);
                 gclog.setOldGenCommittedMemoryAfterGC(memoryUsage.getCommitted());
                 gclog.setOldGenMaxMemoryAfterGC(memoryUsage.getMax());
                 gclog.setOldGenUsedMemoryAfterGC(memoryUsage.getUsed());
 
-                //===========memory management before GC============================
+                // ===========memory management before GC============================
                 memoryUsageMap = gcInfo.getMemoryUsageBeforeGc();
 
-                //eden space memory management
+                // eden space memory management
                 memoryUsage = memoryUsageMap.get(EDEN_SPACE);
                 gclog.setEdenCommittedMemoryBeforeGC(memoryUsage.getCommitted());
                 gclog.setEdenMaxMemoryBeforeGC(memoryUsage.getMax());
                 gclog.setEdenUsedMemoryBeforeGC(memoryUsage.getUsed());
 
-                //survivor space memory management
+                // survivor space memory management
                 memoryUsage = memoryUsageMap.get(SURVIVOR_SPACE);
                 gclog.setSurvivorCommittedMemoryBeforeGC(memoryUsage.getCommitted());
                 gclog.setSurvivorMaxMemoryBeforeGC(memoryUsage.getMax());
                 gclog.setSurvivorUsedMemoryBeforeGC(memoryUsage.getUsed());
 
-                //old gen space memory management
+                // old gen space memory management
                 memoryUsage = memoryUsageMap.get(OLD_GENERATION_SPACE);
                 gclog.setOldGenCommittedMemoryBeforeGC(memoryUsage.getCommitted());
                 gclog.setOldGenMaxMemoryBeforeGC(memoryUsage.getMax());
                 gclog.setOldGenUsedMemoryBeforeGC(memoryUsage.getUsed());
 
-                //=====================general info===========================
+                // =====================general info===========================
                 gclog.setDuration(gcInfo.getDuration());
                 gclog.setGcCause(info.getGcCause());
                 gclog.setStartTime(gcInfo.getEndTime() + jvmStartTime);
                 gclog.setGcType(gctype);
-                //============================================================
+                // ============================================================
 
                 synchronized (garbageCollectionStatistics) {
                     garbageCollectionStatistics.add(gclog);

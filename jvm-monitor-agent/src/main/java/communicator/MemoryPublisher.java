@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package communicator;
 
@@ -40,15 +40,15 @@ public class MemoryPublisher extends DASPublisher {
      * <p>
      * Data format must be in the following order in given types in "MemoryUsageStream":-
      * <p>
-     * long    timeStamp
-     * String  applicationId
-     * long    maxHeapMemory
-     * long    allocatedHeapMemory
-     * long    usedHeapMemory
-     * long    maxNonHeapMemory
-     * long    allocatedNonHeapMemory
-     * long    usedNonHeapMemory
-     * long    pendingFinalizations
+     * long timeStamp
+     * String applicationId
+     * long maxHeapMemory
+     * long allocatedHeapMemory
+     * long usedHeapMemory
+     * long maxNonHeapMemory
+     * long allocatedNonHeapMemory
+     * long usedNonHeapMemory
+     * long pendingFinalizations
      */
     private static final String streamName = "MemoryUsageStream";
     private static final String streamVersion = "1.0.0";
@@ -65,9 +65,9 @@ public class MemoryPublisher extends DASPublisher {
      * @throws DataEndpointConfigurationException
      * @throws TransportException
      */
-    public MemoryPublisher(DASConfiguration dasConfiguration) throws DataEndpointAuthenticationException,
-            DataEndpointAgentConfigurationException, DataEndpointException, DataEndpointConfigurationException,
-            TransportException {
+    public MemoryPublisher(DASConfiguration dasConfiguration)
+            throws DataEndpointAuthenticationException, DataEndpointAgentConfigurationException, DataEndpointException,
+            DataEndpointConfigurationException, TransportException {
 
         super(dasConfiguration);
         setDataStream(streamName, streamVersion);
@@ -100,20 +100,14 @@ public class MemoryPublisher extends DASPublisher {
             MemoryStatistic memoryStat = memoryStatistics.get(memoryStatistics.size() - 1);
 
             Event event = new Event(dataStream, System.currentTimeMillis(), null, null,
-                    new Object[]{timestamp,
-                            applicationId,
-                            memoryStat.getMaxHeapMemory(),
-                            memoryStat.getAllocatedHeapMemory(),
-                            memoryStat.getUsedHeapMemory(),
-                            memoryStat.getMaxNonHeapMemory(),
-                            memoryStat.getAllocatedNonHeapMemory(),
-                            memoryStat.getUsedNonHeapMemory(),
-                            memoryStat.getPendingFinalizations()
-                    });
+                    new Object[] { timestamp, applicationId, memoryStat.getMaxHeapMemory(),
+                            memoryStat.getAllocatedHeapMemory(), memoryStat.getUsedHeapMemory(),
+                            memoryStat.getMaxNonHeapMemory(), memoryStat.getAllocatedNonHeapMemory(),
+                            memoryStat.getUsedNonHeapMemory(), memoryStat.getPendingFinalizations() });
 
             dataPublisher.publish(event);
 
-            //check is debug enable
+            // check is debug enable
             if (logger.isDebugEnabled()) {
 
                 StringBuilder MemoryEvent = new StringBuilder();
@@ -142,6 +136,5 @@ public class MemoryPublisher extends DASPublisher {
         }
 
     }
-
 
 }

@@ -11,22 +11,22 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 /**
  * Load the properties from jma.properties to configure JVM monitor agent
@@ -36,7 +36,7 @@ public class JmaProperties {
     private final static String PROPERTY_FILE = "jma.properties";
     private final static Logger logger = Logger.getLogger(JmaProperties.class);
 
-    //das publisher configurations
+    // das publisher configurations
     private String dasAddress;
     private int dasThriftPort;
     private int dasSecurePort;
@@ -47,21 +47,21 @@ public class JmaProperties {
     private String dasUsername;
     private String dasPassword;
 
-    //targeted monitoring mode
+    // targeted monitoring mode
     private String mode;
 
-    //targeted remote server configuration
+    // targeted remote server configuration
     private String targetAddress;
     private String targetRmiServerPort;
     private String targetRmiRegistryPort;
     private String targetUsername;
     private String targetPassword;
 
-    //targeted remote server snmp configurations
+    // targeted remote server snmp configurations
     private String snmpAddress;
     private String snmpPort;
 
-    //monitor running app using PID configurations
+    // monitor running app using PID configurations
     private String pid;
 
     /**
@@ -69,7 +69,7 @@ public class JmaProperties {
      * Load property attributes
      */
     public JmaProperties() throws PropertyCannotBeLoadedException {
-        init();//load property attributes
+        init();// load property attributes
         logger.info("Properties loaded successfully");
 
     }
@@ -85,9 +85,10 @@ public class JmaProperties {
         InputStream input;
 
         try {
-            input = new FileInputStream("bin" + File.separator + PROPERTY_FILE); //load properties from the bin file when deployed
+            input = new FileInputStream("bin" + File.separator + PROPERTY_FILE); // load properties from the bin file
+            // when deployed
         } catch (FileNotFoundException e1) {
-            //load properties at development environments
+            // load properties at development environments
             input = JmaProperties.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
         }
         try {
