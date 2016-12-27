@@ -4,10 +4,10 @@ import jvmmonitor.agents.JMXUsageMonitorAgent;
 import jvmmonitor.agents.SNMPUsageMonitorAgent;
 import jvmmonitor.exceptions.MonitorAgentInitializationFailed;
 import jvmmonitor.exceptions.UnknownMonitorAgentTypeException;
-import util.PropertyLoader;
+import util.JmaProperties;
 
 /*
-*  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) ${DATE}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -27,38 +27,39 @@ import util.PropertyLoader;
 /**
  * Monitor agent factory
  */
-public class UsageMonitorAgentFatory {
+public class UsageMonitorAgentFactory {
 
     /**
-     * @param monitorAgentType
+     * @param jmaProperties
      * @return UsageMonitorAgent
      * @throws MonitorAgentInitializationFailed
      * @throws UnknownMonitorAgentTypeException
      */
-    public static UsageMonitorAgent getUsageMonitorAgent(String monitorAgentType)
+    public static UsageMonitorAgent getUsageMonitorAgent(JmaProperties jmaProperties)
             throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException {
-        MonitorAgentType type = MonitorAgentType.getMonitorType(monitorAgentType);
+        String mode = jmaProperties.getMode();
+        MonitorAgentType type = MonitorAgentType.getMonitorType(jmaProperties.getMode());
 
         //If the given type not found in MonitorAgentType throws an exception indicating that
         if (type == null) {
-            throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorAgentType);
+            throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + mode);
         }
 
         UsageMonitorAgent usageMonitorAgent;
         switch (type) {
             case JMX:
-                usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.targetAddress,
-                        PropertyLoader.targetRmiServerPort, PropertyLoader.targetRmiRegistryPort,
-                        PropertyLoader.targetUsername, PropertyLoader.targetPassword);
+                usageMonitorAgent = new JMXUsageMonitorAgent(jmaProperties.getTargetAddress(),
+                        jmaProperties.getTargetRmiServerPort(), jmaProperties.getTargetRmiRegistryPort(),
+                        jmaProperties.getTargetUsername(), jmaProperties.getTargetPassword());
                 break;
             case PROCESS_ID:
-                usageMonitorAgent = new JMXUsageMonitorAgent(PropertyLoader.pid);
+                usageMonitorAgent = new JMXUsageMonitorAgent(jmaProperties.getPid());
                 break;
             case SNMP:
-                usageMonitorAgent = new SNMPUsageMonitorAgent(PropertyLoader.snmpAddress, PropertyLoader.snmpPort);
+                usageMonitorAgent = new SNMPUsageMonitorAgent(jmaProperties.getSnmpAddress(), jmaProperties.getSnmpPort());
                 break;
             default:
-                throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + monitorAgentType);
+                throw new UnknownMonitorAgentTypeException("Invalid Monitor agent type : " + mode);
         }
 
         return usageMonitorAgent;

@@ -3,7 +3,11 @@ package util;
 import exceptions.PropertyCannotBeLoadedException;
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /*
@@ -33,88 +37,168 @@ public class JmaProperties {
     private final static Logger logger = Logger.getLogger(JmaProperties.class);
 
     //das publisher configurations
-    public static String dasAddress;
-    public static int dasThriftPort;
-    public static int dasSecurePort;
-    public static String dataAgentConfPath;
-    public static String trustStorePath;
-    public static String trustStorePassword;
+    private String dasAddress;
+    private int dasThriftPort;
+    private int dasSecurePort;
+    private String dataAgentConfPath;
+    private String trustStorePath;
+    private String trustStorePassword;
 
-    public static String dasUsername;
-    public static String dasPassword;
+    private String dasUsername;
+    private String dasPassword;
 
     //targeted monitoring mode
-    public static String mode;
+    private String mode;
 
     //targeted remote server configuration
-    public static String targetAddress;
-    public static String targetRmiServerPort;
-    public static String targetRmiRegistryPort;
-    public static String targetUsername;
-    public static String targetPassword;
+    private String targetAddress;
+    private String targetRmiServerPort;
+    private String targetRmiRegistryPort;
+    private String targetUsername;
+    private String targetPassword;
 
     //targeted remote server snmp configurations
-    public static String snmpAddress;
-    public static String snmpPort;
+    private String snmpAddress;
+    private String snmpPort;
 
     //monitor running app using PID configurations
-    public static String pid;
+    private String pid;
+
+    /**
+     * JmaProperties constructor
+     * Load property attributes
+     */
+    public JmaProperties() throws PropertyCannotBeLoadedException {
+        init();//load property attributes
+        logger.info("Properties loaded successfully");
+
+    }
 
     /**
      * Load JVM monitor agent properties form the jma.properties file
      *
      * @throws PropertyCannotBeLoadedException
      */
-    public static void loadProperties() throws PropertyCannotBeLoadedException {
+    private void init() throws PropertyCannotBeLoadedException {
 
-        Properties prop = new Properties();
+        Properties properties = new Properties();
         InputStream input;
 
         try {
-            input = new FileInputStream("bin"+ File.separator + PROPERTY_FILE); //load properties from the bin file when deployed
+            input = new FileInputStream("bin" + File.separator + PROPERTY_FILE); //load properties from the bin file when deployed
         } catch (FileNotFoundException e1) {
             //load properties at development environments
             input = JmaProperties.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
         }
-
         try {
             if (input != null) {
+                properties.load(input);
 
-                prop.load(input);
+                dasAddress = properties.getProperty("jma.das.address");
+                dasThriftPort = Integer.parseInt(properties.getProperty("jma.das.thrift_port"));
+                dasSecurePort = Integer.parseInt(properties.getProperty("jma.das.secure_port"));
+                dataAgentConfPath = properties.getProperty("jma.das.data_agent_conf.path");
+                trustStorePath = properties.getProperty("javax.net.ssl.trust_store.path");
+                trustStorePassword = properties.getProperty("javax.net.ssl.trust_store.password");
 
-                dasAddress = prop.getProperty("jma.das.address");
-                dasThriftPort = Integer.parseInt(prop.getProperty("jma.das.thrift_port"));
-                dasSecurePort = Integer.parseInt(prop.getProperty("jma.das.secure_port"));
-                dataAgentConfPath = prop.getProperty("jma.das.data_agent_conf.path");
-                trustStorePath = prop.getProperty("javax.net.ssl.trust_store.path");
-                trustStorePassword = prop.getProperty("javax.net.ssl.trust_store.password");
+                dasUsername = properties.getProperty("jma.das.username");
+                dasPassword = properties.getProperty("jma.das.password");
 
-                dasUsername = prop.getProperty("jma.das.username");
-                dasPassword = prop.getProperty("jma.das.password");
+                mode = properties.getProperty("jma.target.mode");
 
-                mode = prop.getProperty("jma.target.mode");
+                targetAddress = properties.getProperty("jma.target.address");
+                targetRmiServerPort = properties.getProperty("jma.target.rmi_server_port");
+                targetRmiRegistryPort = properties.getProperty("jma.target.rmi_registry_port");
+                targetUsername = properties.getProperty("jma.target.username");
+                targetPassword = properties.getProperty("jma.target.password");
 
-                targetAddress = prop.getProperty("jma.target.address");
-                targetRmiServerPort = prop.getProperty("jma.target.rmi_server_port");
-                targetRmiRegistryPort = prop.getProperty("jma.target.rmi_registry_port");
-                targetUsername = prop.getProperty("jma.target.username");
-                targetPassword = prop.getProperty("jma.target.password");
+                pid = properties.getProperty("jma.target.pid");
 
-                pid = prop.getProperty("jma.target.pid");
-
-                snmpAddress = prop.getProperty("jma.target.snmp.address");
-                snmpPort = prop.getProperty("jma.target.snmp.port");
-
-                input.close();
+                snmpAddress = properties.getProperty("jma.target.snmp.address");
+                snmpPort = properties.getProperty("jma.target.snmp.port");
 
             } else {
                 String msg = "The property file can not be loaded";
-                logger.error(msg);
                 throw new PropertyCannotBeLoadedException(msg);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
             throw new PropertyCannotBeLoadedException(e.getMessage(), e);
+        } finally {
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
+    }
+
+    public String getDasAddress() {
+        return dasAddress;
+    }
+
+    public int getDasThriftPort() {
+        return dasThriftPort;
+    }
+
+    public int getDasSecurePort() {
+        return dasSecurePort;
+    }
+
+    public String getDataAgentConfPath() {
+        return dataAgentConfPath;
+    }
+
+    public String getTrustStorePath() {
+        return trustStorePath;
+    }
+
+    public String getTrustStorePassword() {
+        return trustStorePassword;
+    }
+
+    public String getDasUsername() {
+        return dasUsername;
+    }
+
+    public String getDasPassword() {
+        return dasPassword;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public String getTargetAddress() {
+        return targetAddress;
+    }
+
+    public String getTargetRmiServerPort() {
+        return targetRmiServerPort;
+    }
+
+    public String getTargetRmiRegistryPort() {
+        return targetRmiRegistryPort;
+    }
+
+    public String getTargetUsername() {
+        return targetUsername;
+    }
+
+    public String getTargetPassword() {
+        return targetPassword;
+    }
+
+    public String getSnmpAddress() {
+        return snmpAddress;
+    }
+
+    public String getSnmpPort() {
+        return snmpPort;
+    }
+
+    public String getPid() {
+        return pid;
     }
 }

@@ -23,7 +23,7 @@ import communicator.MemoryPublisher;
 import exceptions.PropertyCannotBeLoadedException;
 import exceptions.PublisherInitializationException;
 import jvmmonitor.UsageMonitorAgent;
-import jvmmonitor.UsageMonitorAgentFatory;
+import jvmmonitor.UsageMonitorAgentFactory;
 import jvmmonitor.exceptions.AccessingUsageStatisticFailedException;
 import jvmmonitor.exceptions.MonitorAgentInitializationFailed;
 import jvmmonitor.exceptions.UnknownMonitorAgentTypeException;
@@ -33,7 +33,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationExce
 import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-import util.PropertyLoader;
+import util.JmaProperties;
 
 import java.util.Date;
 import java.util.Timer;
@@ -56,6 +56,8 @@ public class JVMMonitorAgent {
 
     private UsageMonitorAgent usageMonitorAgent;
     private String targetedApplicationId;
+
+    private JmaProperties jmaProperties;
     private ExecutorService executor;
 
     /**
@@ -65,13 +67,16 @@ public class JVMMonitorAgent {
      * Initialize DAS publisher
      * Select between remote monitoring and local monitoring according to the configurations
      */
-    private JVMMonitorAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
-            PublisherInitializationException {
+    private JVMMonitorAgent()
+            throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
+                   PublisherInitializationException, PropertyCannotBeLoadedException {
 
-        DASConfiguration dasConfiguration = new DASConfiguration(PropertyLoader.dasAddress,
-                PropertyLoader.dasThriftPort, PropertyLoader.dasSecurePort, PropertyLoader.dasUsername,
-                PropertyLoader.dasPassword, PropertyLoader.dataAgentConfPath, PropertyLoader.trustStorePath,
-                PropertyLoader.trustStorePassword);
+        jmaProperties = new JmaProperties();
+
+        DASConfiguration dasConfiguration = new DASConfiguration(jmaProperties.getDasAddress(),
+                jmaProperties.getDasThriftPort(), jmaProperties.getDasSecurePort(), jmaProperties.getDasUsername(),
+                jmaProperties.getDasPassword(), jmaProperties.getDataAgentConfPath(), jmaProperties.getTrustStorePath(),
+                jmaProperties.getTrustStorePassword());
 
         try {
 
@@ -85,7 +90,7 @@ public class JVMMonitorAgent {
         }
 
         //Initialize usage monitor agent according to the mode in jma.properties
-        usageMonitorAgent = UsageMonitorAgentFatory.getUsageMonitorAgent(PropertyLoader.mode);
+        usageMonitorAgent = UsageMonitorAgentFactory.getUsageMonitorAgent(jmaProperties);
         //Get generated targeted app_id
         targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
 
@@ -94,11 +99,7 @@ public class JVMMonitorAgent {
     }
 
     public static void main(String[] args) {
-
         try {
-            PropertyLoader.loadProperties();
-            logger.info("Properties loaded successfully");
-
             JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
 
             jvmMonitor.startGarbageCollectionTimer(100);
