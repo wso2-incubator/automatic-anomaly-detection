@@ -1,5 +1,3 @@
-package jvmmonitor.models;
-
 /*
  *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -17,6 +15,7 @@ package jvmmonitor.models;
  * specific language governing permissions and limitations
  * under the License.
  */
+package jvmmonitor.models;
 
 /**
  * Garbage Collection logs models class

@@ -1,17 +1,5 @@
-package util;
-
-import exceptions.PropertyCannotBeLoadedException;
-import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 /*
- *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -27,6 +15,17 @@ import java.util.Properties;
  * specific language governing permissions and limitations
  * under the License.
  */
+package util;
+
+import exceptions.PropertyCannotBeLoadedException;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Load the properties from jma.properties to configure JVM monitor agent

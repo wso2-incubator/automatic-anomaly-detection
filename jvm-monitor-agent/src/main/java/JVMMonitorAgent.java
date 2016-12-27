@@ -1,4 +1,3 @@
-
 /*
  *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -16,7 +15,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 import communicator.CPUPublisher;
 import communicator.DASConfiguration;
 import communicator.GarbageCollectionPublisher;
@@ -58,7 +56,7 @@ public class JVMMonitorAgent {
     private UsageMonitorAgent usageMonitorAgent;
     private String targetedApplicationId;
 
-    private JmaProperties jmaProperties;
+
     private ExecutorService executor;
 
     /**
@@ -71,7 +69,7 @@ public class JVMMonitorAgent {
     private JVMMonitorAgent() throws MonitorAgentInitializationFailed, UnknownMonitorAgentTypeException,
     PublisherInitializationException, PropertyCannotBeLoadedException {
 
-        jmaProperties = new JmaProperties();
+        JmaProperties jmaProperties = new JmaProperties();
 
         DASConfiguration dasConfiguration = new DASConfiguration(jmaProperties.getDasAddress(),
                 jmaProperties.getDasThriftPort(), jmaProperties.getDasSecurePort(), jmaProperties.getDasUsername(),
