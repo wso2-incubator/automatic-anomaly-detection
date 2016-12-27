@@ -26,6 +26,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+
 import java.util.List;
 
 /**
@@ -94,7 +95,7 @@ public class MemoryPublisher extends DASPublisher {
      * Publish Memory Usage Log data to DAS
      */
     @Override
-    protected void publishEvents() {
+    public void publishEvents() {
 
         if (memoryStatistics != null && !memoryStatistics.isEmpty()) {
             MemoryStatistic memoryStat = memoryStatistics.get(memoryStatistics.size() - 1);

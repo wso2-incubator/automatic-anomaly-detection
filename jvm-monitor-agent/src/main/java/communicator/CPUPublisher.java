@@ -26,6 +26,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+
 import java.util.List;
 
 /**
@@ -89,7 +90,7 @@ public class CPUPublisher extends DASPublisher {
      * Publish CPU Load Log data to DAS
      */
     @Override
-    protected void publishEvents() {
+    public void publishEvents() {
 
         if (cpuStatistics != null && !cpuStatistics.isEmpty()) {
             CPUStatistic cpuStat = cpuStatistics.get(cpuStatistics.size() - 1);
@@ -122,6 +123,5 @@ public class CPUPublisher extends DASPublisher {
         }
 
     }
-
 
 }
