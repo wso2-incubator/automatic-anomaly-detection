@@ -37,10 +37,9 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 import util.JmaProperties;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Class to start JVMMonitor agent
@@ -59,7 +58,7 @@ public class JVMMonitorAgent {
     private String targetedApplicationId;
 
     private JmaProperties jmaProperties;
-    private ExecutorService executor;
+    private final ScheduledExecutorService scheduler;
 
     /**
      * Constructor
@@ -94,7 +93,7 @@ public class JVMMonitorAgent {
         // Get generated targeted app_id
         targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
 
-        executor = Executors.newFixedThreadPool(4);
+        scheduler = Executors.newScheduledThreadPool(4);
 
     }
 
@@ -102,8 +101,8 @@ public class JVMMonitorAgent {
         try {
             JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
 
-            jvmMonitor.startGarbageCollectionTimer(100);
-            jvmMonitor.startMemoryCpuTimer(1000);
+            jvmMonitor.startGarbageCollectionScheduler(100);
+            jvmMonitor.startMemoryCpuScheduler(1000);
 
         } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
                 | UnknownMonitorAgentTypeException e) {
@@ -117,9 +116,8 @@ public class JVMMonitorAgent {
      *
      * @param period
      */
-    private void startGarbageCollectionTimer(long period) {
-        Timer timer = new Timer();
-        timer.schedule(new GarbageCollectionTaskScheduler(), 0, period);
+    private void startGarbageCollectionScheduler(long period) {
+        scheduler.scheduleAtFixedRate(new GarbageCollectionTask(), 0, period, MILLISECONDS);
     }
 
     /**
@@ -127,16 +125,15 @@ public class JVMMonitorAgent {
      *
      * @param period
      */
-    private void startMemoryCpuTimer(long period) {
-        Timer timer = new Timer();
-        timer.schedule(new MemoryCpuTaskScheduler(), 0, period);
+    private void startMemoryCpuScheduler(long period) {
+        scheduler.scheduleAtFixedRate(new MemoryCpuTask(), 0, period, MILLISECONDS);
     }
 
     /**
      * Inner class
-     * Implementation of TimerTask
+     * Implementation of Runnable
      */
-    private class GarbageCollectionTaskScheduler extends TimerTask {
+    private class GarbageCollectionTask implements Runnable {
 
         @Override
         public void run() {
@@ -145,7 +142,8 @@ public class JVMMonitorAgent {
                 // Set garbage collection statistic to publish
                 dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics(),
                         targetedApplicationId, new Date().getTime());
-                executor.execute(dasGCPublisher);
+
+                dasGCPublisher.publishEvents();
 
             } catch (AccessingUsageStatisticFailedException e) {
                 logger.error(e.getMessage(), e);
@@ -156,9 +154,9 @@ public class JVMMonitorAgent {
 
     /**
      * Inner class
-     * Implementation of TimerTask
+     * Implementation of Runnable
      */
-    private class MemoryCpuTaskScheduler extends TimerTask {
+    private class MemoryCpuTask implements Runnable {
 
         @Override
         public void run() {
@@ -170,11 +168,11 @@ public class JVMMonitorAgent {
                 // Set Memory statistic to publish
                 dasMemoryPublisher.setMemoryStatistic(usageMonitorAgent.getMemoryStatistics(), targetedApplicationId,
                         timeStamp);
-                executor.execute(dasMemoryPublisher);
+                dasMemoryPublisher.publishEvents();
 
                 // Set CPU statistic to publish
                 dasCPUPublisher.setCPUStatistic(usageMonitorAgent.getCPUStatistics(), targetedApplicationId, timeStamp);
-                executor.execute(dasCPUPublisher);
+                dasCPUPublisher.publishEvents();
 
             } catch (AccessingUsageStatisticFailedException e) {
                 logger.error(e.getMessage(), e);
