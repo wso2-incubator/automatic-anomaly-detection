@@ -27,10 +27,10 @@ import java.util.Properties;
 /**
  * Load the properties from jma.properties to configure JVM monitor agent
  */
-public class PropertyLoader {
+public class JmaProperties {
 
     private final static String PROPERTY_FILE = "jma.properties";
-    private final static Logger logger = Logger.getLogger(PropertyLoader.class);
+    private final static Logger logger = Logger.getLogger(JmaProperties.class);
 
     //das publisher configurations
     public static String dasAddress;
@@ -74,7 +74,7 @@ public class PropertyLoader {
             input = new FileInputStream("bin"+ File.separator + PROPERTY_FILE); //load properties from the bin file when deployed
         } catch (FileNotFoundException e1) {
             //load properties at development environments
-            input = PropertyLoader.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
+            input = JmaProperties.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
         }
 
         try {
