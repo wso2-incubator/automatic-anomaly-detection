@@ -32,7 +32,7 @@ import java.io.File;
 /**
  * This is set data-agent-configurations, create DataPublisher instance
  */
-public abstract class DASPublisher implements Runnable {
+public abstract class DASPublisher {
 
     private final static Logger logger = Logger.getLogger(DASPublisher.class);
 
@@ -79,7 +79,7 @@ public abstract class DASPublisher implements Runnable {
     /**
      * Publish data to DAS
      */
-    protected abstract void publishEvents();
+    public abstract void publishEvents();
 
     /**
      * Shutdown the DataPublisher
@@ -128,11 +128,6 @@ public abstract class DASPublisher implements Runnable {
             System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
         }
 
-    }
-
-    @Override
-    public void run() {
-        publishEvents();
     }
 
 }
