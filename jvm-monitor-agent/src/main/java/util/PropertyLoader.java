@@ -3,10 +3,7 @@ package util;
 import exceptions.PropertyCannotBeLoadedException;
 import org.apache.log4j.Logger;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /*
@@ -74,7 +71,7 @@ public class PropertyLoader {
         InputStream input;
 
         try {
-            input = new FileInputStream("bin/" + PROPERTY_FILE); //load properties from the bin file when deployed
+            input = new FileInputStream("bin"+ File.separator + PROPERTY_FILE); //load properties from the bin file when deployed
         } catch (FileNotFoundException e1) {
             //load properties at development environments
             input = PropertyLoader.class.getClassLoader().getResourceAsStream(PROPERTY_FILE);
