@@ -1,4 +1,3 @@
-
 /*
  *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -49,7 +48,7 @@ public class JVMMonitorAgent {
 
     private final static Logger logger = Logger.getLogger(JVMMonitorAgent.class);
 
-    // DAS Publisher
+    // DAS publisher
     private GarbageCollectionPublisher dasGCPublisher;
     private MemoryPublisher dasMemoryPublisher;
     private CPUPublisher dasCPUPublisher;
@@ -88,11 +87,11 @@ public class JVMMonitorAgent {
             throw new PublisherInitializationException(e.getMessage(), e);
         }
 
-        // Initialize usage monitor agent according to the mode in jma.properties
+        // initialize usage monitor agent according to the mode in jma.properties
         usageMonitorAgent = UsageMonitorAgentFactory.getUsageMonitorAgent(jmaProperties);
-        // Get generated targeted app_id
+        // get generated targeted app_id
         targetedApplicationId = usageMonitorAgent.getTargetedApplicationId();
-
+        // number of threads in the pool = 4
         scheduler = Executors.newScheduledThreadPool(4);
 
     }
@@ -102,7 +101,8 @@ public class JVMMonitorAgent {
             JVMMonitorAgent jvmMonitor = new JVMMonitorAgent();
 
             jvmMonitor.startGarbageCollectionScheduler(100);
-            jvmMonitor.startMemoryCpuScheduler(1000);
+            jvmMonitor.startMemoryScheduler(1000);
+            jvmMonitor.startCpuScheduler(1000);
 
         } catch (PropertyCannotBeLoadedException | PublisherInitializationException | MonitorAgentInitializationFailed
                 | UnknownMonitorAgentTypeException e) {
@@ -112,7 +112,7 @@ public class JVMMonitorAgent {
     }
 
     /**
-     * To schedule the Garbage collection event
+     * To schedule the garbage collection event
      *
      * @param period
      */
@@ -121,17 +121,25 @@ public class JVMMonitorAgent {
     }
 
     /**
-     * To schedule the Memory and CPU event
+     * To schedule the memory event
      *
      * @param period
      */
-    private void startMemoryCpuScheduler(long period) {
-        scheduler.scheduleAtFixedRate(new MemoryCpuTask(), 0, period, MILLISECONDS);
+    private void startMemoryScheduler(long period) {
+        scheduler.scheduleAtFixedRate(new MemoryTask(), 0, period, MILLISECONDS);
     }
 
     /**
-     * Inner class
-     * Implementation of Runnable
+     * To schedule the CPU event
+     *
+     * @param period
+     */
+    private void startCpuScheduler(long period) {
+        scheduler.scheduleAtFixedRate(new CpuTask(), 0, period, MILLISECONDS);
+    }
+
+    /**
+     * Set garbage collection statistic and publish garbage collection event
      */
     private class GarbageCollectionTask implements Runnable {
 
@@ -139,10 +147,10 @@ public class JVMMonitorAgent {
         public void run() {
 
             try {
-                // Set garbage collection statistic to publish
+                // set garbage collection statistic to publish
                 dasGCPublisher.setGarbageCollectionStatistic(usageMonitorAgent.getGarbageCollectionStatistics(),
                         targetedApplicationId, new Date().getTime());
-
+                // publish garbage collection event
                 dasGCPublisher.publishEvents();
 
             } catch (AccessingUsageStatisticFailedException e) {
@@ -153,10 +161,9 @@ public class JVMMonitorAgent {
     }
 
     /**
-     * Inner class
-     * Implementation of Runnable
+     * Set memory statistic and publish memory event
      */
-    private class MemoryCpuTask implements Runnable {
+    private class MemoryTask implements Runnable {
 
         @Override
         public void run() {
@@ -165,13 +172,34 @@ public class JVMMonitorAgent {
             long timeStamp = new Date().getTime();
 
             try {
-                // Set Memory statistic to publish
+                // set memory statistic to publish
                 dasMemoryPublisher.setMemoryStatistic(usageMonitorAgent.getMemoryStatistics(), targetedApplicationId,
                         timeStamp);
+                // publish memory event
                 dasMemoryPublisher.publishEvents();
 
-                // Set CPU statistic to publish
+            } catch (AccessingUsageStatisticFailedException e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        }
+    }
+
+    /**
+     * Set CPU statistic and publish CPU event
+     */
+    private class CpuTask implements Runnable {
+
+        @Override
+        public void run() {
+
+            // get time stamp when publishing the data (should be unique to all publishers)
+            long timeStamp = new Date().getTime();
+
+            try {
+                // set CPU statistic to publish
                 dasCPUPublisher.setCPUStatistic(usageMonitorAgent.getCPUStatistics(), targetedApplicationId, timeStamp);
+                // publish CPU event
                 dasCPUPublisher.publishEvents();
 
             } catch (AccessingUsageStatisticFailedException e) {
