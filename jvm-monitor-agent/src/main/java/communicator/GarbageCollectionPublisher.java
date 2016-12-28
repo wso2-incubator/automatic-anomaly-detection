@@ -26,6 +26,7 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
+
 import java.util.List;
 
 /**
@@ -113,7 +114,7 @@ public class GarbageCollectionPublisher extends DASPublisher {
      * Publish Garbage Collection Log data to DAS
      */
     @Override
-    protected void publishEvents() {
+    public void publishEvents() {
 
         if (garbageCollectionStatistics != null) {
             for (GarbageCollectionStatistic gcStat : garbageCollectionStatistics) {
@@ -203,6 +204,5 @@ public class GarbageCollectionPublisher extends DASPublisher {
         }
 
     }
-
 
 }
