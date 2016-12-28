@@ -1,14 +1,5 @@
-package jvmmonitor;
-
-import jvmmonitor.exceptions.AccessingUsageStatisticFailedException;
-import jvmmonitor.models.CPUStatistic;
-import jvmmonitor.models.GarbageCollectionStatistic;
-import jvmmonitor.models.MemoryStatistic;
-
-import java.util.List;
-
 /*
- *  Copyright (c) ${date}, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +15,14 @@ import java.util.List;
  * specific language governing permissions and limitations
  * under the License.
  */
+package jvmmonitor;
+
+import jvmmonitor.exceptions.AccessingUsageStatisticFailedException;
+import jvmmonitor.models.CPUStatistic;
+import jvmmonitor.models.GarbageCollectionStatistic;
+import jvmmonitor.models.MemoryStatistic;
+
+import java.util.List;
 
 /**
  * Abstract Usage monitor agent which should be implemented in order to define new monitor agents
