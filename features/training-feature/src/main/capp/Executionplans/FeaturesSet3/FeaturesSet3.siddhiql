@@ -81,7 +81,7 @@ define stream GCFeatures (time_stamp long,
 						  dif_survivor_used double,
 						  gc_frequency double);
 						  
-from GarbageCollectionStream#window.length(1)
+from GarbageCollectionStream
 select
 	time_stamp, 
 	app_id, 

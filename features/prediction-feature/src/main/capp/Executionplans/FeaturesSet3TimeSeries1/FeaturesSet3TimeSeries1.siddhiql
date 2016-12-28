@@ -73,7 +73,7 @@ select
 	gc_frequency
 insert into FeaturesModel5StreamTem;
 
-from FeaturesModel5StreamTem#window.length(1)
+from FeaturesModel5StreamTem
 select
 	mc_time_stamp as time_stamp,
 	app_id,

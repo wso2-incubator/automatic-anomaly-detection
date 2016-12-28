@@ -48,7 +48,7 @@ define stream FeaturesModel5Stream (time_stamp long, app_id string, gc_duration 
 									dif_eden_used double, dif_old_used double, dif_survivor_used double,
 									sd_ratio_survivor double, gc_frequency double);
 
-from FeaturesWithoutValidation#window.length(1)
+from FeaturesWithoutValidation
 select
 	mc_time_stamp,
 	app_id,
@@ -70,7 +70,7 @@ select
 	gc_frequency
 insert into FeaturesModel5StreamTem;
 
-from FeaturesModel5StreamTem#window.length(1)
+from FeaturesModel5StreamTem
 select
 	mc_time_stamp as time_stamp,
 	app_id,
