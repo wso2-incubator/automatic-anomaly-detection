@@ -27,10 +27,25 @@ This module is for processing Memory and Garbage collection statistics provided 
 ### 2) Install features
    
   1. Extract WSO2 DAS binary distribution to your local file system.
+  
   2. [Run WSO2 DAS server](https://docs.wso2.com/display/DAS310/Running+the+Product#RunningtheProduct-Startingtheserver)
-  3. Log into WSO2 DAS Management Console  
+  
+  3. Log into WSO2 DAS Management Console
+  
   4. Go to configurations in the WSO2 DAS server and click on the Features on the left navigation panel.   
-  5. Then click on the Add repository button.  
-  6. Give a name to the repository and enter your local p2-repo full path. (Eg:- <JMA_HOME>/features/target/p2-repo)  
+  ![Feature Management](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/FeatureManagementScreenshots.png)
+  
+  5. Then click on the Add repository button.
+  ![Repository Management](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/RepositoryManagementScreenshots.png)
+  
+  6. Give a name to the repository and enter your local p2-repo full path. (Eg:- ```<JMA_HOME>/features/target/p2-repo```)
+  ![Add Repository](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/AddRepositoryScreenshots.png)
+  
   7. Select the repository from Repository List, remove the tick from the Group features by category and click on the Find Features button.
-  8. Select the one you want and click install. Then restart the server. **Note:** Do not tick both.
+  
+  ![Find Features](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/FindFeaturesScreenshots.png)
+  
+  8. Select the one you want and click install. Then restart the server.
+  ![Install Features](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/InstallFeaturesScreenshots.png)
+  
+ **Note:** Do not tick both.
