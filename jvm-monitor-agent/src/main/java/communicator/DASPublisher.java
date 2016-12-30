@@ -27,18 +27,18 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+
 import java.io.File;
 
 /**
  * This is set data-agent-configurations, create DataPublisher instance
  */
-public abstract class DASPublisher {
+public class DASPublisher {
 
     private final static Logger logger = Logger.getLogger(DASPublisher.class);
 
     DataPublisher dataPublisher;
     String dataStream;
-    String applicationId;
 
     /**
      * Constructor
@@ -77,11 +77,6 @@ public abstract class DASPublisher {
     }
 
     /**
-     * Publish data to DAS
-     */
-    public abstract void publishEvents();
-
-    /**
      * Shutdown the DataPublisher
      *
      * @throws DataEndpointException
@@ -91,7 +86,7 @@ public abstract class DASPublisher {
     }
 
     private void setDataAgentConfigurations(String dataAgentConfPath, String trustStorePath,
-            String trustStorePassword) {
+                                            String trustStorePassword) {
 
         // Set data-agent-conf.xml file path
         File dataAgentFilePath = new File(dataAgentConfPath + File.separator + "data-agent-conf.xml");
