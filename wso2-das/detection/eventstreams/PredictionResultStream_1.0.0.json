@@ -1,0 +1,24 @@
+{
+  "name": "PredictionResultStream",
+  "version": "1.0.0",
+  "nickName": "prediction_result_stream",
+  "description": "Prediction Result Stream",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "model_id",
+      "type": "STRING"
+    },
+    {
+      "name": "prediction",
+      "type": "STRING"
+    }
+  ]
+}

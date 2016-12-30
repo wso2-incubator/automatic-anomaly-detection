@@ -1,0 +1,116 @@
+{
+  "name": "MemoryFeatures",
+  "version": "1.0.0",
+  "nickName": "memory_features",
+  "description": "Memory Features",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "max_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "allocated_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "used_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "max_non_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "allocated_non_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "used_non_heap",
+      "type": "LONG"
+    },
+    {
+      "name": "pending_finalizations",
+      "type": "LONG"
+    },
+    {
+      "name": "sd_allocated_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_used_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_max_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_allocated_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_used_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "sd_pending_finalizations",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_allocated_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_used_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_max_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_allocated_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_used_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "z_pending_finalizations",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_allocated_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_used_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_max_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_allocated_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_used_non_heap",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "p_pending_finalizations",
+      "type": "DOUBLE"
+    }
+  ]
+}

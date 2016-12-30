@@ -1,0 +1,88 @@
+@Plan:name('prediction2')
+
+@Plan:statistics('true')
+
+@Plan:trace('true')
+
+define trigger PredictionResultTrigger at every 1 sec ;
+
+@Import('FeaturesModel1Stream:1.0.0')
+define stream FeaturesModel1Stream (time_stamp long, app_id string, 
+									p_process_cpu_load double, p_system_cpu_load double, 
+									sd_allocated_heap double, z_used_heap double,
+									z_allocated_non_heap double, z_used_non_heap double, 
+									p_allocated_heap double, p_used_heap double, 
+									sd_gc_duration double, z_eden_used_before double, 
+									z_survivor_used_after double, z_survivor_used_before double, 
+									z_old_used_after double, z_old_used_before double, 
+									z_eden_committed_after double, z_eden_committed_before double, 
+									z_survivor_committed_after double, z_survivor_committed_before double,
+									z_survivor_max_after double, z_survivor_max_before double, 
+									p_gc_duration double, p_survivor_used_after double, 
+									p_survivor_used_before double, p_old_used_before double, 
+									p_survivor_committed_after double, p_eden_max_after double,
+									p_eden_max_before double);
+
+
+@Export('PredictionResultStream:1.0.0')
+define stream PredictionResultStream (time_stamp long, app_id string, model_id string, prediction string);
+
+@IndexBy('app_id')
+define table PredictionResultStreamTable (time_stamp long, app_id string, model_id string, prediction string);
+
+
+from FeaturesModel1Stream#ml:predict('/home/buddhi/Documents/tem8b6/wso2das-3.1.0/models/pro8bm1a2c4.Model.2016-11-21_11-31-49','string',98.0,
+									 --p_process_cpu_load,
+									 --p_system_cpu_load,
+									 sd_allocated_heap,
+									 z_used_heap,
+									 z_allocated_non_heap,
+									 z_used_non_heap,
+									 p_allocated_heap,
+									 p_used_heap,
+									 sd_gc_duration,
+									 z_eden_used_before,
+									 z_survivor_used_after,
+									 z_survivor_used_before,
+									 z_old_used_after,
+									 z_old_used_before,
+									 z_eden_committed_after,
+									 z_eden_committed_before,
+									 z_survivor_committed_after,
+									 z_survivor_committed_before,
+									 z_survivor_max_after,
+									 z_survivor_max_before,
+									 p_gc_duration,
+									 p_survivor_used_after,
+									 p_survivor_used_before,
+									 p_old_used_before,
+									 p_survivor_committed_after,
+									 p_eden_max_after,
+									 p_eden_max_before
+									)
+select 
+	time_stamp,
+	app_id,
+	'model 5' as model_id,
+	prediction
+insert into PredictionResultStreamTem;
+
+from PredictionResultTrigger join PredictionResultStreamTable#window.length(1)
+select
+	time_stamp+1000l as time_stamp,
+	app_id,
+	model_id,
+	prediction
+insert into PredictionResultStreamTable;
+
+from PredictionResultStreamTem#window.time(100)
+insert expired events into PredictionResultStreamTable;
+
+
+from PredictionResultTrigger#window.time(100) join PredictionResultStreamTable#window.length(1)
+select
+	time_stamp,
+	app_id,
+	model_id,
+	prediction
+insert into PredictionResultStream;

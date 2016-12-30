@@ -1,0 +1,156 @@
+{
+  "name": "PredictionDataStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "time_stamp_1",
+      "type": "LONG"
+    },
+    {
+      "name": "time_stamp_2",
+      "type": "LONG"
+    },
+    {
+      "name": "time_stamp_3",
+      "type": "LONG"
+    },
+    {
+      "name": "heap_used_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "process_cpu_load_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "process_cpu_load_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "process_cpu_load_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "system_cpu_load_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "system_cpu_load_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "system_cpu_load_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "minor_gc_freq_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "minor_gc_freq_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "minor_gc_freq_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_freq_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_freq_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_freq_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "gc_duration_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "gc_duration_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "gc_duration_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_cleared",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_growing",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_committed",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_committed",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_committed",
+      "type": "DOUBLE"
+    }
+  ]
+}
