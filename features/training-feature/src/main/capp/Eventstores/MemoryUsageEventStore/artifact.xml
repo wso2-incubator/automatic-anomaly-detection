@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<artifact name="MemoryUsageEventStore" version="1.0.0" type="analytics/eventstore"
-          serverRole="DataAnalyticsServer">
-    <file>MemoryUsageStream.xml</file>
-</artifact>
