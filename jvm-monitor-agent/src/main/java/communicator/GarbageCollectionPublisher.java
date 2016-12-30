@@ -26,7 +26,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-
 import java.util.List;
 
 /**
@@ -69,8 +68,6 @@ public class GarbageCollectionPublisher extends DASPublisher {
      */
     private static final String streamName = "GarbageCollectionStream";
     private static final String streamVersion = "1.0.0";
-    private List<GarbageCollectionStatistic> garbageCollectionStatistics;
-    private long timestamp;
 
     /**
      * Constructor
@@ -95,26 +92,14 @@ public class GarbageCollectionPublisher extends DASPublisher {
     }
 
     /**
-     * Need to set Garbage collection statistic data before publish data to DAS
+     * Publish Garbage Collection statistic data to DAS
      *
      * @param garbageCollectionStatistics
      * @param applicationId
      * @param timestamp
      */
-    public void setGarbageCollectionStatistic(List<GarbageCollectionStatistic> garbageCollectionStatistics
+    public synchronized void publishEvents(List<GarbageCollectionStatistic> garbageCollectionStatistics
             , String applicationId, long timestamp) {
-
-        this.garbageCollectionStatistics = garbageCollectionStatistics;
-        this.applicationId = applicationId;
-        this.timestamp = timestamp;
-
-    }
-
-    /**
-     * Publish Garbage Collection Log data to DAS
-     */
-    @Override
-    public void publishEvents() {
 
         if (garbageCollectionStatistics != null) {
             for (GarbageCollectionStatistic gcStat : garbageCollectionStatistics) {

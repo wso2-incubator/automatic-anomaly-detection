@@ -26,7 +26,6 @@ import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationExcep
 import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
-
 import java.util.List;
 
 /**
@@ -48,8 +47,6 @@ public class CPUPublisher extends DASPublisher {
      */
     private static final String streamName = "CPUUsageStream";
     private static final String streamVersion = "1.0.0";
-    private List<CPUStatistic> cpuStatistics;
-    private long timestamp;
 
     /**
      * Constructor
@@ -74,23 +71,13 @@ public class CPUPublisher extends DASPublisher {
     }
 
     /**
-     * Need to set CPU statistic data before publish data to DAS
+     * Publish CPU statistics data to DAS
      *
      * @param cpuStatistics
      * @param applicationId
      * @param timestamp
      */
-    public void setCPUStatistic(List<CPUStatistic> cpuStatistics, String applicationId, long timestamp) {
-        this.cpuStatistics = cpuStatistics;
-        this.applicationId = applicationId;
-        this.timestamp = timestamp;
-    }
-
-    /**
-     * Publish CPU Load Log data to DAS
-     */
-    @Override
-    public void publishEvents() {
+    public synchronized void publishEvents(List<CPUStatistic> cpuStatistics, String applicationId, long timestamp) {
 
         if (cpuStatistics != null && !cpuStatistics.isEmpty()) {
             CPUStatistic cpuStat = cpuStatistics.get(cpuStatistics.size() - 1);

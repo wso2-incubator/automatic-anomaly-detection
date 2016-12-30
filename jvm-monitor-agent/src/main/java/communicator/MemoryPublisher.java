@@ -53,8 +53,6 @@ public class MemoryPublisher extends DASPublisher {
      */
     private static final String streamName = "MemoryUsageStream";
     private static final String streamVersion = "1.0.0";
-    private List<MemoryStatistic> memoryStatistics;
-    private long timestamp;
 
     /**
      * Constructor
@@ -79,23 +77,14 @@ public class MemoryPublisher extends DASPublisher {
     }
 
     /**
-     * Need to set Memory statistic data before publish data to DAS
+     * Publish Memory Usage statistic data to DAS
      *
      * @param memoryStatistics
      * @param applicationId
      * @param timestamp
      */
-    public void setMemoryStatistic(List<MemoryStatistic> memoryStatistics, String applicationId, long timestamp) {
-        this.memoryStatistics = memoryStatistics;
-        this.applicationId = applicationId;
-        this.timestamp = timestamp;
-    }
-
-    /**
-     * Publish Memory Usage Log data to DAS
-     */
-    @Override
-    public void publishEvents() {
+    public synchronized void publishEvents(List<MemoryStatistic> memoryStatistics, String applicationId,
+                                           long timestamp) {
 
         if (memoryStatistics != null && !memoryStatistics.isEmpty()) {
             MemoryStatistic memoryStat = memoryStatistics.get(memoryStatistics.size() - 1);
