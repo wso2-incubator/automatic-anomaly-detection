@@ -35,6 +35,7 @@
     <modules>
         <module>training-feature</module>
         <module>prediction-feature</module>
+        <module>commons-feature</module>
     </modules>
 
     <build>
