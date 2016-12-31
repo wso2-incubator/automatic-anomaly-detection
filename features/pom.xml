@@ -63,6 +63,9 @@
                                 <featureArtifactDef>
                                     org.wso2.anomalyDetection:training-feature:1.0.0-SNAPSHOT
                                 </featureArtifactDef>
+                                <featureArtifactDef>
+                                    org.wso2.anomalyDetection:commons-feature:1.0.0-SNAPSHOT
+                                </featureArtifactDef>
                             </featureArtifacts>
                         </configuration>
                     </execution>
