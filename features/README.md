@@ -1,11 +1,11 @@
 ## Introduction
+This module contains three features which can be used to collect usage statictist and process them into features from training models and predictions. Moreover, It has several trained models and an ensemble predictor which is capable of generating a one prediction using the all the predictions from the trained models. The dashboard view can be configured to display prediction results for each application/JVM.
 
-This module is for processing Memory and Garbage collection statistics provided by jvm-monitor-agent using siddhi query. Mainly this has two features.
-
-1. [Training-feature](https://github.com/wso2-incubator/automatic-anomaly-detection/tree/master/features/training-feature)
-   - Collects JVM statistic data and process it to train a ML model.
-2. [Prediction-feature](https://github.com/wso2-incubator/automatic-anomaly-detection/tree/master/features/prediction-feature)
-   - Gives results in real-time using trained ML models and WSO2 Machine Learner Siddhi Extension.
+1. [Commons-feature](/features/commons-feature) - Deploy all the common das artifacts for the training feature and the prediction feauture
+  
+1. [Training-feature](/features/training-feature) - Collects JVM statistic data and process them into features.
+   
+2. [Prediction-feature](/features/prediction-feature) - Provides real-time prediction results using trained ML models and WSO2 Machine Learner Siddhi Extension.
 
 ## Prerequisites
 
@@ -17,12 +17,12 @@ This module is for processing Memory and Garbage collection statistics provided 
 
 ### 1) Build features
 
-   To build features, first navigate to ```<JMA_HOME>/features/``` Then run:
+   To build features, first navigate to ```<AAD_Home>/features/``` Then run:
    
    ```
-        mvn clean install
+   mvn clean install
    ```
-   **NOTE:** After doing this you can see a p2-repo folder inside ```<JMA_HOME>/features/target/```
+   **NOTE:** After doing this you can see a p2-repo folder inside ```<AAD_HOME>/features/target/```
       
 ### 2) Install features
    
@@ -33,23 +33,24 @@ This module is for processing Memory and Garbage collection statistics provided 
   3. Log into WSO2 DAS Management Console
   
   4. Go to configurations in the WSO2 DAS server and click on the Features on the left navigation panel.   
-  ![Feature Management](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/FeatureManagementScreenshots.png)
+  ![Feature Management](../docs/images/FeatureManagementScreenshots.png)
   
   5. Then click on the Add repository button.
-  ![Repository Management](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/RepositoryManagementScreenshots.png)
+  ![Repository Management]../docs/images/RepositoryManagementScreenshots.png)
   
   6. Give a name to the repository and enter your local p2-repo full path. (Eg:- ```<JMA_HOME>/features/target/p2-repo```)
-  ![Add Repository](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/AddRepositoryScreenshots.png)
+  ![Add Repository](../docs/images/AddRepositoryScreenshots.png)
   
   7. Select the repository from Repository List, remove the tick from the Group features by category and click on the Find Features button.
   
-  ![Find Features](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/FindFeaturesScreenshots.png)
+  ![Find Features](../docs/images/FindFeaturesScreenshots.png)
   
   8. Select the Anomaly Prediction Commons feature.
-    ![Install Features](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/CommonsFeaturesScreenshots.png)
+    ![Install Features](../docs/images/CommonsFeaturesScreenshots.png)
     
   9. Then select the one you want and click install.
-    ![Install Features](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/InstallFeaturesScreenshots.png)
+    ![Install Features](../docs/images/InstallFeaturesScreenshots.png)
   
   10. Then restart the server.
-  ![Install Features](https://github.com/wso2-incubator/automatic-anomaly-detection/blob/master/docs/images/RestartServerScreenshots.png)
+  ![Install Features](../docs/images/RestartServerScreenshots.png)
+
