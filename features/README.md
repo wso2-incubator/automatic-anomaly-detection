@@ -60,7 +60,7 @@ Ensemble prediction can be used to generate a single prediction from all the pre
 ### Prerequisites
   - Deploy the [Prediction feature](#installation)
   
-### Deployement
+### Deployment
   1. In the WSO2 DAS Click Main, and then click [Template Manager](https://docs.wso2.com/display/DAS310/Using+Templates)
    under the Manage menu
 
