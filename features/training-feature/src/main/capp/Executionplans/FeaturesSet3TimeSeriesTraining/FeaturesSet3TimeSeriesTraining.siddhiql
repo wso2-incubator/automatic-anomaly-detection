@@ -1,6 +1,6 @@
-@Plan:name('FeaturesSet3TimeSeries1')
+@Plan:name('FeaturesSet3TimeSeriesTraining')
 
-@Plan:description('Features process plan for Model_4 and Model_5')
+@Plan:description('Features process plan for Training')
 
 @Plan:statistics('true')
 @Plan:trace('true')

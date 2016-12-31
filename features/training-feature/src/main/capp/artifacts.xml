@@ -22,7 +22,7 @@
                     serverRole="DataAnalyticsServer"/>
         <dependency artifact="IterationFourProcessExecutionPlan" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
-        <dependency artifact="FeaturesSet3TimeSeries1" version="1.0.0" include="true"
+        <dependency artifact="FeaturesSet3TimeSeriesTraining" version="1.0.0" include="true"
                     serverRole="DataAnalyticsServer"/>
 
     </artifact>
