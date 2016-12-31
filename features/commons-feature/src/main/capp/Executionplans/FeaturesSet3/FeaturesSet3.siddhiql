@@ -148,19 +148,19 @@ from GCFeaturesTem#window.timeBatch(1000)
 select
 	time_stamp,
 	app_id,
-	avg( ifThenElse(gc_duration is null, 0d, ifThenElse(math:isNan(gc_duration), 0d, gc_duration)) ) as gc_duration,
-	avg( ifThenElse(eden_used_after is null, 0d, ifThenElse(math:isNan(eden_used_after), 0d, eden_used_after)) ) as eden_used_after,
-	avg( ifThenElse(eden_used_before is null, 0d, ifThenElse(math:isNan(eden_used_before), 0d, eden_used_before)) ) as eden_used_before,
-	avg( ifThenElse(survivor_used_after is null, 0d, ifThenElse(math:isNan(survivor_used_after), 0d, survivor_used_after)) ) as survivor_used_after,
-	avg( ifThenElse(survivor_used_before is null, 0d, ifThenElse(math:isNan(survivor_used_before), 0d, survivor_used_before)) ) as survivor_used_before,
-	avg( ifThenElse(old_used_after is null, 0d, ifThenElse(math:isNan(old_used_after), 0d, old_used_after)) ) as old_used_after,
-	avg( ifThenElse(old_used_before is null, 0d, ifThenElse(math:isNan(old_used_before), 0d, old_used_before)) ) as old_used_before,
-	avg( ifThenElse(sd_gc_frequency is null, 0d, ifThenElse(math:isNan(sd_gc_frequency), 0d, sd_gc_frequency)) ) as sd_gc_frequency,
-	avg( ifThenElse(dif_eden_used is null, 0d, ifThenElse(math:isNan(dif_eden_used), 0d, dif_eden_used)) ) as dif_eden_used,
-	avg( ifThenElse(dif_old_used is null, 0d, ifThenElse(math:isNan(dif_old_used), 0d, dif_old_used)) ) as dif_old_used,
-	avg( ifThenElse(sd_ratio_survivor is null, 0d, ifThenElse(math:isNan(sd_ratio_survivor), 0d, sd_ratio_survivor)) ) as sd_ratio_survivor,
-	avg( ifThenElse(dif_survivor_used is null, 0d, ifThenElse(math:isNan(dif_survivor_used), 0d, dif_survivor_used)) ) as dif_survivor_used,
-	avg( ifThenElse(gc_frequency is null, 0l, gc_frequency) ) as gc_frequency
+	avg( ifThenElse(gc_duration is null, 0d, gc_duration) ) as gc_duration,
+    	avg( ifThenElse(eden_used_after is null, 0d, eden_used_after) ) as eden_used_after,
+    	avg( ifThenElse(eden_used_before is null, 0d, eden_used_before) ) as eden_used_before,
+    	avg( ifThenElse(survivor_used_after is null, 0d, survivor_used_after) ) as survivor_used_after,
+    	avg( ifThenElse(survivor_used_before is null, 0d, survivor_used_before) ) as survivor_used_before,
+    	avg( ifThenElse(old_used_after is null, 0d, old_used_after) ) as old_used_after,
+    	avg( ifThenElse(old_used_before is null, 0d, old_used_before) ) as old_used_before,
+    	avg( ifThenElse(sd_gc_frequency is null, 0d, sd_gc_frequency) ) as sd_gc_frequency,
+    	avg( ifThenElse(dif_eden_used is null, 0d, dif_eden_used) ) as dif_eden_used,
+    	avg( ifThenElse(dif_old_used is null, 0d, dif_old_used) ) as dif_old_used,
+    	avg( ifThenElse(sd_ratio_survivor is null, 0d, sd_ratio_survivor) ) as sd_ratio_survivor,
+    	avg( ifThenElse(dif_survivor_used is null, 0d, dif_survivor_used) ) as dif_survivor_used,
+    	avg( ifThenElse(gc_frequency is null, 0l, gc_frequency) ) as gc_frequency
 	
 	group by app_id
 insert into GCFeatures;
@@ -168,7 +168,7 @@ insert into GCFeatures;
 
 
 --join the Memory data to GC processed data
-from  MemoryUsageStream#window.length(10) as m unidirectional left outer join GCFeatures#window.timeLength(5 sec , 5)  as gc on ( m.time_stamp-1000 <= gc.time_stamp and m.time_stamp >= gc.time_stamp and m.app_id == gc.app_id)
+from  MemoryUsageStream#window.length(20) as m full outer join GCFeatures#window.length(10)  as gc on ( m.time_stamp-1000 <= gc.time_stamp and m.time_stamp >= gc.time_stamp and m.app_id == gc.app_id)
 select
 	m.time_stamp as mc_time_stamp,
 	m.app_id,
