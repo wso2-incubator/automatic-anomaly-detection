@@ -78,9 +78,9 @@ Dashboard view can be used to display the ensemble prediction as well as the ind
 
 ### Prerequisites
   - Deploy the [Prediction feature](#installation)
-  - Deploy the [Ensemble Predictior](#ensemble-predictor)
-
-### Deployement
+  - Deploy the [Ensemble Predictor](#ensemble-predictor)
+  
+### Deployment
   1. In the WSO2 DAS Click Main, and then click [Template Manager](https://docs.wso2.com/display/DAS310/Using+Templates)
    under the Manage menu
 
@@ -91,4 +91,3 @@ Dashboard view can be used to display the ensemble prediction as well as the ind
   
   
   **note** - The Application id of the monitored applications can be obtained by checking the loggers from JMA.
-     
