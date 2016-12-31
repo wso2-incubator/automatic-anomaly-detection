@@ -19,5 +19,4 @@ hs_err_pid*
 !/wso2-das/patches/*/*/*.jar
 
 #adding siddhi extention
-!/features/training-feature/src/main/resources/conf/*.jar
-!/features/prediction-feature/src/main/resources/conf/*.jar
+!/features/commons-feature/src/main/resources/lib/*.jar
