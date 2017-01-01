@@ -3,9 +3,9 @@ This module contains three features which can be used to collect usage statistic
 
 1. [Commons-feature](commons-feature) - Deploy all the common das artifacts for the training feature and the prediction feature
   
-1. [Training-feature](training-feature) - Collects JVM statistic data and process them into features.
+2. [Training-feature](training-feature) - Collects JVM statistic data and process them into features.
    
-2. [Prediction-feature](prediction-feature) - Provides real-time prediction results using trained ML models and WSO2 Machine Learner Siddhi Extension.
+3. [Prediction-feature](prediction-feature) - Provides real-time prediction results using trained ML models and WSO2 Machine Learner Siddhi Extension.
 
 ## Prerequisites
 

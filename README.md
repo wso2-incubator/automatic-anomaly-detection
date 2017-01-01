@@ -10,8 +10,8 @@ This project provides the complete set of tools to train models and predict perf
 ## Installation
 1. [Install JVM monitor agent](/jvm-monitor-agent/#installation)
 2. [Install DAS Features](/features/#installation)
-3. [Configure Ensemble Predictor]()
-4. [Configure Dashboard view]()
+3. [Configure Ensemble Predictor](features#ensemble-predictor)
+4. [Configure Dashboard view](features#dashboard-view)
 
 ## Deployment
 1. [Run WSO2 DAS](https://docs.wso2.com/display/DAS310/Running+the+Product)
