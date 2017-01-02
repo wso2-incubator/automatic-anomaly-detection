@@ -36,7 +36,7 @@ This module contains three features which can be used to collect usage statistic
   ![Feature Management](../docs/images/FeatureManagementScreenshots.png)
   
   5. Then click on the Add repository button.
-  ![Repository Management]../docs/images/RepositoryManagementScreenshots.png)
+  ![Repository Management](../docs/images/RepositoryManagementScreenshots.png)
   
   6. Give a name to the repository and enter your local p2-repo full path. (Eg:- ```<JMA_HOME>/features/target/p2-repo```)
   ![Add Repository](../docs/images/AddRepositoryScreenshots.png)
