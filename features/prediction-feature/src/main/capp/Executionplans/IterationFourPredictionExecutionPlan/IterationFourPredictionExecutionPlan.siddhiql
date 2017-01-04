@@ -43,7 +43,7 @@ define trigger OneSecTrigger at every 1 sec;
 --==========================================================================================================--
 --//////////////////////////////////////// PROCESS GC EVENTS DATA///////////////////////////////////////////--
 --==========================================================================================================--
---partion by app_id. used a sequence to collect 2 consecutive GC events with same app_id
+--partition by app_id. used a sequence to collect 2 consecutive GC events with same app_id
 partition with (app_id of GarbageCollectionStream)
 begin
   from GarbageCollectionStream
@@ -64,7 +64,7 @@ begin
 
   insert into #GCStream;
 	
-  from g1 = #GCStream, g2 = #GCStream
+  from every g1 = #GCStream, g2 = #GCStream
   select 
 	  g2.app_id,
 	  g2.time_stamp,
@@ -146,7 +146,7 @@ partition with (app_id of PreProcessedMemoryStream)
 begin
 
 	--connect last two consecutive memory events
-	from m1 = PreProcessedMemoryStream, m2 = PreProcessedMemoryStream
+	from every m1 = PreProcessedMemoryStream, m2 = PreProcessedMemoryStream
 		select 
 			m2.time_stamp,
 			m2.app_id,
@@ -200,11 +200,24 @@ select
 insert into ThreeSecMemorySummery;
 
 --process memory usage into summery using 5 seconds values
-from PeriodicMemoryUsageStream#window.time(5 sec)
+from ThreeSecMemorySummery#window.time(5 sec)
 select 
 	time_stamp,
 	app_id,			   
 	
+	heap_free,
+	heap_growing_rate,
+	heap_used_free_proportion,
+			   
+	heap_avg_3sec,
+	heap_std_3sec,
+
+	heap_growing_rate_avg_3sec,
+	heap_growing_rate_std_3sec,
+					   
+	heap_used_free_proportion_avg_3sec,
+	heap_used_free_proportion_std_3sec,
+
 	avg(heap_free) as heap_avg_5sec,
 	stddev(heap_free) as heap_std_5sec,
 
@@ -220,11 +233,35 @@ select
 insert into FiveSecMemorySummery;
 			   
 --process memory usage into summery using 10 seconds values
-from PeriodicMemoryUsageStream#window.time(10 sec)
+from FiveSecMemorySummery#window.time(10 sec)
 select 
 	time_stamp,
 	app_id,			   
 
+	heap_free,
+	heap_growing_rate,
+	heap_used_free_proportion,
+			   
+	heap_avg_3sec,
+	heap_std_3sec,
+
+	heap_growing_rate_avg_3sec,
+	heap_growing_rate_std_3sec,
+					   
+	heap_used_free_proportion_avg_3sec,
+	heap_used_free_proportion_std_3sec,
+
+	heap_avg_5sec,
+	heap_std_5sec,
+
+	heap_growing_rate_avg_5sec,
+	heap_growing_rate_std_5sec,
+					   
+	heap_used_free_proportion_avg_5sec,
+	heap_used_free_proportion_std_5sec,
+	
+	heap_range_5sec,
+	
 	avg(heap_free) as heap_avg_10sec,
 	stddev(heap_free) as heap_std_10sec,
 
@@ -238,10 +275,43 @@ select
 insert into TenSecMemorySummery;
 			   
 --process memory usage into summery using 30 seconds values
-from PeriodicMemoryUsageStream#window.time(30 sec)
+from TenSecMemorySummery#window.time(30 sec)
 select 
 	time_stamp,
 	app_id,			   
+	
+	heap_free,
+	heap_growing_rate,
+	heap_used_free_proportion,
+			   
+	heap_avg_3sec,
+	heap_std_3sec,
+
+	heap_growing_rate_avg_3sec,
+	heap_growing_rate_std_3sec,
+					   
+	heap_used_free_proportion_avg_3sec,
+	heap_used_free_proportion_std_3sec,
+
+	heap_avg_5sec,
+	heap_std_5sec,
+
+	heap_growing_rate_avg_5sec,
+	heap_growing_rate_std_5sec,
+					   
+	heap_used_free_proportion_avg_5sec,
+	heap_used_free_proportion_std_5sec,
+	
+	heap_range_5sec,
+	
+	heap_avg_10sec,
+	heap_std_10sec,
+
+	heap_growing_rate_avg_10sec,
+	heap_growing_rate_std_10sec,
+					   
+	heap_used_free_proportion_avg_10sec,
+	heap_used_free_proportion_std_10sec,
 	
 	avg(heap_free) as heap_avg_30sec,
 	stddev(heap_free) as heap_std_30sec,
@@ -253,109 +323,10 @@ select
 	stddev(heap_used_free_proportion) as heap_used_free_proportion_std_30sec
 	
 	group by app_id
-insert into ThirtySecMemorySummery;
+insert into ProcessedMemoryUsageStream;
 
 --==========================================================================================================--
 --/////////////////////////////////// END OF PROCESS MEMORY USAGE DATA /////////////////////////////////////--
---==========================================================================================================--
-
---==========================================================================================================--
---//////////////////////////////////// JOIN MEMORY SUMMERY STREAMS /////////////////////////////////////////--
---==========================================================================================================--
--- join summeries of memory streams 
-from ThreeSecMemorySummery#window.length(1) as A join FiveSecMemorySummery#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
-select 
-	A.time_stamp,
-	A.app_id,
-	A.heap_free,
-	A.heap_growing_rate,
-	A.heap_used_free_proportion,
-	
-	A.heap_avg_3sec,
-	B.heap_avg_5sec,
-	A.heap_std_3sec,
-	B.heap_std_5sec,
-	
-	A.heap_growing_rate_avg_3sec,
-	B.heap_growing_rate_avg_5sec,
-	A.heap_growing_rate_std_3sec,
-	B.heap_growing_rate_std_5sec,
-	
-	A.heap_used_free_proportion_avg_3sec,
-	B.heap_used_free_proportion_avg_5sec,
-	A.heap_used_free_proportion_std_3sec,
-	B.heap_used_free_proportion_std_5sec,
-	
-	B.heap_range_5sec
-	
-insert into ThreeSecFiveSecMemoryStream;
-
-from TenSecMemorySummery#window.length(1) as A join ThirtySecMemorySummery#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
-select 
-	A.time_stamp,
-	A.app_id,
-
-	A.heap_avg_10sec,
-	B.heap_avg_30sec,
-	A.heap_std_10sec,
-	B.heap_std_30sec,
-	
-	A.heap_growing_rate_avg_10sec,
-	B.heap_growing_rate_avg_30sec,
-	A.heap_growing_rate_std_10sec,
-	B.heap_growing_rate_std_30sec,
-	
-	A.heap_used_free_proportion_avg_10sec,
-	B.heap_used_free_proportion_avg_30sec,
-	A.heap_used_free_proportion_std_10sec,
-	B.heap_used_free_proportion_std_30sec
-	
-insert into TenSecThirtySecMemoryStream;
-
-from ThreeSecFiveSecMemoryStream#window.length(1) as A join TenSecThirtySecMemoryStream#window.length(1) as B on (A.app_id == B.app_id and A.time_stamp == B.time_stamp)
-select 
-	A.time_stamp,
-	A.app_id,
-
-	A.heap_free,
-	A.heap_growing_rate,
-	A.heap_used_free_proportion,
-	
-	A.heap_avg_3sec,
-	A.heap_avg_5sec,
-	A.heap_std_3sec,
-	A.heap_std_5sec,
-	
-	A.heap_growing_rate_avg_3sec,
-	A.heap_growing_rate_avg_5sec,
-	A.heap_growing_rate_std_3sec,
-	A.heap_growing_rate_std_5sec,
-	
-	A.heap_used_free_proportion_avg_3sec,
-	A.heap_used_free_proportion_avg_5sec,
-	A.heap_used_free_proportion_std_3sec,
-	A.heap_used_free_proportion_std_5sec,
-	
-	A.heap_range_5sec,
-	
-	B.heap_avg_10sec,
-	B.heap_avg_30sec,
-	B.heap_std_10sec,
-	B.heap_std_30sec,
-	
-	B.heap_growing_rate_avg_10sec,
-	B.heap_growing_rate_avg_30sec,
-	B.heap_growing_rate_std_10sec,
-	B.heap_growing_rate_std_30sec,
-	
-	B.heap_used_free_proportion_avg_10sec,
-	B.heap_used_free_proportion_avg_30sec,
-	B.heap_used_free_proportion_std_10sec,
-	B.heap_used_free_proportion_std_30sec
-	
-insert into ProcessedMemoryUsageStream;
---==========================================================================================================--
---//////////////////////////////// END OF JOINING MEMORY USAGE SUMMERY DATA/////////////////////////////////--
 --==========================================================================================================--
 
 --==========================================================================================================--
@@ -365,7 +336,7 @@ insert into ProcessedMemoryUsageStream;
 partition with ( app_id of  ProcessedMemoryUsageStream)
 begin
 
-  from p1 = ProcessedMemoryUsageStream, p2 = ProcessedMemoryUsageStream
+  from every p1 = ProcessedMemoryUsageStream, p2 = ProcessedMemoryUsageStream
   select 
   	p2.app_id,
 	p2.time_stamp,
@@ -433,7 +404,7 @@ select *
 insert expired events into DelayedMemoryStream;
 
 --join the common usage data to GC processed data
-from  DelayedMemoryStream#window.length(20) as U unidirectional left outer join GCBatchProcessedStream#window.length(10)  as G on ( U.time_stamp-1000 <= G.time_stamp and U.time_stamp >= G.time_stamp and U.app_id == G.app_id)
+from  DelayedMemoryStream as U unidirectional left outer join GCBatchProcessedStream#window.length(10)  as G on ( U.time_stamp-1000 <= G.time_stamp and U.time_stamp >= G.time_stamp and U.app_id == G.app_id)
 select 
 
 	-------------General details----------------
