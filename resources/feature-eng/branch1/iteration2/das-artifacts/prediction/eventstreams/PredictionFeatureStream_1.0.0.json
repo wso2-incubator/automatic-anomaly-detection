@@ -1,0 +1,76 @@
+{
+  "name": "PredictionFeatureStream",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "time_stamp",
+      "type": "LONG"
+    },
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "heap_used",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_growing",
+      "type": "INT"
+    },
+    {
+      "name": "heap_allocated_growing",
+      "type": "INT"
+    },
+    {
+      "name": "major_gc_freq",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_happend",
+      "type": "INT"
+    },
+    {
+      "name": "eden_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_growing",
+      "type": "INT"
+    },
+    {
+      "name": "survivor_growing",
+      "type": "INT"
+    },
+    {
+      "name": "old_growing",
+      "type": "INT"
+    },
+    {
+      "name": "gc_duration",
+      "type": "DOUBLE"
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+@Plan:name('UsageFeatureProcessEP')
+
+-- @Plan:description('ExecutionPlan')
+
+@Plan:trace('true')
+@Plan:statistics('true')
+
+@Import('CPUUsageStream:1.0.0')
+define stream CPUUsageStream (time_stamp long, app_id string, process_cpu_load double, system_cpu_load double);
+
+@Import('MemoryUsageStream:1.0.0')
+define stream MemoryUsageStream (time_stamp long, app_id string, 
+								 max_heap long, allocated_heap long, used_heap long, 
+								 max_non_heap long, allocated_non_heap long, used_non_heap long, 
+								 pending_finalizations long
+								);
+
+@Import('GarbageCollectionStream:1.0.0')
+define stream GarbageCollectionStream (time_stamp long, app_id string, gc_type string, gc_cause string, gc_duration long, 
+									   eden_used_after long, eden_used_before long, survivor_used_after long, survivor_used_before long, old_used_after long, old_used_before long, 
+									   eden_committed_after long, eden_committed_before long, survivor_committed_after long, survivor_committed_before long, old_committed_after long, old_committed_before long, 
+									   eden_max_after long, eden_max_before long, survivor_max_after long, survivor_max_before long, old_max_after long, old_max_before long);
+
+
+/**
+
+@Export('ValidatedFeatureStream:1.0.0')
+define stream ValidatedFeatureStream (time_stamp long, app_id string, heap_used double, heap_allocated double, heap_used_change double, heap_allocated_change double, heap_used_growing int, heap_allocated_growing int, major_gc_freq double, major_gc_happend int, eden_change double, survivor_change double, old_change double, eden_growing int, survivor_growing int, old_growing int, gc_duration double);
+
+@Export('ValidatedFeatureStreamWithLag:1.0.0')
+define stream ValidatedFeatureStreamWithLag (app_id string, time_stamp_1 long, time_stamp_2 long, time_stamp_3 long, heap_used_1 double, heap_used_2 double, heap_used_3 double, heap_allocated_1 double, heap_allocated_2 double, heap_allocated_3 double, heap_used_change_1 double, heap_used_change_2 double, heap_used_change_3 double, heap_allocated_change_1 double, heap_allocated_change_2 double, heap_allocated_change_3 double, heap_used_growing_1 int, heap_used_growing_2 int, heap_used_growing_3 int, heap_allocated_growing_1 int, heap_allocated_growing_2 int, heap_allocated_growing_3 int, major_gc_freq_1 double, major_gc_freq_2 double, major_gc_freq_3 double, major_gc_happend_1 int, major_gc_happend_2 int, major_gc_happend_3 int, gc_duration_1 double, gc_duration_2 double, gc_duration_3 double, eden_change double, survivor_change double, old_change double, eden_growing int, survivor_growing int, old_growing int);
+
+
+/*process memory usage details into percentage values*/
+from MemoryUsageStream
+select 
+	time_stamp, 
+	app_id,
+	ifThenElse(max_heap > 0 , convert(allocated_heap, 'double')/max_heap, 0.0) as heap_allocated_percentage,
+	ifThenElse(allocated_heap > 0, convert(used_heap, 'double')/allocated_heap, 0.0) as heap_used_percentage,
+	used_heap,
+	max_heap, 
+	allocated_heap
+insert into ProcessedMemoryUsageStream;
+
+
+
+from every e1 = ProcessedMemoryUsageStream -> e2 = ProcessedMemoryUsageStream[e1.time_stamp < e2.time_stamp and e1.app_id == e2.app_id]
+select 
+	e2.time_stamp,
+	e2.app_id,
+	
+	ifThenElse(e2.used_heap >= e1.used_heap , 
+			   ifThenElse( e2.used_heap == 0 , 0.0, convert(e2.used_heap - e1.used_heap , 'double')/e2.used_heap),
+				convert(e1.used_heap - e2.used_heap , 'double')/e1.used_heap) as heap_used_change,
+				
+	ifThenElse(e2.allocated_heap == e1.allocated_heap,
+			   ifThenElse( e2.allocated_heap == 0 , 0.0 , convert(e2.allocated_heap - e1.allocated_heap, 'double')/e2.allocated_heap),
+			   convert(e1.allocated_heap - e2.allocated_heap, 'double')/e1.allocated_heap) as heap_allocated_change,
+			   
+	ifThenElse(e2.used_heap > e1.used_heap, 1,0) as heap_used_growing,
+	ifThenElse(e2.allocated_heap > e1.allocated_heap, 1,0) as heap_allocated_growing,
+	ifThenElse(e2.heap_used_percentage > 0.8 , (e2.heap_used_percentage - 0.8) * 5 , 0.0 ) as heap_used,
+	ifThenElse(e2.heap_allocated_percentage > 0.25 , (e2.heap_allocated_percentage - 0.25) * (3.0/4.0) , 0.0 ) as heap_allocated
+	
+insert into UsageFeatureStream;
+
+
+
+
+/*convert events attibute gc_type(major or minor) into to two attributes as major and minor*/
+from GarbageCollectionStream[gc_type == "major"] 
+select 
+	app_id,
+	time_stamp,
+	ifThenElse(gc_type is null, 0,ifThenElse( gc_type == "minor",1,0))as minor, 
+	ifThenElse(gc_type is null , 0 ,ifThenElse(gc_type == "major",1,0)) as major,
+	gc_cause, 
+	ifThenElse(gc_duration is null , 0L, gc_duration) as gc_duration,
+	ifThenElse(eden_used_after is null , 0L , eden_used_after) as eden_used_after,
+	ifThenElse(eden_used_before is null ,0L , eden_used_before) as eden_used_before, 
+	ifThenElse(survivor_used_after is null , 0L ,survivor_used_after) as survivor_used_after, 
+	ifThenElse(survivor_used_before is null, 0L , survivor_used_before) as survivor_used_before, 
+	ifThenElse(old_used_after is null , 0L , old_used_after) as old_used_after, 
+	ifThenElse(old_used_before is null,0L, old_used_before) as old_used_before, 
+	ifThenElse(eden_committed_after is null , 0L, eden_committed_after) as eden_committed_after, 
+	ifThenElse(eden_committed_before is null,0L , eden_committed_before) as eden_committed_before,
+	ifThenElse(survivor_committed_after is null,0L, survivor_committed_after) as survivor_committed_after,
+	ifThenElse(survivor_committed_before is null, 0L , survivor_committed_before) as survivor_committed_before,
+	ifThenElse(old_committed_after is null,0L, old_committed_after) as old_committed_after,
+	ifThenElse(old_committed_before is null,0L , old_committed_before) as old_committed_before,
+	ifThenElse(eden_max_after is null,0L , eden_max_after) as eden_max_after,
+	ifThenElse(eden_max_before is null,0L, eden_max_before) as eden_max_before,
+	ifThenElse(survivor_max_after is null, 0L , survivor_max_after) as survivor_max_after, 
+	ifThenElse(survivor_max_before is null, 0L, survivor_max_before) as survivor_max_before, 
+	ifThenElse(old_max_after is null, 0L , old_max_after) as old_max_after,
+	ifThenElse(old_max_before is null, 0L , old_max_before) as old_max_before
+	
+	having not (app_id is null or time_stamp is null)
+insert into GCValidatedStream;
+
+
+
+/*process garbage collection data to take average values for one interval(default 1 sec)*/
+from GCValidatedStream#window.timeBatch(1 sec)[major == 1]
+select
+	app_id,
+	
+	--time parameters
+	max(time_stamp) as time_stamp,
+	avg(gc_duration) as gc_duration,
+
+	--take count major gc frequencies 
+	convert(sum(major), 'double') as major_gc_freq,
+
+	--take average values of memory parameteres
+	avg(eden_used_after) as eden_used_after, avg(eden_used_before) as eden_used_before, 
+	avg(survivor_used_after) as survivor_used_after, avg(survivor_used_before) as survivor_used_before, 
+	avg(old_used_after) as old_used_after, avg(old_used_before) as old_used_before, 
+	avg(eden_committed_after) as eden_committed_after , avg(eden_committed_before) as eden_committed_before, 
+	avg(survivor_committed_after) as survivor_committed_after, avg(survivor_committed_before) as survivor_committed_before, 
+	avg(old_committed_after) as old_committed_after, avg(old_committed_before) as old_committed_before, 
+	avg(eden_max_after) as eden_max_after, avg(eden_max_before) as eden_max_before, 
+	avg(survivor_max_after) as survivor_max_after, avg(survivor_max_before) as survivor_max_before, 
+	avg(old_max_after) as old_max_after, avg(old_max_before) as old_max_before,
+
+	--memory cleared or growing
+	ifThenElse(avg(eden_used_before) >= avg(eden_used_after) , 0, 1 ) as eden_growing,
+	ifThenElse(avg(survivor_used_before) >= avg(survivor_used_after) , 0 , 1 ) as survivor_growing,
+	ifThenElse(avg(old_used_before) >= avg(old_used_after) , 0 , 1 ) as old_growing
+  
+  	group by app_id
+	
+	
+insert into GCProcessedStream;
+
+
+/*add a delay to wait UsageStreamEvents until the GC streams is processed
+from UsageStream#window.timeBatch(1 sec)
+select *
+insert expired events into UsageStreamNew;*/
+
+
+/*join the common usage data to GC processed data*/
+from  UsageFeatureStream#window.length(10) as U unidirectional left outer join GCProcessedStream#window.timeLength(5 sec , 5)  as G on ( U.time_stamp-1000 <= G.time_stamp and U.time_stamp >= G.time_stamp and U.app_id == G.app_id)
+select 
+	-------------General details----------------
+	U.time_stamp,
+	U.app_id,
+	
+	----------------Memory usages----------------
+	U.heap_used, 
+	U.heap_allocated,
+	U.heap_used_change,
+	U.heap_allocated_change,
+	U.heap_used_growing,
+	U.heap_allocated_growing,
+	
+	------------------GC logs--------------------
+	
+	--GC frequencies 
+	G.major_gc_freq,
+	ifThenElse(G.major_gc_freq > 0 , 1 , 0 ) as major_gc_happend,
+	
+	--cleared spaces as percentages 
+	ifThenElse(G.eden_used_before >= G.eden_used_after,
+	  ifThenElse(G.eden_used_before == 0 , 0.0 , (G.eden_used_before - G.eden_used_after)/ G.eden_used_before),
+	  	(G.eden_used_after - G.eden_used_before)/G.eden_used_after		
+	) as eden_change, 
+	eden_growing,
+
+	ifThenElse(G.survivor_used_before >= G.survivor_used_after,
+	  ifThenElse(G.survivor_used_before == 0 , 0.0 , (G.survivor_used_before - G.survivor_used_after) / G.survivor_used_before),
+	 	(G.survivor_used_after - G.survivor_used_before) / G.survivor_used_after	
+	) as survivor_change, 
+	survivor_growing,
+
+	ifThenElse(G.old_used_before >= G.old_used_after,
+	  ifThenElse(G.old_used_before == 0 , 0.0 ,(G.old_used_before - G.old_used_after) / G.old_used_before),
+	  	(G.old_used_after - G.old_used_before) / G.old_used_after		
+	) as old_change, 
+	old_growing,
+
+ 
+	--GC time features
+	G.gc_duration
+	
+insert into JoinedFeatureStream;
+
+
+/*validate the values of features*/
+from JoinedFeatureStream
+select 
+	time_stamp,
+	app_id,
+
+	--validate memory
+	heap_used, 
+	heap_allocated,
+	heap_used_change,
+	heap_allocated_change,
+	heap_used_growing,
+	heap_allocated_growing,
+
+
+	--normalize major gc frequencies
+	ifThenElse(major_gc_freq > 0 , ifThenElse(major_gc_freq < 10 , major_gc_freq/10 , 1.0 ), 0.0) as major_gc_freq, --maximum major gc frequency is taken as 10
+	major_gc_happend,
+	
+	--do not validate memory. they have been already validated
+	--if null then return 0
+	ifThenElse(eden_change is null , 0.0 , eden_change) as eden_change, 
+	ifThenElse(survivor_change is null, 0.0, survivor_change) as survivor_change, 
+	ifThenElse(old_change is null, 0.0, old_change) as old_change, 
+	ifThenElse(eden_growing is null , 0 , eden_growing) as eden_growing, 
+	ifThenElse(survivor_growing is null, 0, survivor_growing) as survivor_growing, 
+	ifThenElse(old_growing is null, 0, old_growing) as old_growing,
+		
+	ifThenElse(gc_duration > 0 , ifThenElse(gc_duration<100 , gc_duration/100 , 1.0),0.0 ) as gc_duration --maximum gc durations is taken as 100
+	
+insert into ValidatedFeatureStream;
+
+
+/*create a usage stream with time series of data*/
+from every( e1=ValidatedFeatureStream )-> e2=ValidatedFeatureStream[e2.time_stamp > e1.time_stamp and e1.app_id==e2.app_id] -> e3=ValidatedFeatureStream[e3.time_stamp > e2.time_stamp and e2.app_id==e3.app_id]
+select
+	e1.app_id,
+	e1.time_stamp as time_stamp_1, e2.time_stamp as time_stamp_2,  e3.time_stamp as time_stamp_3,
+	
+	e1.heap_used as heap_used_1, e2.heap_used as heap_used_2, e3.heap_used as heap_used_3, 
+	e1.heap_allocated as heap_allocated_1, e2.heap_allocated as heap_allocated_2, e3.heap_allocated as heap_allocated_3, 
+	e1.heap_used_change as heap_used_change_1, e2.heap_used_change as heap_used_change_2, e3.heap_used_change as heap_used_change_3,
+	e1.heap_allocated_change as heap_allocated_change_1 , e2.heap_allocated_change as heap_allocated_change_2 , e3.heap_allocated_change as heap_allocated_change_3,
+	e1.heap_used_growing as heap_used_growing_1 , e2.heap_used_growing as heap_used_growing_2, e3.heap_used_growing as heap_used_growing_3,
+	e1.heap_allocated_growing as heap_allocated_growing_1 , e2.heap_allocated_growing as heap_allocated_growing_2, e3.heap_allocated_growing as heap_allocated_growing_3,
+	
+	e1.major_gc_freq as major_gc_freq_1, e2.major_gc_freq as major_gc_freq_2, e3.major_gc_freq as major_gc_freq_3,
+	e1.major_gc_happend as major_gc_happend_1, e2.major_gc_happend as major_gc_happend_2, e3.major_gc_happend as major_gc_happend_3,
+	e1.gc_duration as gc_duration_1 , e2.gc_duration as gc_duration_2 , e3.gc_duration as gc_duration_3,
+	
+	
+	e3.eden_change, e3.survivor_change, e3.old_change, e3.eden_growing, e3.survivor_growing, e3.old_growing
+
+insert into ValidatedFeatureStreamWithLag;

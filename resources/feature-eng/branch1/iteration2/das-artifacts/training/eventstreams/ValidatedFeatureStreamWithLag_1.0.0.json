@@ -1,0 +1,156 @@
+{
+  "name": "ValidatedFeatureStreamWithLag",
+  "version": "1.0.0",
+  "nickName": "",
+  "description": "",
+  "payloadData": [
+    {
+      "name": "app_id",
+      "type": "STRING"
+    },
+    {
+      "name": "time_stamp_1",
+      "type": "LONG"
+    },
+    {
+      "name": "time_stamp_2",
+      "type": "LONG"
+    },
+    {
+      "name": "time_stamp_3",
+      "type": "LONG"
+    },
+    {
+      "name": "heap_used_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_change_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_change_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_change_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_change_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_change_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_allocated_change_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "heap_used_growing_1",
+      "type": "INT"
+    },
+    {
+      "name": "heap_used_growing_2",
+      "type": "INT"
+    },
+    {
+      "name": "heap_used_growing_3",
+      "type": "INT"
+    },
+    {
+      "name": "heap_allocated_growing_1",
+      "type": "INT"
+    },
+    {
+      "name": "heap_allocated_growing_2",
+      "type": "INT"
+    },
+    {
+      "name": "heap_allocated_growing_3",
+      "type": "INT"
+    },
+    {
+      "name": "major_gc_freq_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_freq_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_freq_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "major_gc_happend_1",
+      "type": "INT"
+    },
+    {
+      "name": "major_gc_happend_2",
+      "type": "INT"
+    },
+    {
+      "name": "major_gc_happend_3",
+      "type": "INT"
+    },
+    {
+      "name": "gc_duration_1",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "gc_duration_2",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "gc_duration_3",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "survivor_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "old_change",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "eden_growing",
+      "type": "INT"
+    },
+    {
+      "name": "survivor_growing",
+      "type": "INT"
+    },
+    {
+      "name": "old_growing",
+      "type": "INT"
+    }
+  ]
+}
