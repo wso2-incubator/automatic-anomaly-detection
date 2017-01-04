@@ -34,11 +34,6 @@
         </license>
     </licenses>
 
-    <modules>
-        <module>jvm-monitor-agent</module>
-        <module>features</module>
-    </modules>
-
     <repositories>
         <repository>
             <id>wso2-nexus</id>

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<artifact name="IterationThreeProcessedUsageEventStore" version="1.0.0" type="analytics/eventstore"
-          serverRole="DataAnalyticsServer">
-    <file>IterationThreeProcessedUsageStream.xml</file>
-</artifact>

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<artifact name="FeaturesSet3TimeSeries1" version="1.0.0" type="event/execution-plan"
-          serverRole="DataAnalyticsServer">
-    <file>FeaturesSet3TimeSeries1.siddhiql</file>
-</artifact>
